@@ -10,44 +10,42 @@ ScreenManager& ScreenManager::getInstance() {
 
 void ScreenManager::pushScreen(std::unique_ptr<Screen> screen) {
     if (!screens.empty()) {
-        screens.back()->pause();
+        screens.top()->pause();
     }
-    screens.push_back(std::move(screen));
+    screens.push(std::move(screen));
     spdlog::info("Pushed new screen. Total screens: {}", screens.size());
 }
 
 void ScreenManager::popScreen() {
     if (!screens.empty()) {
-        screens.pop_back();
+        screens.pop();
         spdlog::info("Popped screen. Remaining screens: {}", screens.size());
         if (!screens.empty()) {
-            screens.back()->resume();
+            screens.top()->resume();
         }
     }
 }
 
 void ScreenManager::handleInput(const sf::Event& event) {
     if (!screens.empty()) {
-        screens.back()->handleInput(event);
+        screens.top()->handleInput(event);
     }
 }
 
 void ScreenManager::update(float deltaTime) {
     if (!screens.empty()) {
-        screens.back()->update(deltaTime);
+        screens.top()->update(deltaTime);
     }
 }
 
 void ScreenManager::render(sf::RenderWindow& window) {
-    // Render all screens from bottom to top
-    // This allows for transparent overlays
-    for (const auto& screen : screens) {
-        screen->render(window);
+    if (!screens.empty()) {
+        screens.top()->render(window);
     }
 }
 
 Screen* ScreenManager::getCurrentScreen() {
-    return screens.empty() ? nullptr : screens.back().get();
+    return screens.empty() ? nullptr : screens.top().get();
 }
 
 bool ScreenManager::isEmpty() const {

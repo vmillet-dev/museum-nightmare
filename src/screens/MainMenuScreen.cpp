@@ -24,8 +24,9 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game) {
 void MainMenuScreen::handleInput(const sf::Event& event) {
     if (event.type == sf::Event::MouseMoved) {
         sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
+        sf::Vector2f mousePosFloat(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
         for (auto& button : buttons) {
-            button->handleInput(mousePos);
+            button->handleInput(mousePosFloat);
         }
     }
 }

@@ -18,6 +18,7 @@ public:
     sf::RenderWindow& getWindow();
 
 private:
+    void handleEvent(const sf::Event& event);
     void handleEvents();
     void update(float deltaTime);
     void render();

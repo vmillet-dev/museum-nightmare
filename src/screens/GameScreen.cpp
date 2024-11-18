@@ -44,15 +44,25 @@ void GameScreen::update(float deltaTime) {
     // Update player movement based on input
     if (playerPtr) {
         sf::Vector2f movement(0.0f, 0.0f);
-        float speed = ConfigManager::getInstance().getPlayerSpeed();
 
-        if (inputManager.isActionPressed(Action::MoveUp)) movement.y -= speed;
-        if (inputManager.isActionPressed(Action::MoveDown)) movement.y += speed;
-        if (inputManager.isActionPressed(Action::MoveLeft)) movement.x -= speed;
-        if (inputManager.isActionPressed(Action::MoveRight)) movement.x += speed;
+        if (inputManager.isActionPressed(Action::MoveUp)) movement.y = -1.0f;
+        if (inputManager.isActionPressed(Action::MoveDown)) movement.y = 1.0f;
+        if (inputManager.isActionPressed(Action::MoveLeft)) movement.x = -1.0f;
+        if (inputManager.isActionPressed(Action::MoveRight)) movement.x = 1.0f;
+
+        // Normalize movement vector if moving diagonally
+        if (movement.x != 0.0f && movement.y != 0.0f) {
+            float length = std::sqrt(movement.x * movement.x + movement.y * movement.y);
+            movement.x /= length;
+            movement.y /= length;
+            spdlog::debug("Normalized diagonal movement: ({}, {})", movement.x, movement.y);
+        }
 
         if (movement.x != 0.0f || movement.y != 0.0f) {
+            sf::Vector2f oldPos = playerPtr->getPosition();
             playerPtr->move(movement.x, movement.y, deltaTime);
+            spdlog::debug("Movement command: direction({}, {}), from({}, {})",
+                         movement.x, movement.y, oldPos.x, oldPos.y);
         }
     }
 

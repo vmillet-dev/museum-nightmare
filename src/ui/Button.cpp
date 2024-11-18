@@ -3,9 +3,7 @@
 
 namespace game {
 
-Button::Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size)
-    : position(position), size(size) {
-
+Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size) {
     // Load font
     if (!font.loadFromFile("resources/arial.ttf")) {
         spdlog::error("Failed to load font in Button!");
@@ -15,38 +13,52 @@ Button::Button(const std::string& text, const sf::Vector2f& position, const sf::
     shape.setSize(size);
     shape.setPosition(position);
     shape.setOrigin(size.x / 2, size.y / 2);
-    shape.setFillColor(sf::Color(100, 100, 100));
+    shape.setFillColor(defaultColor);
     shape.setOutlineThickness(2);
     shape.setOutlineColor(sf::Color::White);
 
     // Setup text
-    buttonText.setFont(font);
-    buttonText.setString(text);
-    buttonText.setCharacterSize(24);
-    buttonText.setFillColor(sf::Color::White);
+    text.setFont(font);
+    text.setString(buttonText);
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
 
     // Center text in button
-    sf::FloatRect textBounds = buttonText.getLocalBounds();
-    buttonText.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    buttonText.setPosition(position.x, position.y);
+    sf::FloatRect textBounds = text.getLocalBounds();
+    text.setOrigin(textBounds.width / 2, textBounds.height / 2);
+    text.setPosition(position.x, position.y);
+
+    isHovered = false;
 }
 
-void Button::setCallback(const std::function<void()>& callback) {
-    onClick = callback;
+void Button::handleInput(const sf::Vector2f& mousePos) {
+    bool wasHovered = isHovered;
+    isHovered = isMouseOver(mousePos);
+
+    // Handle hover state change
+    if (isHovered != wasHovered) {
+        shape.setFillColor(isHovered ? hoverColor : defaultColor);
+    }
+
+    // Handle click
+    if (isHovered && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        handleClick(mousePos);
+    }
+}
+
+void Button::setCallback(std::function<void()> newCallback) {
+    callback = std::move(newCallback);
 }
 
 void Button::handleClick(const sf::Vector2f& mousePos) {
-    if (isMouseOver(mousePos) && onClick) {
-        onClick();
+    if (callback) {
+        callback();
     }
 }
 
 void Button::handleHover(const sf::Vector2f& mousePos) {
-    if (isMouseOver(mousePos)) {
-        shape.setFillColor(sf::Color(150, 150, 150));
-    } else {
-        shape.setFillColor(sf::Color(100, 100, 100));
-    }
+    isHovered = isMouseOver(mousePos);
+    shape.setFillColor(isHovered ? hoverColor : defaultColor);
 }
 
 void Button::update(float deltaTime) {
@@ -55,12 +67,11 @@ void Button::update(float deltaTime) {
 
 void Button::render(sf::RenderWindow& window) {
     window.draw(shape);
-    window.draw(buttonText);
+    window.draw(text);
 }
 
 bool Button::isMouseOver(const sf::Vector2f& mousePos) const {
-    sf::FloatRect bounds = shape.getGlobalBounds();
-    return bounds.contains(mousePos);
+    return shape.getGlobalBounds().contains(mousePos);
 }
 
 } // namespace game

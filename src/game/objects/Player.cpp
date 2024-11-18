@@ -14,14 +14,21 @@ Player::Player(float x, float y) : GameObject(x, y), speed(200.0f) {
 
 void Player::update(float deltaTime) {
     // Calculate new position based on velocity
-    sf::Vector2f newPosition = position + (velocity * deltaTime);
+    sf::Vector2f newPosition = position + (velocity * speed * deltaTime);
 
-    // Store old position for collision resolution
+    // Store old position for logging
     sf::Vector2f oldPosition = position;
 
     // Update position
     position = newPosition;
     shape.setPosition(position);
+
+    if (oldPosition != position) {
+        spdlog::debug("Player moved from ({}, {}) to ({}, {}), velocity: ({}, {})",
+                     oldPosition.x, oldPosition.y,
+                     position.x, position.y,
+                     velocity.x, velocity.y);
+    }
 }
 
 void Player::render(sf::RenderWindow& window) {
@@ -67,10 +74,17 @@ void Player::handleCollision(GameObject* other) {
 }
 
 void Player::move(float dx, float dy, float deltaTime) {
-    position.x += dx * speed * deltaTime;
-    position.y += dy * speed * deltaTime;
-    shape.setPosition(position);
-    spdlog::debug("Player moved to ({}, {})", position.x, position.y);
+    sf::Vector2f newVelocity(dx, dy);
+
+    // Normalize velocity if moving diagonally
+    if (dx != 0 && dy != 0) {
+        float length = std::sqrt(dx * dx + dy * dy);
+        newVelocity.x /= length;
+        newVelocity.y /= length;
+    }
+
+    velocity = newVelocity;
+    spdlog::debug("Player velocity updated to ({}, {})", velocity.x, velocity.y);
 }
 
 } // namespace game

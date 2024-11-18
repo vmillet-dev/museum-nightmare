@@ -34,22 +34,36 @@ void InputManager::handleInput(const sf::Event& event) {
 }
 
 bool InputManager::isActionPressed(Action action) {
+    bool isPressed = false;
     switch (action) {
         case Action::MoveUp:
-            return sf::Keyboard::isKeyPressed(sf::Keyboard::Z);
+            isPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Z);
+            if (isPressed) spdlog::debug("Move Up action active");
+            break;
         case Action::MoveDown:
-            return sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+            isPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+            if (isPressed) spdlog::debug("Move Down action active");
+            break;
         case Action::MoveLeft:
-            return sf::Keyboard::isKeyPressed(sf::Keyboard::Q);
+            isPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Q);
+            if (isPressed) spdlog::debug("Move Left action active");
+            break;
         case Action::MoveRight:
-            return sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+            isPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+            if (isPressed) spdlog::debug("Move Right action active");
+            break;
         default:
-            return false;
+            break;
     }
+    return isPressed;
 }
 
 void InputManager::update() {
     // Update any continuous input states here if needed
+    if (isActionPressed(Action::MoveUp) || isActionPressed(Action::MoveDown) ||
+        isActionPressed(Action::MoveLeft) || isActionPressed(Action::MoveRight)) {
+        spdlog::debug("Movement input detected in update");
+    }
     spdlog::trace("InputManager updated");
 }
 

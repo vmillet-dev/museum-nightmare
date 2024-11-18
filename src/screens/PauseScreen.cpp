@@ -1,4 +1,5 @@
 #include "PauseScreen.hpp"
+#include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
 #include <spdlog/spdlog.h>
 
@@ -24,7 +25,7 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 350),
         sf::Vector2f(200, 50)
     );
-    mainMenuButton->setCallback([this]() {
+    mainMenuButton->setCallback([this, &game]() {
         spdlog::info("Returning to main menu");
         // Pop both pause screen and game screen
         ScreenManager::getInstance().popScreen();
@@ -51,26 +52,22 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
 }
 
 void PauseScreen::handleInput(const sf::Event& event) {
-    if (event.type == sf::Event::MouseButtonPressed) {
-        sf::Vector2f mousePos(
-            static_cast<float>(event.mouseButton.x),
-            static_cast<float>(event.mouseButton.y)
-        );
-        resumeButton->handleClick(mousePos);
-        mainMenuButton->handleClick(mousePos);
-    } else if (event.type == sf::Event::MouseMoved) {
-        sf::Vector2f mousePos(
-            static_cast<float>(event.mouseMove.x),
-            static_cast<float>(event.mouseMove.y)
-        );
-        resumeButton->handleHover(mousePos);
-        mainMenuButton->handleHover(mousePos);
+    if (event.type == sf::Event::MouseButtonPressed ||
+        event.type == sf::Event::MouseMoved) {
+        sf::Vector2i mousePos;
+        if (event.type == sf::Event::MouseButtonPressed) {
+            mousePos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+        } else {
+            mousePos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
+        }
+        sf::Vector2f mousePosFloat(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
+        resumeButton->handleInput(mousePosFloat);
+        mainMenuButton->handleInput(mousePosFloat);
     }
 }
 
 void PauseScreen::update(float deltaTime) {
-    resumeButton->update(deltaTime);
-    mainMenuButton->update(deltaTime);
+    // No update needed for buttons in our implementation
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {
