@@ -3,18 +3,11 @@
 #include <functional>
 #include <unordered_map>
 #include <spdlog/spdlog.h>
+#include <memory>
+#include "devices/IInputDevice.hpp"
+#include "Action.hpp"
 
 namespace game {
-
-enum class Action {
-    MoveUp,
-    MoveDown,
-    MoveLeft,
-    MoveRight,
-    Pause,
-    Confirm,
-    Cancel
-};
 
 class InputManager {
 public:
@@ -27,7 +20,7 @@ public:
     void update();
     void bindAction(Action action, std::function<void()> callback);
     void handleInput(const sf::Event& event);
-    bool isActionPressed(Action action);
+    bool isActionPressed(Action action) const;
     void setKeyState(sf::Keyboard::Key key, bool pressed); // New method
 
 private:
@@ -35,14 +28,12 @@ private:
     InputManager(const InputManager&) = delete;
     InputManager& operator=(const InputManager&) = delete;
 
-    std::unordered_map<sf::Keyboard::Key, Action> keyBindings;
+    void updateDevices();
+    void tryConnectController();
+
+    std::unordered_map<std::string, std::unique_ptr<IInputDevice>> devices;
     std::unordered_map<Action, std::function<void()>> actionCallbacks;
-    std::unordered_map<sf::Keyboard::Key, bool> keyStates; // Track key states
-    std::unordered_map<Action, unsigned int> controllerButtonBindings;
-    std::unordered_map<Action, sf::Joystick::Axis> controllerAxisBindings;
-    bool hasController = false;  // Track controller connection status
-    float controllerDeadzone = 20.0f;
-    float controllerSensitivity = 100.0f;
+    std::string lastActiveDevice;
 };
 
 } // namespace game
