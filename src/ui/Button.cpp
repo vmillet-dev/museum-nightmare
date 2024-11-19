@@ -5,7 +5,7 @@ namespace game {
 
 Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size) {
     // Load font
-    if (!font.loadFromFile("resources/arial.ttf")) {
+    if (!font.loadFromFile("assets/arial.ttf")) {
         spdlog::error("Failed to load font in Button!");
     }
 
