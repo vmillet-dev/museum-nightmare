@@ -6,22 +6,19 @@
 
 namespace game {
 
-Game::Game(bool testMode) : window(
+Game::Game() : window(
     sf::VideoMode(
         ConfigManager::getInstance().getWindowWidth(),
         ConfigManager::getInstance().getWindowHeight()
     ),
     ConfigManager::getInstance().getWindowTitle()
-), testMode(testMode), testDuration(0.0f) {
+) {
     spdlog::info("Initializing game...");
     auto& configManager = ConfigManager::getInstance();
     auto& inputManager = InputManager::getInstance();
     inputManager.init();
     ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
     spdlog::info("Game initialized successfully");
-    if (testMode) {
-        spdlog::info("Running in test mode");
-    }
 }
 
 void Game::run() {
@@ -44,16 +41,6 @@ void Game::run() {
             spdlog::debug("FPS: {}", frameCount);
             frameCount = 0;
             fpsTimer.restart();
-        }
-
-        // Test mode: exit after 5 seconds
-        if (testMode) {
-            testDuration += dt;
-            spdlog::debug("Test mode duration: {:.2f}/5.00 seconds", testDuration);
-            if (testDuration >= 5.0f) {
-                spdlog::info("Test mode: exiting after 5 seconds");
-                window.close();
-            }
         }
     }
 }
