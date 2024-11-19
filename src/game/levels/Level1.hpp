@@ -1,7 +1,7 @@
 #pragma once
 #include "../objects/Wall.hpp"
 #include "../objects/GameObjectManager.hpp"
-#include "LevelLoader.hpp"
+#include "GridLevelLoader.hpp"
 #include <vector>
 #include <memory>
 
@@ -11,9 +11,9 @@ class Level1 {
 public:
     static void loadLevel(GameObjectManager& gameObjects) {
         try {
-            LevelLoader::loadLevelFromFile("assets/levels/level1.txt", gameObjects);
+            GridLevelLoader::loadLevelFromFile("assets/levels/level1.txt", gameObjects);
         } catch (const std::exception& e) {
-            spdlog::error("Failed to load level: {}", e.what());
+            spdlog::error("Failed to load grid level: {}", e.what());
             // Fallback to hardcoded level if file loading fails
             loadHardcodedLevel(gameObjects);
         }

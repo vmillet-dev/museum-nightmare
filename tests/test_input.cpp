@@ -32,13 +32,14 @@ int main() {
     spdlog::info("Level 1 loaded successfully");
 
     // Verify level objects were loaded correctly
-    const int EXPECTED_OBJECTS = 12;  // 4 border walls + 6 display shelves + 2 pedestals
+    // Grid is 25x19, with 38 wall blocks (count from level1.txt)
+    const int EXPECTED_OBJECTS = 38;  // Counted from grid layout
     auto logGameState = [&gameObjects](const std::string& action) {
         spdlog::info("Game state after {}: Objects in level: {}",
                      action,
                      std::to_string(EXPECTED_OBJECTS));
     };
-    logGameState("initial load");
+    logGameState("initial grid load");
 
     // Create a headless rendering context for testing
     sf::RenderWindow window(sf::VideoMode(800, 600), "Input Test", sf::Style::None);
