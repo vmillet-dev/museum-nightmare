@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main", "feature/*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          build-essential \
+          libx11-dev \
+          xorg-dev \
+          libudev-dev \
+          libopenal-dev \
+          libvorbis-dev \
+          libflac-dev \
+          libxrandr-dev \
+          libfreetype6-dev \
+          libogg-dev
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+
+    - name: Build
+      run: |
+        cd build
+        make
+
+    - name: Test Run with Xvfb
+      run: |
+        cd build
+        xvfb-run --auto-servernum ./sfml_game --test-mode
