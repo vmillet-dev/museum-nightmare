@@ -18,6 +18,7 @@ private:
     sf::RectangleShape shape;
     float speed;
     sf::Vector2f velocity;
+    sf::Vector2u windowSize;  // Store window size
 };
 
 } // namespace game

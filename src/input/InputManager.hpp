@@ -28,6 +28,7 @@ public:
     void bindAction(Action action, std::function<void()> callback);
     void handleInput(const sf::Event& event);
     bool isActionPressed(Action action);
+    void setKeyState(sf::Keyboard::Key key, bool pressed); // New method
 
 private:
     InputManager() = default;
@@ -36,6 +37,8 @@ private:
 
     std::unordered_map<sf::Keyboard::Key, Action> keyBindings;
     std::unordered_map<Action, std::function<void()>> actionCallbacks;
+    std::unordered_map<sf::Keyboard::Key, bool> keyStates; // Track key states
+    bool hasController = false;  // Track controller connection status
 };
 
 } // namespace game

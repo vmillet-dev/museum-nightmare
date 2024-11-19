@@ -19,6 +19,15 @@ void Player::update(float deltaTime) {
     // Store old position for logging
     sf::Vector2f oldPosition = position;
 
+    // Clamp position to window bounds (using default window size if not set)
+    float halfWidth = shape.getSize().x / 2;
+    float halfHeight = shape.getSize().y / 2;
+    float maxX = (windowSize.x > 0) ? static_cast<float>(windowSize.x) : 800.0f;
+    float maxY = (windowSize.y > 0) ? static_cast<float>(windowSize.y) : 600.0f;
+
+    newPosition.x = std::max(halfWidth, std::min(newPosition.x, maxX - halfWidth));
+    newPosition.y = std::max(halfHeight, std::min(newPosition.y, maxY - halfHeight));
+
     // Update position
     position = newPosition;
     shape.setPosition(position);
@@ -32,6 +41,8 @@ void Player::update(float deltaTime) {
 }
 
 void Player::render(sf::RenderWindow& window) {
+    // Update window size
+    windowSize = window.getSize();
     window.draw(shape);
 }
 

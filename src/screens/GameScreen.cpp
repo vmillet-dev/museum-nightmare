@@ -1,6 +1,7 @@
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
 #include "../input/InputManager.hpp"
+#include "../game/levels/Level1.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -16,19 +17,8 @@ GameScreen::GameScreen(Game& game) : game(game) {
     playerPtr = player.get();  // Store raw pointer before moving ownership
     gameObjectManager->addObject(std::move(player));
 
-    // Create walls for the border
-    // Top wall
-    gameObjectManager->addObject(std::make_unique<Wall>(400.0f, 16.0f, 800.0f, 32.0f));
-    // Bottom wall
-    gameObjectManager->addObject(std::make_unique<Wall>(400.0f, 584.0f, 800.0f, 32.0f));
-    // Left wall
-    gameObjectManager->addObject(std::make_unique<Wall>(16.0f, 300.0f, 32.0f, 600.0f));
-    // Right wall
-    gameObjectManager->addObject(std::make_unique<Wall>(784.0f, 300.0f, 32.0f, 600.0f));
-
-    // Add some obstacles
-    gameObjectManager->addObject(std::make_unique<Wall>(300.0f, 200.0f, 32.0f, 200.0f));
-    gameObjectManager->addObject(std::make_unique<Wall>(500.0f, 400.0f, 32.0f, 200.0f));
+    // Load level
+    Level1::loadLevel(*gameObjectManager);
 }
 
 void GameScreen::handleInput(const sf::Event& event) {
@@ -45,10 +35,22 @@ void GameScreen::update(float deltaTime) {
     if (playerPtr) {
         sf::Vector2f movement(0.0f, 0.0f);
 
-        if (inputManager.isActionPressed(Action::MoveUp)) movement.y = -1.0f;
-        if (inputManager.isActionPressed(Action::MoveDown)) movement.y = 1.0f;
-        if (inputManager.isActionPressed(Action::MoveLeft)) movement.x = -1.0f;
-        if (inputManager.isActionPressed(Action::MoveRight)) movement.x = 1.0f;
+        if (inputManager.isActionPressed(Action::MoveUp)) {
+            movement.y = -1.0f;
+            spdlog::debug("GameScreen: MoveUp action detected");
+        }
+        if (inputManager.isActionPressed(Action::MoveDown)) {
+            movement.y = 1.0f;
+            spdlog::debug("GameScreen: MoveDown action detected");
+        }
+        if (inputManager.isActionPressed(Action::MoveLeft)) {
+            movement.x = -1.0f;
+            spdlog::debug("GameScreen: MoveLeft action detected");
+        }
+        if (inputManager.isActionPressed(Action::MoveRight)) {
+            movement.x = 1.0f;
+            spdlog::debug("GameScreen: MoveRight action detected");
+        }
 
         // Normalize movement vector if moving diagonally
         if (movement.x != 0.0f && movement.y != 0.0f) {
@@ -61,7 +63,7 @@ void GameScreen::update(float deltaTime) {
         if (movement.x != 0.0f || movement.y != 0.0f) {
             sf::Vector2f oldPos = playerPtr->getPosition();
             playerPtr->move(movement.x, movement.y, deltaTime);
-            spdlog::debug("Movement command: direction({}, {}), from({}, {})",
+            spdlog::debug("GameScreen: Movement command sent: direction({}, {}), from({}, {})",
                          movement.x, movement.y, oldPos.x, oldPos.y);
         }
     }
