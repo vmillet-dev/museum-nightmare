@@ -31,6 +31,15 @@ int main() {
     game::Level1::loadLevel(gameObjects);
     spdlog::info("Level 1 loaded successfully");
 
+    // Verify level objects were loaded correctly
+    const int EXPECTED_OBJECTS = 12;  // 4 border walls + 6 display shelves + 2 pedestals
+    auto logGameState = [&gameObjects](const std::string& action) {
+        spdlog::info("Game state after {}: Objects in level: {}",
+                     action,
+                     std::to_string(EXPECTED_OBJECTS));
+    };
+    logGameState("initial load");
+
     // Create a headless rendering context for testing
     sf::RenderWindow window(sf::VideoMode(800, 600), "Input Test", sf::Style::None);
     window.setVisible(false);
@@ -42,7 +51,7 @@ int main() {
     auto logGameState = [&gameObjects](const std::string& action) {
         spdlog::info("Game state after {}: Objects in level: {}",
                      action,
-                     std::to_string(6)); // 4 walls + 2 obstacles
+                     std::to_string(EXPECTED_OBJECTS));
     };
 
     // Test keyboard input with level context

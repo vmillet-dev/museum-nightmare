@@ -1,0 +1,21 @@
+# Level 1 - Museum Main Hall
+# Format: Type X Y Width Height
+# Border walls
+Wall 400.0 16.0 800.0 32.0    # Top wall
+Wall 400.0 584.0 800.0 32.0   # Bottom wall
+Wall 16.0 300.0 32.0 600.0    # Left wall
+Wall 784.0 300.0 32.0 600.0   # Right wall
+
+# Exhibition Area 1
+Wall 200.0 150.0 100.0 20.0   # Display shelf
+Wall 350.0 150.0 100.0 20.0   # Display shelf
+Wall 500.0 150.0 100.0 20.0   # Display shelf
+
+# Exhibition Area 2
+Wall 200.0 450.0 100.0 20.0   # Display shelf
+Wall 350.0 450.0 100.0 20.0   # Display shelf
+Wall 500.0 450.0 100.0 20.0   # Display shelf
+
+# Central obstacles
+Wall 300.0 300.0 64.0 64.0    # Statue pedestal
+Wall 500.0 300.0 64.0 64.0    # Statue pedestal
