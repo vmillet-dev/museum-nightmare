@@ -37,11 +37,26 @@ file(GLOB_RECURSE SOURCES
     "src/*.cpp"
 )
 
+# Remove main.cpp from sources
+list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
+
+# Create test executable
+add_executable(input_test tests/test_input.cpp ${SOURCES})
 
 # Link SFML, toml++ and spdlog
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    sfml-graphics
+    sfml-window
+    sfml-system
+    tomlplusplus::tomlplusplus
+    spdlog::spdlog
+)
+
+# Link libraries for test executable
+target_link_libraries(input_test PRIVATE
     sfml-graphics
     sfml-window
     sfml-system

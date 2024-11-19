@@ -38,7 +38,11 @@ private:
     std::unordered_map<sf::Keyboard::Key, Action> keyBindings;
     std::unordered_map<Action, std::function<void()>> actionCallbacks;
     std::unordered_map<sf::Keyboard::Key, bool> keyStates; // Track key states
+    std::unordered_map<Action, unsigned int> controllerButtonBindings;
+    std::unordered_map<Action, sf::Joystick::Axis> controllerAxisBindings;
     bool hasController = false;  // Track controller connection status
+    float controllerDeadzone = 20.0f;
+    float controllerSensitivity = 100.0f;
 };
 
 } // namespace game

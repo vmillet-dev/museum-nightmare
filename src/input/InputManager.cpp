@@ -1,19 +1,59 @@
 #include "InputManager.hpp"
+#include "../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
 void InputManager::init() {
     spdlog::info("Initializing InputManager");
+    auto& config = ConfigManager::getInstance();
 
     // Set up default key bindings
-    keyBindings[sf::Keyboard::Z] = Action::MoveUp;
-    keyBindings[sf::Keyboard::S] = Action::MoveDown;
-    keyBindings[sf::Keyboard::Q] = Action::MoveLeft;
-    keyBindings[sf::Keyboard::D] = Action::MoveRight;
-    keyBindings[sf::Keyboard::Escape] = Action::Pause;
-    keyBindings[sf::Keyboard::Return] = Action::Confirm;
-    keyBindings[sf::Keyboard::BackSpace] = Action::Cancel;
+    keyBindings[config.getKeyBinding("move_up")] = Action::MoveUp;
+    keyBindings[config.getKeyBinding("move_down")] = Action::MoveDown;
+    keyBindings[config.getKeyBinding("move_left")] = Action::MoveLeft;
+    keyBindings[config.getKeyBinding("move_right")] = Action::MoveRight;
+    keyBindings[config.getKeyBinding("pause")] = Action::Pause;
+    keyBindings[config.getKeyBinding("confirm")] = Action::Confirm;
+    keyBindings[config.getKeyBinding("cancel")] = Action::Cancel;
+    spdlog::debug("KB: ZQSD={}{}{}{}", config.getKeyBinding("move_up"), config.getKeyBinding("move_down"), config.getKeyBinding("move_left"), config.getKeyBinding("move_right"));
+
+    // Set up controller button bindings
+    controllerButtonBindings[Action::MoveUp] = config.getControllerButton("controller_move_up");
+    controllerButtonBindings[Action::MoveDown] = config.getControllerButton("controller_move_down");
+    controllerButtonBindings[Action::MoveLeft] = config.getControllerButton("controller_move_left");
+    controllerButtonBindings[Action::MoveRight] = config.getControllerButton("controller_move_right");
+    controllerButtonBindings[Action::Pause] = config.getControllerButton("controller_pause");
+    controllerButtonBindings[Action::Confirm] = config.getControllerButton("controller_confirm");
+    controllerButtonBindings[Action::Cancel] = config.getControllerButton("controller_cancel");
+    spdlog::debug("Ctrl bind: U{} D{} L{} R{} P{} OK{} C{}",
+                 controllerButtonBindings[Action::MoveUp], controllerButtonBindings[Action::MoveDown],
+                 controllerButtonBindings[Action::MoveLeft], controllerButtonBindings[Action::MoveRight],
+                 controllerButtonBindings[Action::Pause], controllerButtonBindings[Action::Confirm],
+                 controllerButtonBindings[Action::Cancel]);
+
+    // Initialize controller settings
+    hasController = config.isControllerEnabled() && sf::Joystick::isConnected(0);
+    controllerDeadzone = config.getControllerDeadzone();
+    controllerSensitivity = config.getControllerSensitivity();
+
+    // Initialize axis bindings
+    controllerAxisBindings[Action::MoveUp] = sf::Joystick::Y;
+    controllerAxisBindings[Action::MoveDown] = sf::Joystick::Y;
+    controllerAxisBindings[Action::MoveLeft] = sf::Joystick::X;
+    controllerAxisBindings[Action::MoveRight] = sf::Joystick::X;
+
+    spdlog::info("Input: KB(ZQSD), Ctrl(en:{},conn:{},dz:{:.1f},sens:{:.1f})",
+                 config.isControllerEnabled(), sf::Joystick::isConnected(0),
+                 controllerDeadzone, controllerSensitivity);
+
+    if (hasController) {
+        spdlog::info("Controller: {} buttons, X:{}, Y:{}, Sens:{:.1f}",
+                    sf::Joystick::getButtonCount(0),
+                    sf::Joystick::hasAxis(0, sf::Joystick::X),
+                    sf::Joystick::hasAxis(0, sf::Joystick::Y),
+                    controllerSensitivity);
+    }
 
     // Initialize all key states to false
     for (const auto& binding : keyBindings) {
@@ -65,39 +105,47 @@ bool InputManager::isActionPressed(Action action) {
         return sf::Keyboard::Unknown;
     };
 
-    switch (action) {
-        case Action::MoveUp: {
-            sf::Keyboard::Key key = findKeyForAction(Action::MoveUp);
-            keyboardPressed = keyStates[key];
-            joystickPressed = hasController && sf::Joystick::getAxisPosition(0, sf::Joystick::Y) < -20.0f;
-            break;
+    // Check keyboard input
+    sf::Keyboard::Key key = findKeyForAction(action);
+    keyboardPressed = keyStates[key];
+
+    // Check controller input if enabled
+    if (hasController) {
+        float xAxis = (sf::Joystick::getAxisPosition(0, sf::Joystick::X) / 100.0f) * controllerSensitivity;
+        float yAxis = (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) / 100.0f) * controllerSensitivity;
+
+        switch (action) {
+            case Action::MoveUp: {
+                float yAxis = (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) / 100.0f) * controllerSensitivity;
+                joystickPressed = yAxis < -controllerDeadzone || sf::Joystick::isButtonPressed(0, controllerButtonBindings[action]);
+            } break;
+            case Action::MoveDown: {
+                float yAxis = (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) / 100.0f) * controllerSensitivity;
+                joystickPressed = yAxis > controllerDeadzone || sf::Joystick::isButtonPressed(0, controllerButtonBindings[action]);
+            } break;
+            case Action::MoveLeft: {
+                float xAxis = (sf::Joystick::getAxisPosition(0, sf::Joystick::X) / 100.0f) * controllerSensitivity;
+                joystickPressed = xAxis < -controllerDeadzone || sf::Joystick::isButtonPressed(0, controllerButtonBindings[action]);
+            } break;
+            case Action::MoveRight: {
+                float xAxis = (sf::Joystick::getAxisPosition(0, sf::Joystick::X) / 100.0f) * controllerSensitivity;
+                joystickPressed = xAxis > controllerDeadzone || sf::Joystick::isButtonPressed(0, controllerButtonBindings[action]);
+            } break;
+            default:
+                if (auto it = controllerButtonBindings.find(action); it != controllerButtonBindings.end()) {
+                    joystickPressed = sf::Joystick::isButtonPressed(0, it->second);
+                    if (joystickPressed) spdlog::debug("Button {} pressed for action {}", it->second, static_cast<int>(action));
+                }
+                break;
         }
-        case Action::MoveDown: {
-            sf::Keyboard::Key key = findKeyForAction(Action::MoveDown);
-            keyboardPressed = keyStates[key];
-            joystickPressed = hasController && sf::Joystick::getAxisPosition(0, sf::Joystick::Y) > 20.0f;
-            break;
-        }
-        case Action::MoveLeft: {
-            sf::Keyboard::Key key = findKeyForAction(Action::MoveLeft);
-            keyboardPressed = keyStates[key];
-            joystickPressed = hasController && sf::Joystick::getAxisPosition(0, sf::Joystick::X) < -20.0f;
-            break;
-        }
-        case Action::MoveRight: {
-            sf::Keyboard::Key key = findKeyForAction(Action::MoveRight);
-            keyboardPressed = keyStates[key];
-            joystickPressed = hasController && sf::Joystick::getAxisPosition(0, sf::Joystick::X) > 20.0f;
-            break;
-        }
-        default:
-            break;
     }
 
     isPressed = keyboardPressed || joystickPressed;
-    if (isPressed) {
-        spdlog::debug("InputManager: Action {} detected - Keyboard: {}, Joystick: {}",
-                     static_cast<int>(action), keyboardPressed, joystickPressed);
+    if (isPressed && hasController) {
+        spdlog::debug("Input[{}]: KB:{} Ctrl:{} XY({:.1f},{:.1f})",
+            static_cast<int>(action), keyboardPressed, joystickPressed,
+            (sf::Joystick::getAxisPosition(0, sf::Joystick::X) / 100.0f) * controllerSensitivity,
+            (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) / 100.0f) * controllerSensitivity);
     }
     return isPressed;
 }
@@ -108,11 +156,18 @@ void InputManager::update() {
     hasController = sf::Joystick::isConnected(0);
 
     if (wasControllerConnected != hasController) {
-        if (hasController) {
-            spdlog::info("Controller connected");
-        } else {
-            spdlog::info("Controller disconnected");
-        }
+        spdlog::info("Controller {}: Btn:{} Axes(X:{},Y:{})",
+            hasController?"connected":"disconnected",
+            sf::Joystick::getButtonCount(0),
+            sf::Joystick::hasAxis(0, sf::Joystick::X),
+            sf::Joystick::hasAxis(0, sf::Joystick::Y));
+    }
+
+    // Log controller axis positions when connected
+    if (hasController) {
+        spdlog::debug("Axes: XY({:.1f},{:.1f})",
+            (sf::Joystick::getAxisPosition(0, sf::Joystick::X) / 100.0f) * controllerSensitivity,
+            (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) / 100.0f) * controllerSensitivity);
     }
 }
 

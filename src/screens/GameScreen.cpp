@@ -37,19 +37,19 @@ void GameScreen::update(float deltaTime) {
 
         if (inputManager.isActionPressed(Action::MoveUp)) {
             movement.y = -1.0f;
-            spdlog::debug("GameScreen: MoveUp action detected");
+            spdlog::debug("Move Up - Input detected");
         }
         if (inputManager.isActionPressed(Action::MoveDown)) {
             movement.y = 1.0f;
-            spdlog::debug("GameScreen: MoveDown action detected");
+            spdlog::debug("Move Down - Input detected");
         }
         if (inputManager.isActionPressed(Action::MoveLeft)) {
             movement.x = -1.0f;
-            spdlog::debug("GameScreen: MoveLeft action detected");
+            spdlog::debug("Move Left - Input detected");
         }
         if (inputManager.isActionPressed(Action::MoveRight)) {
             movement.x = 1.0f;
-            spdlog::debug("GameScreen: MoveRight action detected");
+            spdlog::debug("Move Right - Input detected");
         }
 
         // Normalize movement vector if moving diagonally
@@ -57,14 +57,14 @@ void GameScreen::update(float deltaTime) {
             float length = std::sqrt(movement.x * movement.x + movement.y * movement.y);
             movement.x /= length;
             movement.y /= length;
-            spdlog::debug("Normalized diagonal movement: ({}, {})", movement.x, movement.y);
+            spdlog::debug("Diagonal movement normalized: ({:.2f},{:.2f})", movement.x, movement.y);
         }
 
         if (movement.x != 0.0f || movement.y != 0.0f) {
             sf::Vector2f oldPos = playerPtr->getPosition();
             playerPtr->move(movement.x, movement.y, deltaTime);
-            spdlog::debug("GameScreen: Movement command sent: direction({}, {}), from({}, {})",
-                         movement.x, movement.y, oldPos.x, oldPos.y);
+            spdlog::debug("Player moved: dir({:.2f},{:.2f}), from({:.1f},{:.1f}), dt:{:.3f}",
+                movement.x, movement.y, oldPos.x, oldPos.y, deltaTime);
         }
     }
 
@@ -76,12 +76,8 @@ void GameScreen::render(sf::RenderWindow& window) {
     gameObjectManager->render(window);
 }
 
-void GameScreen::pause() {
-    spdlog::info("Game paused");
-}
+void GameScreen::pause() { spdlog::info("Game state: paused"); }
 
-void GameScreen::resume() {
-    spdlog::info("Game resumed");
-}
+void GameScreen::resume() { spdlog::info("Game state: resumed"); }
 
 } // namespace game

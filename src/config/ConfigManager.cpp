@@ -5,13 +5,22 @@
 namespace game {
 
 ConfigManager::ConfigManager() {
+    // Initialize key name mapping
+    keyNameMap = {
+        {"Z", sf::Keyboard::Z}, {"S", sf::Keyboard::S},
+        {"Q", sf::Keyboard::Q}, {"D", sf::Keyboard::D},
+        {"Escape", sf::Keyboard::Escape},
+        {"Return", sf::Keyboard::Return},
+        {"BackSpace", sf::Keyboard::BackSpace}
+    };
+    spdlog::debug("Input config: KB(ZQSD), Ctrl({})", isControllerEnabled());
     loadConfig();
 }
 
 void ConfigManager::loadConfig() {
     try {
         config = toml::parse_file("resources/config.toml");
-        spdlog::info("Config file loaded successfully");
+        spdlog::info("Config loaded - Controller(enabled:{},deadzone:{:.1f},sens:{:.1f})", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
 
         // Set up logging level from config
         std::string logLevel = config["debug"]["level"].value_or("info");
@@ -32,7 +41,7 @@ void ConfigManager::loadConfig() {
 }
 
 void ConfigManager::createDefaultConfig() {
-    spdlog::info("Creating default config");
+    spdlog::info("Creating default config with controller settings");
     config = toml::table{
         {"window", toml::table{
             {"width", 800},
@@ -45,16 +54,34 @@ void ConfigManager::createDefaultConfig() {
         }},
         {"debug", toml::table{
             {"level", "info"}
+        }},
+        {"controls", toml::table{
+            {"move_up", "Z"},
+            {"move_down", "S"},
+            {"move_left", "Q"},
+            {"move_right", "D"},
+            {"pause", "Escape"},
+            {"confirm", "Return"},
+            {"cancel", "BackSpace"},
+            {"controller_enabled", true},
+            {"controller_deadzone", 20.0},
+            {"controller_sensitivity", 100.0},
+            {"controller_move_up", 0},
+            {"controller_move_down", 1},
+            {"controller_move_left", 2},
+            {"controller_move_right", 3},
+            {"controller_pause", 7},
+            {"controller_confirm", 4},
+            {"controller_cancel", 5}
         }}
     };
-
     saveConfig();
 }
 
 void ConfigManager::saveConfig() {
     std::ofstream file("resources/config.toml");
     file << config;
-    spdlog::info("Config saved successfully");
+    spdlog::info("Config saved with controller settings: enabled={}, deadzone={:.1f}, sensitivity={:.1f}", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
 }
 
 int ConfigManager::getWindowWidth() const {
@@ -75,6 +102,42 @@ float ConfigManager::getPlayerSpeed() const {
 
 float ConfigManager::getPlayerSize() const {
     return config["player"]["size"].value_or(32.0f);
+}
+
+sf::Keyboard::Key ConfigManager::stringToKey(const std::string& keyName) const {
+    auto it = keyNameMap.find(keyName);
+    return it != keyNameMap.end() ? it->second : sf::Keyboard::Unknown;
+}
+
+sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
+    std::string keyName = config["controls"][action].value_or("");
+    auto key = stringToKey(keyName);
+    spdlog::debug("Key binding: {} -> {}", action, keyName);
+    return key;
+}
+
+bool ConfigManager::isControllerEnabled() const {
+    bool enabled = config["controls"]["controller_enabled"].value_or(true);
+    spdlog::debug("Controller enabled: {}", enabled);
+    return enabled;
+}
+
+float ConfigManager::getControllerDeadzone() const {
+    float deadzone = config["controls"]["controller_deadzone"].value_or(20.0f);
+    spdlog::debug("Controller deadzone: {:.1f}", deadzone);
+    return deadzone;
+}
+
+float ConfigManager::getControllerSensitivity() const {
+    float sensitivity = config["controls"]["controller_sensitivity"].value_or(100.0f);
+    spdlog::debug("Controller sensitivity: {:.1f}", sensitivity);
+    return sensitivity;
+}
+
+unsigned int ConfigManager::getControllerButton(const std::string& action) const {
+    unsigned int button = static_cast<unsigned int>(config["controls"][action].value_or(0));
+    spdlog::debug("Controller button for {}: {}", action, button);
+    return button;
 }
 
 } // namespace game

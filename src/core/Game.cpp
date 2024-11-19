@@ -136,7 +136,11 @@ void Game::handleEvent(const sf::Event& event) {
             case sf::Keyboard::S: keyName = "Move Down (S)"; break;
             case sf::Keyboard::Q: keyName = "Move Left (Q)"; break;
             case sf::Keyboard::D: keyName = "Move Right (D)"; break;
-            case sf::Keyboard::Escape: keyName = "Escape"; break;
+            case sf::Keyboard::Escape:
+                keyName = "Escape";
+                spdlog::info("Escape pressed, quitting game");
+                window.close();
+                break;
             default: return; // Skip logging unknown keys
         }
         spdlog::debug("Key pressed: {}", keyName);

@@ -33,7 +33,7 @@ void Player::update(float deltaTime) {
     shape.setPosition(position);
 
     if (oldPosition != position) {
-        spdlog::debug("Player moved from ({}, {}) to ({}, {}), velocity: ({}, {})",
+        spdlog::debug("Pos:({:.1f},{:.1f})->({:.1f},{:.1f}) Vel:({:.1f},{:.1f})",
                      oldPosition.x, oldPosition.y,
                      position.x, position.y,
                      velocity.x, velocity.y);
@@ -68,6 +68,7 @@ void Player::handleCollision(GameObject* other) {
         // Find smallest overlap
         float minOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
 
+        sf::Vector2f oldPos = position;
         // Resolve collision
         if (minOverlap == overlapLeft) {
             position.x = wallBounds.left - (playerBounds.width / 2);
@@ -81,21 +82,19 @@ void Player::handleCollision(GameObject* other) {
 
         // Update shape position
         shape.setPosition(position);
+        spdlog::debug("Collision resolved: from({:.1f},{:.1f}) to({:.1f},{:.1f})", oldPos.x, oldPos.y, position.x, position.y);
     }
 }
 
 void Player::move(float dx, float dy, float deltaTime) {
     sf::Vector2f newVelocity(dx, dy);
-
-    // Normalize velocity if moving diagonally
     if (dx != 0 && dy != 0) {
         float length = std::sqrt(dx * dx + dy * dy);
         newVelocity.x /= length;
         newVelocity.y /= length;
+        spdlog::debug("Normalized movement: ({:.2f},{:.2f})", newVelocity.x, newVelocity.y);
     }
-
     velocity = newVelocity;
-    spdlog::debug("Player velocity updated to ({}, {})", velocity.x, velocity.y);
 }
 
 } // namespace game
