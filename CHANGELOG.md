@@ -1,3 +1,7 @@
+## [v0.1.0] - 2024-11-20
+
+- No changes
+
 # Changelog
 All notable changes to Museum Nightmare will be documented in this file.
 
