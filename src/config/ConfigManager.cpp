@@ -19,7 +19,7 @@ ConfigManager::ConfigManager() {
 
 void ConfigManager::loadConfig() {
     try {
-        config = toml::parse_file("resources/config.toml");
+        config = toml::parse_file("assets/config.toml");
         spdlog::info("Config loaded - Controller(enabled:{},deadzone:{:.1f},sens:{:.1f})", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
 
         // Set up logging level from config
@@ -79,7 +79,7 @@ void ConfigManager::createDefaultConfig() {
 }
 
 void ConfigManager::saveConfig() {
-    std::ofstream file("resources/config.toml");
+    std::ofstream file("assets/config.toml");
     file << config;
     spdlog::info("Config saved with controller settings: enabled={}, deadzone={:.1f}, sensitivity={:.1f}", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
 }

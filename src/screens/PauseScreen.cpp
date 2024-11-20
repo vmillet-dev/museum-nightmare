@@ -35,7 +35,7 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     });
 
     // Load font
-    if (!font.loadFromFile("resources/arial.ttf")) {
+    if (!font.loadFromFile("assets/arial.ttf")) {
         spdlog::error("Failed to load font!");
     }
 

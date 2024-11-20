@@ -24,7 +24,6 @@ Game::Game() : window(
 void Game::run() {
     sf::Clock clock;
     sf::Clock fpsTimer;
-    float testInputTimer = 0.0f;
     int frameCount = 0;
     bool testSequenceActive = false;
     int currentTestStep = 0;
@@ -32,28 +31,25 @@ void Game::run() {
     float stepTimer = 0.0f;
     bool keyPressed = false;
 
-    // Initialize input system
-    InputManager::getInstance().init();
-
-    // Define test sequence for input system verification
-    const std::vector<std::pair<std::string, Action>> testSequence = {
-        {"Move Up", Action::MoveUp},
-        {"Move Down", Action::MoveDown},
-        {"Move Left", Action::MoveLeft},
-        {"Move Right", Action::MoveRight}
+    // Define test sequence keys
+    const std::vector<sf::Keyboard::Key> testSequence = {
+        sf::Keyboard::Z,    // Move up
+        sf::Keyboard::S,    // Move down
+        sf::Keyboard::Q,    // Move left
+        sf::Keyboard::D     // Move right
     };
 
     while (window.isOpen()) {
         sf::Time deltaTime = clock.restart();
         float dt = deltaTime.asSeconds();
 
-        // Handle real events first
+        // Handle real events
         handleEvents();
 
         // Test sequence logic
         testInputTimer += dt;
         if (testInputTimer >= 2.0f && !testSequenceActive) {
-            spdlog::info("Starting input system test sequence...");
+            spdlog::info("Starting input test sequence...");
             testSequenceActive = true;
             currentTestStep = 0;
             stepTimer = 0.0f;
@@ -64,28 +60,48 @@ void Game::run() {
         if (testSequenceActive) {
             stepTimer += dt;
 
-            // Test each action in sequence
+            // Keep the current test key "pressed" for most of the step duration
             if (currentTestStep < testSequence.size()) {
-                auto& [actionName, action] = testSequence[currentTestStep];
-
                 if (stepTimer < TEST_STEP_DURATION * 0.8f && !keyPressed) {
-                    spdlog::debug("Testing action: {}", actionName);
+                    // Simulate key press at start of step
+                    sf::Event keyEvent;
+                    keyEvent.type = sf::Event::KeyPressed;
+                    keyEvent.key.code = testSequence[currentTestStep];
+                    keyEvent.key.alt = false;
+                    keyEvent.key.control = false;
+                    keyEvent.key.shift = false;
+                    keyEvent.key.system = false;
+
+                    switch (testSequence[currentTestStep]) {
+                        case sf::Keyboard::Z:
+                            spdlog::debug("Test sequence: Move Up (Z)");
+                            break;
+                        case sf::Keyboard::S:
+                            spdlog::debug("Test sequence: Move Down (S)");
+                            break;
+                        case sf::Keyboard::Q:
+                            spdlog::debug("Test sequence: Move Left (Q)");
+                            break;
+                        case sf::Keyboard::D:
+                            spdlog::debug("Test sequence: Move Right (D)");
+                            break;
+                    }
+
+                    // Process the simulated key event and set key state
+                    handleEvent(keyEvent);
+                    InputManager::getInstance().setKeyState(testSequence[currentTestStep], true);
                     keyPressed = true;
                 } else if (stepTimer >= TEST_STEP_DURATION) {
-                    // Move to next test
+                    // Release key and move to next step
+                    InputManager::getInstance().setKeyState(testSequence[currentTestStep], false);
                     currentTestStep++;
                     stepTimer = 0.0f;
                     keyPressed = false;
 
                     if (currentTestStep >= testSequence.size()) {
                         testSequenceActive = false;
-                        spdlog::info("Input system test sequence completed");
+                        spdlog::info("Input test sequence completed");
                     }
-                }
-
-                // Check if action is registered
-                if (InputManager::getInstance().isActionPressed(action)) {
-                    spdlog::debug("Action {} detected", actionName);
                 }
             }
         }
