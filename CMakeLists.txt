@@ -17,10 +17,13 @@ file(GLOB_RECURSE SOURCES
 # Remove main.cpp from sources
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-# Create executable
+# Create main executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
-# Link SFML, toml++ and spdlog
+# Create input system test executable
+add_executable(input_system_test ${SOURCES} tests/input_system_test.cpp)
+
+# Link SFML, toml++ and spdlog for main executable
 target_link_libraries(${PROJECT_NAME} PRIVATE
     sfml-graphics
     sfml-window
@@ -29,5 +32,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog::spdlog
 )
 
+# Link libraries for input system test
+target_link_libraries(input_system_test PRIVATE
+    sfml-graphics
+    sfml-window
+    sfml-system
+    tomlplusplus::tomlplusplus
+    spdlog::spdlog
+)
+
 # Copy assets to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+add_custom_command(TARGET input_system_test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)

@@ -7,13 +7,25 @@ namespace game {
 ConfigManager::ConfigManager() {
     // Initialize key name mapping
     keyNameMap = {
-        {"Z", sf::Keyboard::Z}, {"S", sf::Keyboard::S},
-        {"Q", sf::Keyboard::Q}, {"D", sf::Keyboard::D},
+        {"W", sf::Keyboard::W}, {"A", sf::Keyboard::A},
+        {"S", sf::Keyboard::S}, {"D", sf::Keyboard::D},
         {"Escape", sf::Keyboard::Escape},
         {"Return", sf::Keyboard::Return},
-        {"BackSpace", sf::Keyboard::BackSpace}
+        {"Space", sf::Keyboard::Space}
     };
-    spdlog::debug("Input config: KB(ZQSD), Ctrl({})", isControllerEnabled());
+
+    // Initialize axis name mapping
+    axisNameMap = {
+        {"X", sf::Joystick::X},
+        {"Y", sf::Joystick::Y},
+        {"Z", sf::Joystick::Z},
+        {"R", sf::Joystick::R},
+        {"U", sf::Joystick::U},
+        {"V", sf::Joystick::V},
+        {"PovX", sf::Joystick::PovX},
+        {"PovY", sf::Joystick::PovY}
+    };
+
     loadConfig();
 }
 
@@ -35,7 +47,6 @@ void ConfigManager::loadConfig() {
         }
     } catch (const toml::parse_error& err) {
         spdlog::error("Failed to parse config file: {}", err.description());
-        // Create default config
         createDefaultConfig();
     }
 }
@@ -56,23 +67,33 @@ void ConfigManager::createDefaultConfig() {
             {"level", "info"}
         }},
         {"controls", toml::table{
-            {"move_up", "Z"},
-            {"move_down", "S"},
-            {"move_left", "Q"},
-            {"move_right", "D"},
-            {"pause", "Escape"},
-            {"confirm", "Return"},
-            {"cancel", "BackSpace"},
-            {"controller_enabled", true},
-            {"controller_deadzone", 20.0},
-            {"controller_sensitivity", 100.0},
-            {"controller_move_up", 0},
-            {"controller_move_down", 1},
-            {"controller_move_left", 2},
-            {"controller_move_right", 3},
-            {"controller_pause", 7},
-            {"controller_confirm", 4},
-            {"controller_cancel", 5}
+            {"keyboard", toml::table{
+                {"move_up", "W"},
+                {"move_down", "S"},
+                {"move_left", "A"},
+                {"move_right", "D"},
+                {"pause", "Escape"},
+                {"confirm", "Return"},
+                {"cancel", "Space"}
+            }},
+            {"controller", toml::table{
+                {"enabled", true},
+                {"deadzone", 20.0},
+                {"sensitivity", 100.0},
+                {"buttons", toml::table{
+                    {"move_up", 0},
+                    {"move_down", 1},
+                    {"move_left", 2},
+                    {"move_right", 3},
+                    {"pause", 7},
+                    {"confirm", 0},
+                    {"cancel", 1}
+                }},
+                {"axes", toml::table{
+                    {"horizontal", "X"},
+                    {"vertical", "Y"}
+                }}
+            }}
         }}
     };
     saveConfig();
@@ -81,7 +102,8 @@ void ConfigManager::createDefaultConfig() {
 void ConfigManager::saveConfig() {
     std::ofstream file("assets/config.toml");
     file << config;
-    spdlog::info("Config saved with controller settings: enabled={}, deadzone={:.1f}, sensitivity={:.1f}", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
+    spdlog::info("Config saved with controller settings: enabled={}, deadzone={:.1f}, sensitivity={:.1f}",
+        isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
 }
 
 int ConfigManager::getWindowWidth() const {
@@ -110,32 +132,32 @@ sf::Keyboard::Key ConfigManager::stringToKey(const std::string& keyName) const {
 }
 
 sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
-    std::string keyName = config["controls"][action].value_or("");
+    std::string keyName = config["controls"]["keyboard"][action].value_or("");
     auto key = stringToKey(keyName);
     spdlog::debug("Key binding: {} -> {}", action, keyName);
     return key;
 }
 
 bool ConfigManager::isControllerEnabled() const {
-    bool enabled = config["controls"]["controller_enabled"].value_or(true);
+    bool enabled = config["controls"]["controller"]["enabled"].value_or(true);
     spdlog::debug("Controller enabled: {}", enabled);
     return enabled;
 }
 
 float ConfigManager::getControllerDeadzone() const {
-    float deadzone = config["controls"]["controller_deadzone"].value_or(20.0f);
+    float deadzone = config["controls"]["controller"]["deadzone"].value_or(20.0f);
     spdlog::debug("Controller deadzone: {:.1f}", deadzone);
     return deadzone;
 }
 
 float ConfigManager::getControllerSensitivity() const {
-    float sensitivity = config["controls"]["controller_sensitivity"].value_or(100.0f);
+    float sensitivity = config["controls"]["controller"]["sensitivity"].value_or(100.0f);
     spdlog::debug("Controller sensitivity: {:.1f}", sensitivity);
     return sensitivity;
 }
 
 unsigned int ConfigManager::getControllerButton(const std::string& action) const {
-    unsigned int button = static_cast<unsigned int>(config["controls"][action].value_or(0));
+    unsigned int button = static_cast<unsigned int>(config["controls"]["controller"]["buttons"][action].value_or(0));
     spdlog::debug("Controller button for {}: {}", action, button);
     return button;
 }

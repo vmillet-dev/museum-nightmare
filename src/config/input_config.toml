@@ -1,0 +1,28 @@
+# Input Configuration
+
+[keyboard]
+move_up = "W"
+move_down = "S"
+move_left = "A"
+move_right = "D"
+pause = "Escape"
+confirm = "Return"
+cancel = "Space"
+
+[controller]
+enabled = true
+deadzone = 20.0
+sensitivity = 100.0
+
+[controller.buttons]
+move_up = 0     # D-pad Up
+move_down = 1   # D-pad Down
+move_left = 2   # D-pad Left
+move_right = 3  # D-pad Right
+pause = 7       # Start button
+confirm = 0     # A button
+cancel = 1      # B button
+
+[controller.axes]
+horizontal = "X"  # Left stick X-axis
+vertical = "Y"    # Left stick Y-axis

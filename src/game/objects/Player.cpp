@@ -1,15 +1,60 @@
 #include "Player.hpp"
 #include "Wall.hpp"
 #include <spdlog/spdlog.h>
+#include "../../input/InputManager.hpp"
 
 namespace game {
 
-Player::Player(float x, float y) : GameObject(x, y), speed(200.0f) {
+Player::Player(float x, float y) : GameObject(x, y), speed(200.0f), isMoving(false) {
     shape.setSize(sf::Vector2f(32.0f, 32.0f));
     shape.setFillColor(sf::Color::Green);
     shape.setOrigin(16.0f, 16.0f);
     shape.setPosition(position);
     spdlog::info("Player created at position ({}, {})", x, y);
+
+    bindInputActions();
+}
+
+void Player::bindInputActions() {
+    auto& inputManager = InputManager::getInstance();
+
+    inputManager.bindAction(Action::MoveLeft, [this]() { handleMoveAction(Action::MoveLeft); });
+    inputManager.bindAction(Action::MoveRight, [this]() { handleMoveAction(Action::MoveRight); });
+    inputManager.bindAction(Action::MoveUp, [this]() { handleMoveAction(Action::MoveUp); });
+    inputManager.bindAction(Action::MoveDown, [this]() { handleMoveAction(Action::MoveDown); });
+
+    inputManager.bindAction(Action::Confirm, [this]() { handleInteractAction(Action::Confirm); });
+    inputManager.bindAction(Action::Cancel, [this]() { handleInteractAction(Action::Cancel); });
+}
+
+void Player::handleMoveAction(Action action) {
+    float dx = 0.0f, dy = 0.0f;
+
+    switch (action) {
+        case Action::MoveLeft:  dx = -1.0f; break;
+        case Action::MoveRight: dx = 1.0f;  break;
+        case Action::MoveUp:    dy = -1.0f; break;
+        case Action::MoveDown:  dy = 1.0f;  break;
+        default: break;
+    }
+
+    if (dx != 0.0f || dy != 0.0f) {
+        isMoving = true;
+        move(dx, dy, 1.0f/60.0f);
+    }
+}
+
+void Player::handleInteractAction(Action action) {
+    switch (action) {
+        case Action::Confirm:
+            spdlog::debug("Player confirmed action at position ({}, {})", position.x, position.y);
+            break;
+        case Action::Cancel:
+            spdlog::debug("Player cancelled action at position ({}, {})", position.x, position.y);
+            break;
+        default:
+            break;
+    }
 }
 
 void Player::update(float deltaTime) {

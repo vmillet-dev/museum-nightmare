@@ -16,8 +16,13 @@ public:
     void setPosition(const sf::Vector2f& newPosition);
     const sf::Vector2f& getPosition() const;
 
+    // New ID-related methods
+    void setId(size_t newId) { id = newId; }
+    size_t getId() const { return id; }
+
 protected:
     sf::Vector2f position;
+    size_t id = 0;  // Default ID
 };
 
 } // namespace game
