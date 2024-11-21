@@ -162,32 +162,6 @@ unsigned int ConfigManager::getControllerButton(const std::string& action) const
     return button;
 }
 
-void ConfigManager::loadInputConfig() {
-    try {
-        // Load or create default config if not already loaded
-        if (config.empty()) {
-            loadConfig();
-        }
 
-        spdlog::info("Loading input configuration");
-
-        // Verify input configuration sections exist
-        if (!config["input"]["keyboard"] || !config["input"]["controller"]) {
-            spdlog::warn("Input configuration sections missing, creating defaults");
-            createDefaultConfig();
-        }
-
-        // Log loaded configurations
-        spdlog::debug("Keyboard bindings loaded");
-        spdlog::debug("Controller settings - enabled: {}, deadzone: {}, sensitivity: {}",
-            isControllerEnabled(),
-            getControllerDeadzone(),
-            getControllerSensitivity());
-
-    } catch (const std::exception& e) {
-        spdlog::error("Error loading input config: {}", e.what());
-        createDefaultConfig();
-    }
-}
 
 } // namespace game
