@@ -10,18 +10,23 @@ include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Add source files
-file(GLOB_RECURSE SOURCES
-    "src/*.cpp"
-)
-
-# Remove main.cpp from sources
+file(GLOB_RECURSE SOURCES "src/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-# Create main executable
-add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
+# Create an object library with common sources
+add_library(common_objects OBJECT ${SOURCES})
 
-# Create input system test executable
-add_executable(input_system_test ${SOURCES} tests/input_system_test.cpp)
+# Main executable
+add_executable(${PROJECT_NAME} 
+    $<TARGET_OBJECTS:common_objects> 
+    src/main.cpp
+)
+
+# Input system test executable
+add_executable(input_system_test 
+    $<TARGET_OBJECTS:common_objects> 
+    tests/input_system_test.cpp
+)
 
 # Link SFML, toml++ and spdlog for main executable
 target_link_libraries(${PROJECT_NAME} PUBLIC
