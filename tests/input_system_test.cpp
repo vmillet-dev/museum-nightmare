@@ -18,8 +18,8 @@ int main() {
     auto& gameObjectManager = game::GameObjectManager::getInstance();
     auto& configManager = game::ConfigManager::getInstance();
 
-    // Load input configuration
-    configManager.loadInputConfig();
+    // Load configuration
+    configManager.loadConfig();
 
     // Initialize input system
     inputManager.init();
