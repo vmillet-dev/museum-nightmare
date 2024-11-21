@@ -10,7 +10,7 @@ GameScreen::GameScreen(Game& game) : game(game) {
     spdlog::info("Initializing game screen");
 
     // Initialize game objects
-    gameObjectManager = std::make_unique<GameObjectManager>();
+    gameObjectManager = &GameObjectManager::getInstance();
 
     // Create player
     auto player = std::make_unique<Player>(400.0f, 300.0f);  // Start at center

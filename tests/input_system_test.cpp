@@ -14,9 +14,9 @@ int main() {
     window.setFramerateLimit(60);
 
     // Initialize managers
-    auto& inputManager = InputManager::getInstance();
-    auto& gameObjectManager = GameObjectManager::getInstance();
-    auto& configManager = ConfigManager::getInstance();
+    auto& inputManager = game::InputManager::getInstance();
+    auto& gameObjectManager = game::GameObjectManager::getInstance();
+    auto& configManager = game::ConfigManager::getInstance();
 
     // Load input configuration
     configManager.loadInputConfig();
@@ -25,8 +25,8 @@ int main() {
     inputManager.init();
 
     // Create player
-    auto player = std::make_unique<Player>(400.f, 300.f);
-    gameObjectManager.addObject(std::move(player), ObjectType::Player);
+    auto player = std::make_unique<game::Player>(400.f, 300.f);
+    gameObjectManager.addObject(std::move(player));
 
     sf::Clock clock;
     while (window.isOpen()) {
