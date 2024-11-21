@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 add_executable(input_system_test ${SOURCES} tests/input_system_test.cpp)
 
 # Link SFML, toml++ and spdlog for main executable
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME} PUBLIC
     sfml-graphics
     sfml-window
     sfml-system
@@ -33,7 +33,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # Link libraries for input system test
-target_link_libraries(input_system_test PRIVATE
+target_link_libraries(input_system_test PUBLIC
     sfml-graphics
     sfml-window
     sfml-system
