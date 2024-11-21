@@ -20,7 +20,8 @@ jobs:
           build-essential \
           cmake \
           libsfml-dev \
-          xvfb
+          xvfb \
+          libudev-dev
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Debug
