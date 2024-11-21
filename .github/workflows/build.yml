@@ -44,4 +44,5 @@ jobs:
       timeout-minutes: 2
       run: |
         cd build
-        xvfb-run --auto-servernum ./sfml_game --test-mode
+        xvfb-run --auto-servernum ./input_system_test
+        xvfb-run --auto-servernum ./sfml_game & sleep 10 && kill $!
