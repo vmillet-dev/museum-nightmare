@@ -7,11 +7,11 @@ namespace game {
 ConfigManager::ConfigManager() {
     // Initialize key name mapping
     keyNameMap = {
-        {"W", sf::Keyboard::W}, {"A", sf::Keyboard::A},
+        {"Z", sf::Keyboard::Z}, {"Q", sf::Keyboard::Q},
         {"S", sf::Keyboard::S}, {"D", sf::Keyboard::D},
         {"Escape", sf::Keyboard::Escape},
         {"Return", sf::Keyboard::Return},
-        {"Space", sf::Keyboard::Space}
+        {"BackSpace", sf::Keyboard::BackSpace}
     };
 
     // Initialize axis name mapping
@@ -66,28 +66,28 @@ void ConfigManager::createDefaultConfig() {
         {"debug", toml::table{
             {"level", "info"}
         }},
-        {"controls", toml::table{
+        {"input", toml::table{
             {"keyboard", toml::table{
-                {"move_up", "W"},
+                {"move_up", "Z"},
                 {"move_down", "S"},
-                {"move_left", "A"},
+                {"move_left", "Q"},
                 {"move_right", "D"},
                 {"pause", "Escape"},
                 {"confirm", "Return"},
-                {"cancel", "Space"}
+                {"cancel", "BackSpace"}
             }},
             {"controller", toml::table{
                 {"enabled", true},
                 {"deadzone", 20.0},
                 {"sensitivity", 100.0},
                 {"buttons", toml::table{
-                    {"move_up", 0},
+                    {"move_up", 3},
                     {"move_down", 1},
                     {"move_left", 2},
-                    {"move_right", 3},
+                    {"move_right", 0},
                     {"pause", 7},
-                    {"confirm", 0},
-                    {"cancel", 1}
+                    {"confirm", 4},
+                    {"cancel", 5}
                 }},
                 {"axes", toml::table{
                     {"horizontal", "X"},
@@ -132,32 +132,32 @@ sf::Keyboard::Key ConfigManager::stringToKey(const std::string& keyName) const {
 }
 
 sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
-    std::string keyName = config["controls"]["keyboard"][action].value_or("");
+    std::string keyName = config["input"]["keyboard"][action].value_or("");
     auto key = stringToKey(keyName);
     spdlog::debug("Key binding: {} -> {}", action, keyName);
     return key;
 }
 
 bool ConfigManager::isControllerEnabled() const {
-    bool enabled = config["controls"]["controller"]["enabled"].value_or(true);
+    bool enabled = config["input"]["controller"]["enabled"].value_or(true);
     spdlog::debug("Controller enabled: {}", enabled);
     return enabled;
 }
 
 float ConfigManager::getControllerDeadzone() const {
-    float deadzone = config["controls"]["controller"]["deadzone"].value_or(20.0f);
+    float deadzone = config["input"]["controller"]["deadzone"].value_or(20.0f);
     spdlog::debug("Controller deadzone: {:.1f}", deadzone);
     return deadzone;
 }
 
 float ConfigManager::getControllerSensitivity() const {
-    float sensitivity = config["controls"]["controller"]["sensitivity"].value_or(100.0f);
+    float sensitivity = config["input"]["controller"]["sensitivity"].value_or(100.0f);
     spdlog::debug("Controller sensitivity: {:.1f}", sensitivity);
     return sensitivity;
 }
 
 unsigned int ConfigManager::getControllerButton(const std::string& action) const {
-    unsigned int button = static_cast<unsigned int>(config["controls"]["controller"]["buttons"][action].value_or(0));
+    unsigned int button = static_cast<unsigned int>(config["input"]["controller"]["buttons"][action].value_or(0));
     spdlog::debug("Controller button for {}: {}", action, button);
     return button;
 }
@@ -172,7 +172,7 @@ void ConfigManager::loadInputConfig() {
         spdlog::info("Loading input configuration");
 
         // Verify input configuration sections exist
-        if (!config["controls"]["keyboard"] || !config["controls"]["controller"]) {
+        if (!config["input"]["keyboard"] || !config["input"]["controller"]) {
             spdlog::warn("Input configuration sections missing, creating defaults");
             createDefaultConfig();
         }

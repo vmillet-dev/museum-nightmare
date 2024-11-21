@@ -41,10 +41,6 @@ public:
     void setControllerSensitivity(float value);
     void setControllerEnabled(bool enabled);
 
-    // Load and save specific configurations
-    void loadInputConfig();
-    void saveInputConfig();
-
 private:
     ConfigManager();
     ConfigManager(const ConfigManager&) = delete;
