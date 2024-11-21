@@ -14,7 +14,7 @@ set(COMMON_LIBS
     sfml-graphics 
     sfml-window 
     sfml-system 
-    tomlplusplus::tomlplusplus
+    tomlplusplus::tomlplusplus 
     spdlog::spdlog
 )
 
@@ -24,21 +24,15 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Common Object Library
 add_library(common_objects OBJECT ${SOURCES})
-target_link_libraries(common_objects PUBLIC
-    ${COMMON_LIBS}
-)
+target_link_libraries(common_objects PUBLIC ${COMMON_LIBS})
 
 # Main Executable
 add_executable(${PROJECT_NAME} $<TARGET_OBJECTS:common_objects> src/main.cpp)
-target_link_libraries(${PROJECT_NAME} PUBLIC 
-    spdlog::spdlog
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${COMMON_LIBS})
 
 # Test Executable
 add_executable(input_system_test $<TARGET_OBJECTS:common_objects> tests/input_system_test.cpp)
-target_link_libraries(input_system_test PUBLIC
-    ${COMMON_LIBS}
-)
+target_link_libraries(input_system_test PUBLIC ${COMMON_LIBS})
 
 # Asset Copying (Single Command)
 foreach(TARGET ${PROJECT_NAME} input_system_test)
