@@ -22,7 +22,7 @@ public:
 
 private:
     Game& game;
-    std::unique_ptr<GameObjectManager> gameObjectManager;
+    GameObjectManager* gameObjectManager;  // Reference to singleton
     Player* playerPtr{nullptr};  // Non-owning pointer to player
 };
 

@@ -1,8 +1,11 @@
 #pragma once
 #include <SFML/Window.hpp>
-#include "../InputManager.hpp"
+#include <string>
+#include "../Actions.hpp"
 
 namespace game {
+
+class InputManager;  // Forward declaration
 
 class InputDevice {
 public:
@@ -19,11 +22,7 @@ public:
 
 protected:
     // Utility methods for derived classes
-    virtual void notifyActionTriggered(Action action) {
-        if (auto callback = InputManager::getInstance().getActionCallback(action)) {
-            callback();
-        }
-    }
+    virtual void notifyActionTriggered(Action action);
 };
 
 } // namespace game
