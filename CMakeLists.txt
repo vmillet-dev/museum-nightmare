@@ -1,61 +1,46 @@
 cmake_minimum_required(VERSION 3.16)
 project(sfml_game)
 
+# C++ Standard Configuration
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Include dependencies
+# Dependencies
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
-
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
-# Add source files
+# Common Libraries
+set(COMMON_LIBS 
+    sfml-graphics 
+    sfml-window 
+    sfml-system 
+    tomlplusplus::tomlplusplus
+    spdlog::spdlog
+)
+
+# Source Files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-# Create an object library with common sources
+# Common Object Library
 add_library(common_objects OBJECT ${SOURCES})
-
-# Main executable
-add_executable(${PROJECT_NAME} 
-    $<TARGET_OBJECTS:common_objects> 
-    src/main.cpp
-)
-
-# Input system test executable
-add_executable(input_system_test 
-    $<TARGET_OBJECTS:common_objects> 
-    tests/input_system_test.cpp
-)
-
 target_link_libraries(common_objects PUBLIC
-    sfml-graphics
-    sfml-window
-    sfml-system
-    tomlplusplus::tomlplusplus
+    ${COMMON_LIBS}
+)
+
+# Main Executable
+add_executable(${PROJECT_NAME} $<TARGET_OBJECTS:common_objects> src/main.cpp)
+target_link_libraries(${PROJECT_NAME} PUBLIC 
     spdlog::spdlog
 )
 
-# Link SFML, toml++ and spdlog for main executable
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    sfml-graphics
-    sfml-window
-    sfml-system
-    tomlplusplus::tomlplusplus
-    spdlog::spdlog
-)
-
-# Link libraries for input system test
+# Test Executable
+add_executable(input_system_test $<TARGET_OBJECTS:common_objects> tests/input_system_test.cpp)
 target_link_libraries(input_system_test PUBLIC
-    sfml-graphics
-    sfml-window
-    sfml-system
-    tomlplusplus::tomlplusplus
-    spdlog::spdlog
+    ${COMMON_LIBS}
 )
 
-# Copy assets to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
-add_custom_command(TARGET input_system_test POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+# Asset Copying (Single Command)
+foreach(TARGET ${PROJECT_NAME} input_system_test)
+    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+endforeach()
