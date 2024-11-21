@@ -6,6 +6,7 @@
 #include "../game/objects/Wall.hpp"
 #include "../input/InputManager.hpp"
 #include "../core/Game.hpp"
+#include "../game/LevelLoader.hpp"
 
 namespace game {
 
@@ -24,6 +25,7 @@ private:
     Game& game;
     GameObjectManager* gameObjectManager;  // Reference to singleton
     Player* playerPtr{nullptr};  // Non-owning pointer to player
+    void loadInitialLevel();  // New method to handle level loading
 };
 
 } // namespace game

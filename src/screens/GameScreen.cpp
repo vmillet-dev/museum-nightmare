@@ -1,7 +1,7 @@
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
 #include "../input/InputManager.hpp"
-#include "../game/levels/Level1.hpp"
+#include "../game/LevelLoader.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -17,8 +17,16 @@ GameScreen::GameScreen(Game& game) : game(game) {
     playerPtr = player.get();  // Store raw pointer before moving ownership
     gameObjectManager->addObject(std::move(player));
 
-    // Load level
-    Level1::loadLevel(*gameObjectManager);
+    loadInitialLevel();
+}
+
+void GameScreen::loadInitialLevel() {
+    const std::string levelPath = "assets/levels/level1.txt";
+    if (!LevelLoader::loadLevel(levelPath, *gameObjectManager)) {
+        spdlog::error("Failed to load initial level from {}", levelPath);
+    } else {
+        spdlog::info("Successfully loaded level from {}", levelPath);
+    }
 }
 
 void GameScreen::handleInput(const sf::Event& event) {
