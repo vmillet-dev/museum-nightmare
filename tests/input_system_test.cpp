@@ -56,6 +56,7 @@ int main() {
                 sf::Joystick::getAxisPosition(0, sf::Joystick::X),
                 sf::Joystick::getAxisPosition(0, sf::Joystick::Y));
         }
+        window.quit();
     }
 
     return 0;
