@@ -28,6 +28,14 @@ add_executable(input_system_test
     tests/input_system_test.cpp
 )
 
+target_link_libraries(common_objects PUBLIC
+    sfml-graphics
+    sfml-window
+    sfml-system
+    tomlplusplus::tomlplusplus
+    spdlog::spdlog
+)
+
 # Link SFML, toml++ and spdlog for main executable
 target_link_libraries(${PROJECT_NAME} PUBLIC
     sfml-graphics
