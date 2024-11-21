@@ -26,11 +26,14 @@ int main(int argc, char* argv[]) {
 
     try {
         bool test_mode = (argc > 1 && std::string(argv[1]) == "--test-mode");
+        float timeout = (test_mode ? 5.0f : 0.0f);  // 5 second timeout in test mode
 
-        spdlog::info("Starting game application {}", test_mode ? "in test mode" : "");
+        spdlog::info("Starting game application {} {}",
+            test_mode ? "in test mode" : "",
+            test_mode ? "(with 5s timeout)" : "");
 
         game::Game game;
-        (test_mode ? game.quit() : game.run());
+        game.run(timeout);
 
         spdlog::info("Game closed successfully");
         return 0;

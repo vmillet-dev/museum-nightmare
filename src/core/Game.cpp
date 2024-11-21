@@ -12,7 +12,7 @@ Game::Game() : window(
         ConfigManager::getInstance().getWindowHeight()
     ),
     ConfigManager::getInstance().getWindowTitle()
-) {
+), should_quit(false) {
     spdlog::info("Initializing game...");
     auto& configManager = ConfigManager::getInstance();
     auto& inputManager = InputManager::getInstance();
@@ -21,14 +21,21 @@ Game::Game() : window(
     spdlog::info("Game initialized successfully");
 }
 
-void Game::run() {
+void Game::run(float timeout_seconds) {
     sf::Clock clock;
     sf::Clock fpsTimer;
+    sf::Clock timeoutClock;
     int frameCount = 0;
 
-    while (window.isOpen()) {
+    while (window.isOpen() && !should_quit) {
         sf::Time deltaTime = clock.restart();
         float dt = deltaTime.asSeconds();
+
+        // Check timeout
+        if (timeout_seconds > 0.0f && timeoutClock.getElapsedTime().asSeconds() >= timeout_seconds) {
+            spdlog::info("Game timeout reached after {:.1f} seconds", timeout_seconds);
+            break;
+        }
 
         // Handle real events
         handleEvents();
