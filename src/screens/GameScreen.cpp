@@ -1,7 +1,7 @@
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
 #include "../input/InputManager.hpp"
-#include "../game/levels/Level1.hpp"
+#include "../game/levels/Level2.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -12,13 +12,13 @@ GameScreen::GameScreen(Game& game) : game(game) {
     // Initialize game objects
     gameObjectManager = std::make_unique<GameObjectManager>();
 
-    // Create player
-    auto player = std::make_unique<Player>(400.0f, 300.0f);  // Start at center
+    // Create player at a better starting position for the larger level
+    auto player = std::make_unique<Player>(100.0f, 100.0f);
     playerPtr = player.get();  // Store raw pointer before moving ownership
     gameObjectManager->addObject(std::move(player));
 
     // Load level
-    Level1::loadLevel(*gameObjectManager);
+    Level2::loadLevel(*gameObjectManager);
 }
 
 void GameScreen::handleInput(const sf::Event& event) {
