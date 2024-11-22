@@ -17,7 +17,7 @@ public:
 
     void init();
     void update();
-    void handleInput(const sf::Event& event);
+    void handleEvent(const sf::Event& event);
     bool isActionPressed(Action action);
 
 private:

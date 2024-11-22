@@ -48,7 +48,7 @@ void InputManager::update() {
     controllerDevice->update();
 }
 
-void InputManager::handleInput(const sf::Event& event) {
+void InputManager::handleEvent(const sf::Event& event) {
     keyboardDevice->handleEvent(event);
     controllerDevice->handleEvent(event);
 }
