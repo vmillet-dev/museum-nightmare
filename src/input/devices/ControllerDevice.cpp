@@ -7,9 +7,16 @@ namespace game {
 void ControllerDevice::init() {
     auto& config = ConfigManager::getInstance();
 
-    // Check for connected controllers
-    connected = sf::Joystick::isConnected(0);
-    spdlog::debug("Controller connected: {}", connected);
+    // Check for any available controller
+    connected = false;
+    for (int i = 0; i < sf::Joystick::Count; ++i) {
+        if (sf::Joystick::isConnected(i)) {
+            connected = true;
+            controllerId = i;
+            spdlog::info("Controller connected on port {}", i);
+            break;
+        }
+    }
 
     // Load button bindings from config
     buttonBindings[Action::Confirm] = config.getControllerButton("controller_confirm");
@@ -28,14 +35,34 @@ void ControllerDevice::init() {
 }
 
 void ControllerDevice::update() {
-    // Check controller connection status
-    bool wasConnected = connected;
-    connected = sf::Joystick::isConnected(0);
+    wasConnected = connected;
 
-    if (connected != wasConnected) {
-        spdlog::info("Controller {} - Status changed", connected ? "connected" : "disconnected");
-        if (connected) {
-            init();  // Reinitialize on reconnection
+    // Check if current controller is still connected
+    if (connected && !sf::Joystick::isConnected(controllerId)) {
+        connected = false;
+        spdlog::info("Controller {} disconnected", controllerId);
+
+        // Try to find another connected controller
+        for (int i = 0; i < sf::Joystick::Count; ++i) {
+            if (sf::Joystick::isConnected(i)) {
+                connected = true;
+                controllerId = i;
+                spdlog::info("Switched to controller {}", i);
+                init();  // Reinitialize with new controller
+                break;
+            }
+        }
+    }
+    // Check for new controller if none connected
+    else if (!connected) {
+        for (int i = 0; i < sf::Joystick::Count; ++i) {
+            if (sf::Joystick::isConnected(i)) {
+                connected = true;
+                controllerId = i;
+                spdlog::info("New controller connected on port {}", i);
+                init();  // Initialize with new controller
+                break;
+            }
         }
     }
 }
@@ -46,13 +73,13 @@ bool ControllerDevice::isActionPressed(Action action) {
     // Check button bindings
     auto buttonIt = buttonBindings.find(action);
     if (buttonIt != buttonBindings.end()) {
-        return sf::Joystick::isButtonPressed(0, buttonIt->second);
+        return sf::Joystick::isButtonPressed(controllerId, buttonIt->second);
     }
 
     // Check axis bindings
     auto axisIt = axisBindings.find(action);
     if (axisIt != axisBindings.end()) {
-        float position = sf::Joystick::getAxisPosition(0, axisIt->second);
+        float position = sf::Joystick::getAxisPosition(controllerId, axisIt->second);
 
         // Apply deadzone and sensitivity
         if (std::abs(position) < deadzone) return false;
@@ -78,10 +105,17 @@ bool ControllerDevice::isActionPressed(Action action) {
 
 void ControllerDevice::handleEvent(const sf::Event& event) {
     if (event.type == sf::Event::JoystickConnected) {
-        connected = true;
-        init();
+        if (!connected) {
+            controllerId = event.joystickConnect.joystickId;
+            connected = true;
+            spdlog::info("Controller {} connected", controllerId);
+            init();
+        }
     } else if (event.type == sf::Event::JoystickDisconnected) {
-        connected = false;
+        if (event.joystickConnect.joystickId == controllerId) {
+            connected = false;
+            spdlog::info("Controller {} disconnected", controllerId);
+        }
     }
 }
 
