@@ -53,12 +53,10 @@ void Game::handleEvent(const sf::Event& event) {
         return;
     }
 
-    // Handle key events through InputManager
-    if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
-        InputManager::getInstance().handleEvent(event);
-    }
+    // Handle all input events through InputManager
+    InputManager::getInstance().handleEvent(event);
 
-    // Let current screen handle the event
+    // Let current screen handle non-input events
     if (!ScreenManager::getInstance().isEmpty()) {
         ScreenManager::getInstance().handleInput(event);
     }
