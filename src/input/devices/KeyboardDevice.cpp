@@ -1,17 +1,20 @@
 #include "KeyboardDevice.hpp"
+#include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
 void KeyboardDevice::init() {
-    // Default key bindings
-    keyBindings[sf::Keyboard::Z] = Action::MoveUp;
-    keyBindings[sf::Keyboard::S] = Action::MoveDown;
-    keyBindings[sf::Keyboard::Q] = Action::MoveLeft;
-    keyBindings[sf::Keyboard::D] = Action::MoveRight;
-    keyBindings[sf::Keyboard::Escape] = Action::Pause;
-    keyBindings[sf::Keyboard::Enter] = Action::Confirm;
-    keyBindings[sf::Keyboard::BackSpace] = Action::Cancel;
+    auto& config = ConfigManager::getInstance();
+
+    // Load key bindings from config
+    keyBindings[config.getKeyBinding("move_up")] = Action::MoveUp;
+    keyBindings[config.getKeyBinding("move_down")] = Action::MoveDown;
+    keyBindings[config.getKeyBinding("move_left")] = Action::MoveLeft;
+    keyBindings[config.getKeyBinding("move_right")] = Action::MoveRight;
+    keyBindings[config.getKeyBinding("pause")] = Action::Pause;
+    keyBindings[config.getKeyBinding("confirm")] = Action::Confirm;
+    keyBindings[config.getKeyBinding("cancel")] = Action::Cancel;
 }
 
 void KeyboardDevice::update() {
