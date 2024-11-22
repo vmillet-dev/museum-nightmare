@@ -1,10 +1,12 @@
 #include "Player.hpp"
 #include "Wall.hpp"
+#include "../../input/providers/PlayerInputProvider.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-Player::Player(float x, float y) : GameObject(x, y), speed(200.0f) {
+Player::Player(float x, float y)
+    : Actor(x, y, std::make_unique<PlayerInputProvider>(), 200.0f) {
     shape.setSize(sf::Vector2f(32.0f, 32.0f));
     shape.setFillColor(sf::Color::Green);
     shape.setOrigin(16.0f, 16.0f);
@@ -12,42 +14,9 @@ Player::Player(float x, float y) : GameObject(x, y), speed(200.0f) {
     spdlog::info("Player created at position ({}, {})", x, y);
 }
 
-void Player::update(float deltaTime) {
-    // Calculate new position based on velocity
-    sf::Vector2f newPosition = position + (velocity * speed * deltaTime);
-
-    // Store old position for logging
-    sf::Vector2f oldPosition = position;
-
-    // Clamp position to window bounds (using default window size if not set)
-    float halfWidth = shape.getSize().x / 2;
-    float halfHeight = shape.getSize().y / 2;
-    float maxX = (windowSize.x > 0) ? static_cast<float>(windowSize.x) : 800.0f;
-    float maxY = (windowSize.y > 0) ? static_cast<float>(windowSize.y) : 600.0f;
-
-    newPosition.x = std::max(halfWidth, std::min(newPosition.x, maxX - halfWidth));
-    newPosition.y = std::max(halfHeight, std::min(newPosition.y, maxY - halfHeight));
-
-    // Update position
-    position = newPosition;
-    shape.setPosition(position);
-
-    if (oldPosition != position) {
-        spdlog::debug("Pos:({:.1f},{:.1f})->({:.1f},{:.1f}) Vel:({:.1f},{:.1f})",
-                     oldPosition.x, oldPosition.y,
-                     position.x, position.y,
-                     velocity.x, velocity.y);
-    }
-}
-
 void Player::render(sf::RenderWindow& window) {
-    // Update window size
     windowSize = window.getSize();
     window.draw(shape);
-}
-
-void Player::setVelocity(const sf::Vector2f& newVelocity) {
-    velocity = newVelocity;
 }
 
 sf::FloatRect Player::getBounds() const {
@@ -84,17 +53,6 @@ void Player::handleCollision(GameObject* other) {
         shape.setPosition(position);
         spdlog::debug("Collision resolved: from({:.1f},{:.1f}) to({:.1f},{:.1f})", oldPos.x, oldPos.y, position.x, position.y);
     }
-}
-
-void Player::move(float dx, float dy, float deltaTime) {
-    sf::Vector2f newVelocity(dx, dy);
-    if (dx != 0 && dy != 0) {
-        float length = std::sqrt(dx * dx + dy * dy);
-        newVelocity.x /= length;
-        newVelocity.y /= length;
-        spdlog::debug("Normalized movement: ({:.2f},{:.2f})", newVelocity.x, newVelocity.y);
-    }
-    velocity = newVelocity;
 }
 
 } // namespace game
