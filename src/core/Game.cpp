@@ -53,22 +53,9 @@ void Game::handleEvent(const sf::Event& event) {
         return;
     }
 
-    // Handle key events
-    if (event.type == sf::Event::KeyPressed) {
-        std::string keyName;
-        switch (event.key.code) {
-            case sf::Keyboard::Z: keyName = "Move Up (Z)"; break;
-            case sf::Keyboard::S: keyName = "Move Down (S)"; break;
-            case sf::Keyboard::Q: keyName = "Move Left (Q)"; break;
-            case sf::Keyboard::D: keyName = "Move Right (D)"; break;
-            case sf::Keyboard::Escape:
-                keyName = "Escape";
-                spdlog::info("Escape pressed, quitting game");
-                window.close();
-                break;
-            default: return; // Skip logging unknown keys
-        }
-        spdlog::debug("Key pressed: {}", keyName);
+    // Handle key events through InputManager
+    if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
+        InputManager::getInstance().handleEvent(event);
     }
 
     // Let current screen handle the event
