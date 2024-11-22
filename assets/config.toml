@@ -16,6 +16,9 @@ move_up = "Z"
 move_down = "S"
 move_left = "Q"
 move_right = "D"
+jump = "Space"
+attack = "E"
+interact = "F"
 pause = "Escape"
 confirm = "Return"
 cancel = "BackSpace"
@@ -27,10 +30,28 @@ controller_sensitivity = 100.0  # Joystick sensitivity for analog stick movement
 # Note: Analog stick (X/Y axes) automatically mapped for movement in addition to buttons
 
 # Controller button mappings (using SFML joystick button indices)
+controller_type = "xbox"  # or "playstation" - affects button labels
 controller_move_up = 3     # Usually Triangle/Y button
 controller_move_down = 1   # Usually Circle/B button
 controller_move_left = 2   # Usually Square/X button
 controller_move_right = 0  # Usually X/A button
-controller_pause = 7      # Usually Start button
-controller_confirm = 4    # Usually L1 button
-controller_cancel = 5     # Usually R1 button
+controller_jump = 0        # A/Cross button
+controller_attack = 2      # X/Square button
+controller_interact = 3    # Y/Triangle button
+controller_pause = 7       # Usually Start button
+controller_confirm = 4     # Usually L1 button
+controller_cancel = 5      # Usually R1 button
+
+[actor.properties]
+# Common properties for actors (player and enemies)
+max_speed = 200.0
+acceleration = 1000.0
+deceleration = 2000.0
+jump_force = 400.0
+gravity = 800.0
+
+[actor.enemy]
+# Enemy-specific properties (overrides common properties where needed)
+max_speed = 150.0
+acceleration = 800.0
+deceleration = 1600.0

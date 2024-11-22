@@ -1,24 +1,21 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Actor.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace game {
 
-class Player : public GameObject {
+class Player : public Actor {
 public:
     Player(float x, float y);
-    void update(float deltaTime) override;
-    void render(sf::RenderWindow& window) override;
-    void handleCollision(GameObject* other) override;
-    sf::FloatRect getBounds() const override;
-    void move(float dx, float dy, float deltaTime);
-    void setVelocity(const sf::Vector2f& newVelocity);
+
+protected:
+    // Override Actor's state transition handling
+    void handleStateTransition(ActorStateType newState) override;
 
 private:
-    sf::RectangleShape shape;
-    float speed;
-    sf::Vector2f velocity;
-    sf::Vector2u windowSize;  // Store window size
+    // Player-specific state handling
+    void initializeStates();
+    void setupInputProvider();
 };
 
 } // namespace game
