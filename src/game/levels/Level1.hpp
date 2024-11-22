@@ -1,6 +1,6 @@
 #pragma once
 #include "../objects/Wall.hpp"
-#include "../objects/GameObjectManager.hpp"
+#include "../GameObjectManager.hpp"
 #include <vector>
 #include <memory>
 

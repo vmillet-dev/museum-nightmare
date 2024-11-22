@@ -1,6 +1,6 @@
 #include "Player.hpp"
-#include "Wall.hpp"
-#include "../../input/providers/PlayerInputProvider.hpp"
+#include "../Wall.hpp"
+#include "../../../input/providers/PlayerInputProvider.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {

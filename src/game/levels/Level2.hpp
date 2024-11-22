@@ -1,7 +1,7 @@
 #pragma once
-#include "../objects/GameObjectManager.hpp"
+#include "../GameObjectManager.hpp"
 #include "../objects/Wall.hpp"
-#include "../objects/Enemy.hpp"
+#include "../objects/actor/Enemy.hpp"
 #include <memory>
 
 namespace game {

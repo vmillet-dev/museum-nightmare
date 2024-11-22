@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <SFML/Window/Keyboard.hpp>
 #include <unordered_map>
-#include "../input/KeyMapper.hpp"
+#include "KeyMapper.hpp"
 
 namespace game {
 

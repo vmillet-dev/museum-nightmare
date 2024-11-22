@@ -1,6 +1,6 @@
 #pragma once
 #include "Actor.hpp"
-#include "../../input/providers/RandomAIInputProvider.hpp"
+#include "../../../input/providers/RandomAIInputProvider.hpp"
 
 namespace game {
 

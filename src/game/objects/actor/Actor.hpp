@@ -1,6 +1,6 @@
 #pragma once
-#include "GameObject.hpp"
-#include "../../input/providers/InputProvider.hpp"
+#include "../GameObject.hpp"
+#include "../../../input/providers/InputProvider.hpp"
 #include <memory>
 
 namespace game {
