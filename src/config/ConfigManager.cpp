@@ -5,14 +5,6 @@
 namespace game {
 
 ConfigManager::ConfigManager() {
-    // Initialize key name mapping
-    keyNameMap = {
-        {"Z", sf::Keyboard::Z}, {"S", sf::Keyboard::S},
-        {"Q", sf::Keyboard::Q}, {"D", sf::Keyboard::D},
-        {"Escape", sf::Keyboard::Escape},
-        {"Return", sf::Keyboard::Return},
-        {"BackSpace", sf::Keyboard::BackSpace}
-    };
     spdlog::debug("Input config: KB(ZQSD), Ctrl({})", isControllerEnabled());
     loadConfig();
 }
@@ -104,14 +96,9 @@ float ConfigManager::getPlayerSize() const {
     return config["player"]["size"].value_or(32.0f);
 }
 
-sf::Keyboard::Key ConfigManager::stringToKey(const std::string& keyName) const {
-    auto it = keyNameMap.find(keyName);
-    return it != keyNameMap.end() ? it->second : sf::Keyboard::Unknown;
-}
-
 sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
     std::string keyName = config["controls"][action].value_or("");
-    auto key = stringToKey(keyName);
+    auto key = KeyMapper::getInstance().fromName(keyName);
     spdlog::debug("Key binding: {} -> {}", action, keyName);
     return key;
 }
