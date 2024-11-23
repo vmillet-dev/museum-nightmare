@@ -13,6 +13,7 @@ Game::Game() : window(
     ),
     ConfigManager::getInstance().getWindowTitle()
 ) {
+    sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
     inputManager.init();
     ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
