@@ -2,6 +2,7 @@
 #include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
 #include "ScreenManager.hpp"
+#include "../core/GameState.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {

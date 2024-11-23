@@ -1,6 +1,7 @@
 #include "MainMenuScreen.hpp"
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
+#include "../core/GameState.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {

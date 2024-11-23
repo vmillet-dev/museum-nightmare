@@ -2,6 +2,7 @@
 #include "../core/Game.hpp"
 #include "../input/InputManager.hpp"
 #include "../game/levels/Level2.hpp"
+#include "../core/GameState.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
