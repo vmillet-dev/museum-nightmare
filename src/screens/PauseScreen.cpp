@@ -14,9 +14,9 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 250),
         sf::Vector2f(200, 50)
     );
-    resumeButton->setCallback([this]() {
+    resumeButton->setCallback([this, &game]() {
         spdlog::info("Resuming game");
-        ScreenManager::getInstance().popScreen();
+        game.getScreenManager().popScreen();
     });
 
     // Create main menu button
@@ -28,10 +28,10 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     mainMenuButton->setCallback([this, &game]() {
         spdlog::info("Returning to main menu");
         // Pop both pause screen and game screen
-        ScreenManager::getInstance().popScreen();
-        ScreenManager::getInstance().popScreen();
+        game.getScreenManager().popScreen();
+        game.getScreenManager().popScreen();
         // Push new main menu screen
-        ScreenManager::getInstance().pushScreen(std::make_unique<MainMenuScreen>(game));
+        game.getScreenManager().pushScreen(std::make_unique<MainMenuScreen>(game));
     });
 
     // Load font
