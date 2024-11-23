@@ -13,6 +13,23 @@ void InputManager::init() {
     keyboardDevice->init();
     devices.push_back(std::move(keyboardDevice));
 
+    // Check for already connected controllers
+    for (unsigned int i = 0; i < sf::Joystick::Count; ++i) {
+        if (sf::Joystick::isConnected(i)) {
+            try {
+                auto controllerDevice = std::make_unique<ControllerDevice>();
+                auto& config = ConfigManager::getInstance();
+                controllerDevice->setDeadzone(config.getControllerDeadzone());
+                controllerDevice->setSensitivity(config.getControllerSensitivity());
+                controllerDevice->init();
+                devices.push_back(std::move(controllerDevice));
+                spdlog::info("Found and initialized existing controller at index {}", i);
+            } catch (const std::exception& e) {
+                spdlog::error("Failed to initialize existing controller at index {}: {}", i, e.what());
+            }
+        }
+    }
+
     spdlog::info("Input devices initialized");
 }
 
@@ -23,31 +40,46 @@ void InputManager::update() {
 }
 
 void InputManager::handleEvent(const sf::Event& event) {
-    // Handle controller connection/disconnection
-    if (event.type == sf::Event::JoystickConnected) {
-        auto controllerDevice = std::make_unique<ControllerDevice>();
-        auto& config = ConfigManager::getInstance();
-        controllerDevice->setDeadzone(config.getControllerDeadzone());
-        controllerDevice->setSensitivity(config.getControllerSensitivity());
-        controllerDevice->init();
-        devices.push_back(std::move(controllerDevice));
-        spdlog::info("Controller connected and initialized");
-    }
-    else if (event.type == sf::Event::JoystickDisconnected) {
-        devices.erase(
-            std::remove_if(devices.begin(), devices.end(),
-                [](const auto& device) {
-                    return dynamic_cast<ControllerDevice*>(device.get()) != nullptr;
+    try {
+        switch (event.type) {
+            case sf::Event::JoystickConnected: {
+                auto controllerDevice = std::make_unique<ControllerDevice>();
+                auto& config = ConfigManager::getInstance();
+                controllerDevice->setDeadzone(config.getControllerDeadzone());
+                controllerDevice->setSensitivity(config.getControllerSensitivity());
+                controllerDevice->init();
+                devices.push_back(std::move(controllerDevice));
+                spdlog::info("Controller connected and initialized");
+                break;
+            }
+            case sf::Event::JoystickDisconnected: {
+                auto it = std::find_if(devices.begin(), devices.end(),
+                    [](const auto& device) { return dynamic_cast<ControllerDevice*>(device.get()) != nullptr; }
+                );
+                if (it != devices.end()) {
+                    try {
+                        devices.erase(it);
+                        spdlog::info("Controller disconnected and removed");
+                    } catch (const std::exception& e) {
+                        spdlog::error("Error removing controller: {}", e.what());
+                    }
                 }
-            ),
-            devices.end()
-        );
-        spdlog::info("Controller disconnected and removed");
+                break;
+            }
+            default:
+                break;
+        }
+    } catch (const std::exception& e) {
+        spdlog::error("Error handling controller event: {}", e.what());
     }
 
     // Forward events to all devices
     for (auto& device : devices) {
-        device->handleEvent(event);
+        try {
+            device->handleEvent(event);
+        } catch (const std::exception& e) {
+            spdlog::error("Error in device event handling: {}", e.what());
+        }
     }
 }
 
