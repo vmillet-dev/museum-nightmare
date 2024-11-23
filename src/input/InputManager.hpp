@@ -18,6 +18,8 @@ public:
     bool isActionPressed(Action action);
 
 private:
+    void createControllerDevice();
+    void removeControllerDevice();
     std::vector<std::unique_ptr<InputDevice>> devices;
 };
 
