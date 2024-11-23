@@ -29,9 +29,10 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
     text.setPosition(position.x, position.y);
 
     isHovered = false;
+    clicked = false;
 }
 
-void Button::handleInput(const sf::Vector2f& mousePos) {
+void Button::update(const sf::Vector2f& mousePos) {
     bool wasHovered = isHovered;
     isHovered = isMouseOver(mousePos);
 
@@ -41,28 +42,10 @@ void Button::handleInput(const sf::Vector2f& mousePos) {
     }
 
     // Handle click
+    clicked = false;
     if (isHovered && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        handleClick(mousePos);
+        clicked = true;
     }
-}
-
-void Button::setCallback(std::function<void()> newCallback) {
-    callback = std::move(newCallback);
-}
-
-void Button::handleClick(const sf::Vector2f& mousePos) {
-    if (callback) {
-        callback();
-    }
-}
-
-void Button::handleHover(const sf::Vector2f& mousePos) {
-    isHovered = isMouseOver(mousePos);
-    shape.setFillColor(isHovered ? hoverColor : defaultColor);
-}
-
-void Button::update(float deltaTime) {
-    // Animation or other updates can be added here
 }
 
 void Button::render(sf::RenderWindow& window) {

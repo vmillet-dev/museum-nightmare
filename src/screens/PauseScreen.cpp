@@ -14,10 +14,6 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 250),
         sf::Vector2f(200, 50)
     );
-    resumeButton->setCallback([this]() {
-        spdlog::info("Resuming game");
-        ScreenManager::getInstance().popScreen();
-    });
 
     // Create main menu button
     mainMenuButton = std::make_unique<Button>(
@@ -25,14 +21,6 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 350),
         sf::Vector2f(200, 50)
     );
-    mainMenuButton->setCallback([this, &game]() {
-        spdlog::info("Returning to main menu");
-        // Pop both pause screen and game screen
-        ScreenManager::getInstance().popScreen();
-        ScreenManager::getInstance().popScreen();
-        // Push new main menu screen
-        ScreenManager::getInstance().pushScreen(std::make_unique<MainMenuScreen>(game));
-    });
 
     // Load font
     if (!font.loadFromFile("assets/arial.ttf")) {
@@ -52,22 +40,25 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
 }
 
 void PauseScreen::handleInput(const sf::Event& event) {
-    if (event.type == sf::Event::MouseButtonPressed ||
-        event.type == sf::Event::MouseMoved) {
-        sf::Vector2i mousePos;
-        if (event.type == sf::Event::MouseButtonPressed) {
-            mousePos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-        } else {
-            mousePos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
-        }
-        sf::Vector2f mousePosFloat(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-        resumeButton->handleInput(mousePosFloat);
-        mainMenuButton->handleInput(mousePosFloat);
+    if (event.type == sf::Event::MouseMoved) {
+        sf::Vector2f mousePos(event.mouseMove.x, event.mouseMove.y);
+        resumeButton->update(mousePos);
+        mainMenuButton->update(mousePos);
+    }
+
+    if (resumeButton->isClicked()) {
+        spdlog::info("Resuming game");
+        game.getScreenManager().setState(GameState::Playing);
+    }
+
+    if (mainMenuButton->isClicked()) {
+        spdlog::info("Returning to main menu");
+        game.getScreenManager().setState(GameState::MainMenu);
     }
 }
 
 void PauseScreen::update(float deltaTime) {
-    // No update needed for buttons in our implementation
+    // No update needed for pause screen
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {

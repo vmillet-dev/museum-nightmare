@@ -17,6 +17,7 @@ public:
     void quit();
     sf::RenderWindow& getWindow();
     InputManager& getInputManager() { return inputManager; }
+    ScreenManager& getScreenManager() { return screenManager; }
 
 private:
     void handleEvent(const sf::Event& event);
@@ -26,6 +27,7 @@ private:
 
     sf::RenderWindow window;
     InputManager inputManager;
+    ScreenManager screenManager;
 };
 
 } // namespace game
