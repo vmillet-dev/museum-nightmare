@@ -1,6 +1,7 @@
 #include "PauseScreen.hpp"
 #include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
+#include "ScreenManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
