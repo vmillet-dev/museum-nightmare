@@ -69,19 +69,19 @@ void ControllerDevice::update() {
     }
 }
 
-bool ControllerDevice::isActionPressed(Action action) {
+bool ControllerDevice::isActionPressed(Action action) const {
     if (!connected) return false;
 
     // Check button states
     auto buttonIt = buttonBindings.find(action);
     if (buttonIt != buttonBindings.end()) {
-        return buttonStates[action];
+        return buttonStates.at(action);
     }
 
     // Check axis states
     auto axisIt = axisBindings.find(action);
     if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
+        float position = axisStates.at(action);
         switch(action) {
             case Action::MoveUp:
                 return position < -0.5f;

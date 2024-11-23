@@ -3,13 +3,14 @@
 #include <functional>
 #include <string>
 #include <spdlog/spdlog.h>
+#include "../input/InputManager.hpp"
 
 namespace game {
 
 class Button {
 public:
     Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size);
-    void handleInput(const sf::Vector2f& mousePos);
+    void handleInput(const sf::Vector2f& mousePos, const InputManager& inputManager);
     void setCallback(std::function<void()> callback);
     void render(sf::RenderWindow& window);
 

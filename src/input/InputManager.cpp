@@ -63,8 +63,8 @@ void InputManager::handleEvent(const sf::Event& event) {
     }
 }
 
-bool InputManager::isActionPressed(Action action) {
-    for (auto& device : devices) {
+bool InputManager::isActionPressed(Action action) const {
+    for (const auto& device : devices) {
         if (device->isActionPressed(action)) {
             return true;
         }

@@ -8,7 +8,7 @@ class KeyboardDevice : public InputDevice {
 public:
     void init() override;
     void update() override;
-    bool isActionPressed(Action action) override;
+    bool isActionPressed(Action action) const override;
     void handleEvent(const sf::Event& event) override;
     void setKeyBinding(Action action, sf::Keyboard::Key key);
     void setKeyState(sf::Keyboard::Key key, bool pressed);

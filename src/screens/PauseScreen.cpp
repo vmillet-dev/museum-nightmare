@@ -59,8 +59,8 @@ void PauseScreen::handleInput(const sf::Event& event) {
             mousePos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
         }
         sf::Vector2f mousePosFloat(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-        resumeButton->handleInput(mousePosFloat);
-        mainMenuButton->handleInput(mousePosFloat);
+        resumeButton->handleInput(mousePosFloat, game.getInputManager());
+        mainMenuButton->handleInput(mousePosFloat, game.getInputManager());
     }
 }
 

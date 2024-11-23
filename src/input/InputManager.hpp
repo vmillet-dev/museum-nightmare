@@ -15,7 +15,7 @@ public:
     void init();
     void update();
     void handleEvent(const sf::Event& event);
-    bool isActionPressed(Action action);
+    bool isActionPressed(Action action) const;
 
 private:
     void createControllerDevice();

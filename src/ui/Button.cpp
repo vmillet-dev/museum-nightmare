@@ -31,7 +31,7 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
     isHovered = false;
 }
 
-void Button::handleInput(const sf::Vector2f& mousePos) {
+void Button::handleInput(const sf::Vector2f& mousePos, const InputManager& inputManager) {
     bool wasHovered = isHovered;
     isHovered = isMouseOver(mousePos);
 
@@ -40,8 +40,8 @@ void Button::handleInput(const sf::Vector2f& mousePos) {
         shape.setFillColor(isHovered ? hoverColor : defaultColor);
     }
 
-    // Handle click
-    if (isHovered && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+    // Handle click using InputManager
+    if (isHovered && inputManager.isActionPressed(Action::Confirm)) {
         handleClick(mousePos);
     }
 }

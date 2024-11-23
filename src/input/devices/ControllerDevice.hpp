@@ -8,7 +8,7 @@ class ControllerDevice : public InputDevice {
 public:
     void init() override;
     void update() override;
-    bool isActionPressed(Action action) override;
+    bool isActionPressed(Action action) const override;
     void handleEvent(const sf::Event& event) override;
 
     void setButtonBinding(Action action, unsigned int button);

@@ -24,9 +24,9 @@ void KeyboardDevice::update() {
     }
 }
 
-bool KeyboardDevice::isActionPressed(Action action) {
+bool KeyboardDevice::isActionPressed(Action action) const {
     for (const auto& binding : keyBindings) {
-        if (binding.second == action && keyStates[binding.first]) {
+        if (binding.second == action && keyStates.at(binding.first)) {
             return true;
         }
     }
