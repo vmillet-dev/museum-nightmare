@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <SFML/Window/Keyboard.hpp>
 #include <unordered_map>
+#include "KeyMapper.hpp"
 
 namespace game {
 
@@ -36,9 +37,7 @@ private:
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
 
-    sf::Keyboard::Key stringToKey(const std::string& keyName) const;
     toml::table config;
-    std::unordered_map<std::string, sf::Keyboard::Key> keyNameMap;
 };
 
 } // namespace game

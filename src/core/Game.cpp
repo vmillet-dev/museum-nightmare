@@ -13,9 +13,8 @@ Game::Game() : window(
     ),
     ConfigManager::getInstance().getWindowTitle()
 ) {
+    sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
-    auto& configManager = ConfigManager::getInstance();
-    auto& inputManager = InputManager::getInstance();
     inputManager.init();
     ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
     spdlog::info("Game initialized successfully");
@@ -23,8 +22,6 @@ Game::Game() : window(
 
 void Game::run() {
     sf::Clock clock;
-    sf::Clock fpsTimer;
-    int frameCount = 0;
 
     while (window.isOpen()) {
         sf::Time deltaTime = clock.restart();
@@ -34,14 +31,6 @@ void Game::run() {
         handleEvents();
         update(deltaTime.asSeconds());
         render();
-
-        // FPS Counter
-        frameCount++;
-        if (fpsTimer.getElapsedTime().asSeconds() >= 1.0f) {
-            spdlog::debug("FPS: {}", frameCount);
-            frameCount = 0;
-            fpsTimer.restart();
-        }
     }
 }
 
@@ -53,25 +42,10 @@ void Game::handleEvent(const sf::Event& event) {
         return;
     }
 
-    // Handle key events
-    if (event.type == sf::Event::KeyPressed) {
-        std::string keyName;
-        switch (event.key.code) {
-            case sf::Keyboard::Z: keyName = "Move Up (Z)"; break;
-            case sf::Keyboard::S: keyName = "Move Down (S)"; break;
-            case sf::Keyboard::Q: keyName = "Move Left (Q)"; break;
-            case sf::Keyboard::D: keyName = "Move Right (D)"; break;
-            case sf::Keyboard::Escape:
-                keyName = "Escape";
-                spdlog::info("Escape pressed, quitting game");
-                window.close();
-                break;
-            default: return; // Skip logging unknown keys
-        }
-        spdlog::debug("Key pressed: {}", keyName);
-    }
+    // Handle all input events through InputManager
+    inputManager.handleEvent(event);
 
-    // Let current screen handle the event
+    // Let current screen handle non-input events
     if (!ScreenManager::getInstance().isEmpty()) {
         ScreenManager::getInstance().handleInput(event);
     }
@@ -85,7 +59,7 @@ void Game::handleEvents() {
 }
 
 void Game::update(float deltaTime) {
-    InputManager::getInstance().update();
+    inputManager.update();
     if (!ScreenManager::getInstance().isEmpty()) {
         ScreenManager::getInstance().update(deltaTime);
     }

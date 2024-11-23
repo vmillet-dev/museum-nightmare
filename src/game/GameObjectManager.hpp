@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "GameObject.hpp"
+#include "objects/GameObject.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {

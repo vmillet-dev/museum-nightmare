@@ -1,8 +1,8 @@
 #pragma once
 #include "Screen.hpp"
 #include "PauseScreen.hpp"
-#include "../game/objects/GameObjectManager.hpp"
-#include "../game/objects/Player.hpp"
+#include "../game/GameObjectManager.hpp"
+#include "../game/objects/actor/Player.hpp"
 #include "../game/objects/Wall.hpp"
 #include "../input/InputManager.hpp"
 #include "../core/Game.hpp"
