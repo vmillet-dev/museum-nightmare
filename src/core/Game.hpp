@@ -16,6 +16,7 @@ public:
     void run();
     void quit();
     sf::RenderWindow& getWindow();
+    InputManager& getInputManager() { return inputManager; }
 
 private:
     void handleEvent(const sf::Event& event);
@@ -24,6 +25,7 @@ private:
     void render();
 
     sf::RenderWindow window;
+    InputManager inputManager;
 };
 
 } // namespace game

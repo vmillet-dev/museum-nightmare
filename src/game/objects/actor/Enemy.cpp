@@ -14,6 +14,7 @@ Enemy::Enemy(float x, float y)
 }
 
 void Enemy::render(sf::RenderWindow& window) {
+    shape.setPosition(position);
     window.draw(shape);
 }
 

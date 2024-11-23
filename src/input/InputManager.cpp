@@ -1,60 +1,63 @@
 #include "InputManager.hpp"
 #include "../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
+#include <algorithm>
 
 namespace game {
 
 void InputManager::init() {
     spdlog::info("Initializing InputManager");
 
-    keyboardDevice = std::make_unique<KeyboardDevice>();
-    controllerDevice = std::make_unique<ControllerDevice>();
-
-    auto& config = ConfigManager::getInstance();
-
-    // Initialize keyboard device with config bindings
+    // Add keyboard device by default
+    auto keyboardDevice = std::make_unique<KeyboardDevice>();
     keyboardDevice->init();
-    keyboardDevice->setKeyBinding(Action::MoveUp, config.getKeyBinding("move_up"));
-    keyboardDevice->setKeyBinding(Action::MoveDown, config.getKeyBinding("move_down"));
-    keyboardDevice->setKeyBinding(Action::MoveLeft, config.getKeyBinding("move_left"));
-    keyboardDevice->setKeyBinding(Action::MoveRight, config.getKeyBinding("move_right"));
-    keyboardDevice->setKeyBinding(Action::Pause, config.getKeyBinding("pause"));
-    keyboardDevice->setKeyBinding(Action::Confirm, config.getKeyBinding("confirm"));
-    keyboardDevice->setKeyBinding(Action::Cancel, config.getKeyBinding("cancel"));
+    devices.push_back(std::move(keyboardDevice));
 
-    // Initialize controller device with config settings
-    controllerDevice->setDeadzone(config.getControllerDeadzone());
-    controllerDevice->setSensitivity(config.getControllerSensitivity());
-    controllerDevice->init();
-    controllerDevice->setButtonBinding(Action::MoveUp, config.getControllerButton("controller_move_up"));
-    controllerDevice->setButtonBinding(Action::MoveDown, config.getControllerButton("controller_move_down"));
-    controllerDevice->setButtonBinding(Action::MoveLeft, config.getControllerButton("controller_move_left"));
-    controllerDevice->setButtonBinding(Action::MoveRight, config.getControllerButton("controller_move_right"));
-    controllerDevice->setButtonBinding(Action::Pause, config.getControllerButton("controller_pause"));
-    controllerDevice->setButtonBinding(Action::Confirm, config.getControllerButton("controller_confirm"));
-    controllerDevice->setButtonBinding(Action::Cancel, config.getControllerButton("controller_cancel"));
-
-    // Set up axis bindings
-    controllerDevice->setAxisBinding(Action::MoveUp, sf::Joystick::Y);
-    controllerDevice->setAxisBinding(Action::MoveDown, sf::Joystick::Y);
-    controllerDevice->setAxisBinding(Action::MoveLeft, sf::Joystick::X);
-    controllerDevice->setAxisBinding(Action::MoveRight, sf::Joystick::X);
-
-    spdlog::info("Input devices initialized with configuration settings");
+    spdlog::info("Input devices initialized");
 }
 
 void InputManager::update() {
-    keyboardDevice->update();
-    controllerDevice->update();
+    for (auto& device : devices) {
+        device->update();
+    }
 }
 
 void InputManager::handleEvent(const sf::Event& event) {
-    keyboardDevice->handleEvent(event);
-    controllerDevice->handleEvent(event);
+    // Handle controller connection/disconnection
+    if (event.type == sf::Event::JoystickConnected) {
+        auto controllerDevice = std::make_unique<ControllerDevice>();
+        auto& config = ConfigManager::getInstance();
+        controllerDevice->setDeadzone(config.getControllerDeadzone());
+        controllerDevice->setSensitivity(config.getControllerSensitivity());
+        controllerDevice->init();
+        devices.push_back(std::move(controllerDevice));
+        spdlog::info("Controller connected and initialized");
+    }
+    else if (event.type == sf::Event::JoystickDisconnected) {
+        devices.erase(
+            std::remove_if(devices.begin(), devices.end(),
+                [](const auto& device) {
+                    return dynamic_cast<ControllerDevice*>(device.get()) != nullptr;
+                }
+            ),
+            devices.end()
+        );
+        spdlog::info("Controller disconnected and removed");
+    }
+
+    // Forward events to all devices
+    for (auto& device : devices) {
+        device->handleEvent(event);
+    }
 }
 
 bool InputManager::isActionPressed(Action action) {
-    return keyboardDevice->isActionPressed(action) || controllerDevice->isActionPressed(action);
+    for (auto& device : devices) {
+        if (device->isActionPressed(action)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace game

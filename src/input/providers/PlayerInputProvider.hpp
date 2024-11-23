@@ -9,7 +9,7 @@ private:
     InputManager& inputManager;
 
 public:
-    PlayerInputProvider();
+    PlayerInputProvider(InputManager& inputMgr);
     sf::Vector2f getMovementVector() override;
     bool isActionActive(Action action) override;
 };

@@ -3,7 +3,7 @@
 
 namespace game {
 
-PlayerInputProvider::PlayerInputProvider() : inputManager(InputManager::getInstance()) {}
+PlayerInputProvider::PlayerInputProvider(InputManager& inputMgr) : inputManager(inputMgr) {}
 
 sf::Vector2f PlayerInputProvider::getMovementVector() {
     sf::Vector2f movement(0.0f, 0.0f);

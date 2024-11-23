@@ -13,7 +13,7 @@ GameScreen::GameScreen(Game& game) : game(game) {
     gameObjectManager = std::make_unique<GameObjectManager>();
 
     // Create player at a better starting position for the larger level
-    auto player = std::make_unique<Player>(100.0f, 100.0f);
+    auto player = std::make_unique<Player>(100.0f, 100.0f, game);
     playerPtr = player.get();  // Store raw pointer before moving ownership
     gameObjectManager->addObject(std::move(player));
 

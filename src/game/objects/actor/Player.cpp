@@ -1,12 +1,13 @@
 #include "Player.hpp"
 #include "../Wall.hpp"
 #include "../../../input/providers/PlayerInputProvider.hpp"
+#include "../../../core/Game.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-Player::Player(float x, float y)
-    : Actor(x, y, std::make_unique<PlayerInputProvider>(), 200.0f) {
+Player::Player(float x, float y, Game& game)
+    : Actor(x, y, std::make_unique<PlayerInputProvider>(game.getInputManager()), 200.0f) {
     shape.setSize(sf::Vector2f(32.0f, 32.0f));
     shape.setFillColor(sf::Color::Green);
     shape.setOrigin(16.0f, 16.0f);
@@ -16,6 +17,7 @@ Player::Player(float x, float y)
 
 void Player::render(sf::RenderWindow& window) {
     windowSize = window.getSize();
+    shape.setPosition(position);
     window.draw(shape);
 }
 

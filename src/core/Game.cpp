@@ -14,8 +14,6 @@ Game::Game() : window(
     ConfigManager::getInstance().getWindowTitle()
 ) {
     spdlog::info("Initializing game...");
-    auto& configManager = ConfigManager::getInstance();
-    auto& inputManager = InputManager::getInstance();
     inputManager.init();
     ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
     spdlog::info("Game initialized successfully");
@@ -23,8 +21,6 @@ Game::Game() : window(
 
 void Game::run() {
     sf::Clock clock;
-    sf::Clock fpsTimer;
-    int frameCount = 0;
 
     while (window.isOpen()) {
         sf::Time deltaTime = clock.restart();
@@ -34,14 +30,6 @@ void Game::run() {
         handleEvents();
         update(deltaTime.asSeconds());
         render();
-
-        // FPS Counter
-        frameCount++;
-        if (fpsTimer.getElapsedTime().asSeconds() >= 1.0f) {
-            spdlog::debug("FPS: {}", frameCount);
-            frameCount = 0;
-            fpsTimer.restart();
-        }
     }
 }
 
@@ -54,7 +42,7 @@ void Game::handleEvent(const sf::Event& event) {
     }
 
     // Handle all input events through InputManager
-    InputManager::getInstance().handleEvent(event);
+    inputManager.handleEvent(event);
 
     // Let current screen handle non-input events
     if (!ScreenManager::getInstance().isEmpty()) {
@@ -70,7 +58,7 @@ void Game::handleEvents() {
 }
 
 void Game::update(float deltaTime) {
-    InputManager::getInstance().update();
+    inputManager.update();
     if (!ScreenManager::getInstance().isEmpty()) {
         ScreenManager::getInstance().update(deltaTime);
     }
