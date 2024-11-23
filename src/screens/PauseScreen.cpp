@@ -16,10 +16,6 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 250),
         sf::Vector2f(200, 50)
     );
-    resumeButton->setCallback([this]() {
-        spdlog::info("Resuming game");
-        this->game.getStateManager().transitionTo(GameState::PLAYING);
-    });
 
     // Create main menu button
     mainMenuButton = std::make_unique<Button>(
@@ -27,10 +23,6 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 350),
         sf::Vector2f(200, 50)
     );
-    mainMenuButton->setCallback([this]() {
-        spdlog::info("Returning to main menu");
-        this->game.getStateManager().transitionTo(GameState::MAIN_MENU);
-    });
 
     // Load font
     if (!font.loadFromFile("assets/arial.ttf")) {
@@ -50,17 +42,24 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
 }
 
 void PauseScreen::handleInput(const sf::Event& event) {
-    if (event.type == sf::Event::MouseButtonPressed ||
-        event.type == sf::Event::MouseMoved) {
-        sf::Vector2i mousePos;
-        if (event.type == sf::Event::MouseButtonPressed) {
-            mousePos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-        } else {
-            mousePos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
-        }
-        sf::Vector2f mousePosFloat(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
-        resumeButton->handleInput(mousePosFloat, game.getInputManager());
-        mainMenuButton->handleInput(mousePosFloat, game.getInputManager());
+    sf::Vector2f mousePosFloat;
+    if (event.type == sf::Event::MouseMoved) {
+        mousePosFloat = sf::Vector2f(static_cast<float>(event.mouseMove.x),
+                                   static_cast<float>(event.mouseMove.y));
+    }
+
+    // Update button states
+    resumeButton->handleInput(mousePosFloat, game.getInputManager());
+    mainMenuButton->handleInput(mousePosFloat, game.getInputManager());
+
+    // Check button states
+    if (resumeButton->isPressed()) {
+        spdlog::info("Resuming game");
+        game.getStateManager().transitionTo(GameState::PLAYING);
+    }
+    if (mainMenuButton->isPressed()) {
+        spdlog::info("Returning to main menu");
+        game.getStateManager().transitionTo(GameState::MAIN_MENU);
     }
 }
 

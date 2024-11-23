@@ -3,7 +3,7 @@
 
 namespace game {
 
-Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size) {
+Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size) : buttonText(buttonText), isHovered(false), isActive(false) {
     // Load font
     if (!font.loadFromFile("assets/arial.ttf")) {
         spdlog::error("Failed to load font in Button!");
@@ -27,8 +27,6 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
     sf::FloatRect textBounds = text.getLocalBounds();
     text.setOrigin(textBounds.width / 2, textBounds.height / 2);
     text.setPosition(position.x, position.y);
-
-    isHovered = false;
 }
 
 void Button::handleInput(const sf::Vector2f& mousePos, const InputManager& inputManager) {
@@ -40,20 +38,8 @@ void Button::handleInput(const sf::Vector2f& mousePos, const InputManager& input
         shape.setFillColor(isHovered ? hoverColor : defaultColor);
     }
 
-    // Handle click using InputManager
-    if (isHovered && inputManager.isActionPressed(Action::Confirm)) {
-        handleClick(mousePos);
-    }
-}
-
-void Button::setCallback(std::function<void()> newCallback) {
-    callback = std::move(newCallback);
-}
-
-void Button::handleClick(const sf::Vector2f& mousePos) {
-    if (callback) {
-        callback();
-    }
+    // Update button active state
+    isActive = isHovered && inputManager.isActionPressed(Action::Confirm);
 }
 
 void Button::handleHover(const sf::Vector2f& mousePos) {
