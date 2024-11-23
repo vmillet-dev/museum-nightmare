@@ -6,9 +6,11 @@
 
 namespace game {
 
+class Game;  // Forward declaration
+
 class ScreenManager {
 public:
-    static ScreenManager& getInstance();
+    explicit ScreenManager(Game& game);
     void pushScreen(std::unique_ptr<Screen> screen);
     void popScreen();
     void handleInput(const sf::Event& event);
@@ -18,11 +20,8 @@ public:
     bool isEmpty() const;
 
 private:
-    ScreenManager() = default;
+    Game& game;
     std::stack<std::unique_ptr<Screen>> screens;
-    // Delete copy constructor and assignment operator
-    ScreenManager(const ScreenManager&) = delete;
-    ScreenManager& operator=(const ScreenManager&) = delete;
 };
 
 } // namespace game

@@ -3,10 +3,7 @@
 
 namespace game {
 
-ScreenManager& ScreenManager::getInstance() {
-    static ScreenManager instance;
-    return instance;
-}
+ScreenManager::ScreenManager(Game& game) : game(game) {}
 
 void ScreenManager::pushScreen(std::unique_ptr<Screen> screen) {
     if (!screens.empty()) {

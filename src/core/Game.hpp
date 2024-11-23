@@ -1,11 +1,12 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "../input/InputManager.hpp"
+#include "../config/ConfigManager.hpp"
 #include "../screens/ScreenManager.hpp"
+#include "StateManager.hpp"
 #include "../screens/MainMenuScreen.hpp"
 #include "../screens/GameScreen.hpp"
 #include "../screens/PauseScreen.hpp"
-#include "../input/InputManager.hpp"
-#include "../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -17,6 +18,8 @@ public:
     void quit();
     sf::RenderWindow& getWindow();
     InputManager& getInputManager() { return inputManager; }
+    ScreenManager& getScreenManager() { return screenManager; }
+    StateManager& getStateManager() { return stateManager; }
 
 private:
     void handleEvent(const sf::Event& event);
@@ -26,6 +29,8 @@ private:
 
     sf::RenderWindow window;
     InputManager inputManager;
+    ScreenManager screenManager;
+    StateManager stateManager;
 };
 
 } // namespace game

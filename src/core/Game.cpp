@@ -1,6 +1,7 @@
 #include "Game.hpp"
 #include "../screens/MainMenuScreen.hpp"
 #include "../screens/GameScreen.hpp"
+#include "../screens/PauseScreen.hpp"
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -12,11 +13,15 @@ Game::Game() : window(
         ConfigManager::getInstance().getWindowHeight()
     ),
     ConfigManager::getInstance().getWindowTitle()
-) {
+),
+    inputManager(),
+    screenManager(*this),
+    stateManager(*this)  // Initialize StateManager
+{
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
     inputManager.init();
-    ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
+    stateManager.transitionTo(GameState::MAIN_MENU);  // Start with main menu
     spdlog::info("Game initialized successfully");
 }
 
@@ -46,8 +51,8 @@ void Game::handleEvent(const sf::Event& event) {
     inputManager.handleEvent(event);
 
     // Let current screen handle non-input events
-    if (!ScreenManager::getInstance().isEmpty()) {
-        ScreenManager::getInstance().handleInput(event);
+    if (!screenManager.isEmpty()) {
+        screenManager.handleInput(event);
     }
 }
 
@@ -60,15 +65,15 @@ void Game::handleEvents() {
 
 void Game::update(float deltaTime) {
     inputManager.update();
-    if (!ScreenManager::getInstance().isEmpty()) {
-        ScreenManager::getInstance().update(deltaTime);
+    if (!screenManager.isEmpty()) {
+        screenManager.update(deltaTime);
     }
 }
 
 void Game::render() {
     window.clear(sf::Color::Black);
-    if (!ScreenManager::getInstance().isEmpty()) {
-        ScreenManager::getInstance().render(window);
+    if (!screenManager.isEmpty()) {
+        screenManager.render(window);
     }
     window.display();
 }
