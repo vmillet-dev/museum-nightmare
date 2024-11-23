@@ -25,14 +25,19 @@ void StateManager::transitionTo(GameState newState) {
 
         case GameState::PLAYING:
             if (currentState == GameState::PAUSED) {
-                game.getScreenManager().popScreen();  // Return to game screen
-            } else {
+                // When resuming from pause, just pop the pause screen
+                game.getScreenManager().popScreen();
+            } else if (currentState == GameState::MAIN_MENU) {
+                // Starting new game from main menu
+                game.getScreenManager().popScreen(); // Remove main menu
                 game.getScreenManager().pushScreen(std::make_unique<GameScreen>(game));
             }
             break;
 
         case GameState::PAUSED:
-            game.getScreenManager().pushScreen(std::make_unique<PauseScreen>(game));
+            if (currentState == GameState::PLAYING) {
+                game.getScreenManager().pushScreen(std::make_unique<PauseScreen>(game));
+            }
             break;
     }
 

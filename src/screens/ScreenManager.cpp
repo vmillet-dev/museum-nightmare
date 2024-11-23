@@ -15,10 +15,14 @@ void ScreenManager::pushScreen(std::unique_ptr<Screen> screen) {
 
 void ScreenManager::popScreen() {
     if (!screens.empty()) {
+        auto currentScreen = std::move(screens.top());
         screens.pop();
         spdlog::info("Popped screen. Remaining screens: {}", screens.size());
+
+        // Only resume the previous screen if it exists
         if (!screens.empty()) {
             screens.top()->resume();
+            spdlog::info("Resumed previous screen");
         }
     }
 }
