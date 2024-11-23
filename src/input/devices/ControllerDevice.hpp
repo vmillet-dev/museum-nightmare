@@ -21,13 +21,14 @@ public:
     int getControllerId() const { return controllerId; }
 
 private:
-    std::unordered_map<Action, unsigned int> buttonBindings;
-    std::unordered_map<Action, sf::Joystick::Axis> axisBindings;
+    std::unordered_map<unsigned int, Action> buttonBindings;
+    std::unordered_map<sf::Joystick::Axis, Action> axisBindings;
+    std::unordered_map<unsigned int, bool> buttonStates;
+    std::unordered_map<sf::Joystick::Axis, float> axisStates;
     bool connected = false;
     float deadzone = 20.0f;
     float sensitivity = 100.0f;
-    int controllerId = 0;  // Store the active controller ID
-    bool wasConnected = false;  // Track previous connection state
+    int controllerId = 0;
 };
 
 } // namespace game
