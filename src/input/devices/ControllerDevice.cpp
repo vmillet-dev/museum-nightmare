@@ -19,20 +19,22 @@ void ControllerDevice::init() {
     }
 
     // Load button bindings from config
-    buttonBindings[config.getControllerButton("controller_confirm")] = Action::Confirm;
-    buttonBindings[config.getControllerButton("controller_cancel")] = Action::Cancel;
-    buttonBindings[config.getControllerButton("controller_pause")] = Action::Pause;
+    buttonBindings[Action::Confirm] = config.getControllerButton("controller_confirm");
+    buttonBindings[Action::Cancel] = config.getControllerButton("controller_cancel");
+    buttonBindings[Action::Pause] = config.getControllerButton("controller_pause");
 
     // Load axis bindings from config
-    axisBindings[sf::Joystick::Y] = Action::MoveUp;
-    axisBindings[sf::Joystick::X] = Action::MoveLeft;
+    axisBindings[Action::MoveUp] = sf::Joystick::Y;
+    axisBindings[Action::MoveDown] = sf::Joystick::Y;
+    axisBindings[Action::MoveLeft] = sf::Joystick::X;
+    axisBindings[Action::MoveRight] = sf::Joystick::X;
 
     // Initialize states
-    for (const auto& [button, action] : buttonBindings) {
-        buttonStates[button] = false;
+    for (const auto& [action, button] : buttonBindings) {
+        buttonStates[action] = false;
     }
-    for (const auto& [axis, action] : axisBindings) {
-        axisStates[axis] = 0.0f;
+    for (const auto& [action, axis] : axisBindings) {
+        axisStates[action] = 0.0f;
     }
 
     // Load controller settings
@@ -56,14 +58,14 @@ void ControllerDevice::update() {
     }
 
     // Update button states
-    for (const auto& [button, action] : buttonBindings) {
-        buttonStates[button] = sf::Joystick::isButtonPressed(controllerId, button);
+    for (const auto& [action, button] : buttonBindings) {
+        buttonStates[action] = sf::Joystick::isButtonPressed(controllerId, button);
     }
 
     // Update axis states
-    for (const auto& [axis, action] : axisBindings) {
+    for (const auto& [action, axis] : axisBindings) {
         float position = sf::Joystick::getAxisPosition(controllerId, axis);
-        axisStates[axis] = std::abs(position) < deadzone ? 0.0f : position / sensitivity;
+        axisStates[action] = std::abs(position) < deadzone ? 0.0f : position / sensitivity;
     }
 }
 
@@ -71,28 +73,26 @@ bool ControllerDevice::isActionPressed(Action action) {
     if (!connected) return false;
 
     // Check button states
-    for (const auto& [button, boundAction] : buttonBindings) {
-        if (boundAction == action && buttonStates[button]) {
-            return true;
-        }
+    auto buttonIt = buttonBindings.find(action);
+    if (buttonIt != buttonBindings.end()) {
+        return buttonStates[action];
     }
 
     // Check axis states
-    for (const auto& [axis, boundAction] : axisBindings) {
-        if (boundAction == action) {
-            float position = axisStates[axis];
-            switch(action) {
-                case Action::MoveUp:
-                    return position < -0.5f;
-                case Action::MoveDown:
-                    return position > 0.5f;
-                case Action::MoveLeft:
-                    return position < -0.5f;
-                case Action::MoveRight:
-                    return position > 0.5f;
-                default:
-                    break;
-            }
+    auto axisIt = axisBindings.find(action);
+    if (axisIt != axisBindings.end()) {
+        float position = axisStates[action];
+        switch(action) {
+            case Action::MoveUp:
+                return position < -0.5f;
+            case Action::MoveDown:
+                return position > 0.5f;
+            case Action::MoveLeft:
+                return position < -0.5f;
+            case Action::MoveRight:
+                return position > 0.5f;
+            default:
+                return false;
         }
     }
 
@@ -108,11 +108,11 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
 }
 
 void ControllerDevice::setButtonBinding(Action action, unsigned int button) {
-    buttonBindings[button] = action;
+    buttonBindings[action] = button;
 }
 
 void ControllerDevice::setAxisBinding(Action action, sf::Joystick::Axis axis) {
-    axisBindings[axis] = action;
+    axisBindings[action] = axis;
 }
 
 } // namespace game
