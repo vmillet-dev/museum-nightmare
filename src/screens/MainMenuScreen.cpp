@@ -9,10 +9,9 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game) {
     buttons.push_back(std::make_unique<Button>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50)));
     buttons.push_back(std::make_unique<Button>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50)));
 
-    buttons[0]->setCallback([&]() {
+    buttons[0]->setCallback([this, &game]() {
         spdlog::info("Starting game");
-        auto screen = std::make_unique<GameScreen>(game);
-        ScreenManager::getInstance().pushScreen(std::move(screen));
+        game.getStateManager().transitionTo(GameState::PLAYING);
     });
 
     buttons[1]->setCallback([this]() {

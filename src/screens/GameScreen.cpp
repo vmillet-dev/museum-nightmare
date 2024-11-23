@@ -24,7 +24,7 @@ GameScreen::GameScreen(Game& game) : game(game) {
 void GameScreen::handleInput(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
         spdlog::info("Opening pause menu");
-        ScreenManager::getInstance().pushScreen(std::make_unique<PauseScreen>(game));
+        game.getStateManager().transitionTo(GameState::PAUSED);
     }
 }
 
