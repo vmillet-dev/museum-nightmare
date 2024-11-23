@@ -38,8 +38,12 @@ void Button::handleInput(const sf::Vector2f& mousePos, const InputManager& input
         shape.setFillColor(isHovered ? hoverColor : defaultColor);
     }
 
-    // Update button active state
-    isActive = isHovered && inputManager.isActionPressed(Action::Confirm);
+    // Update button active state based on mouse click
+    if (isHovered && inputManager.isActionPressed(Action::Confirm)) {
+        isActive = true;
+    } else if (isActive && !inputManager.isActionPressed(Action::Confirm)) {
+        isActive = false;
+    }
 }
 
 void Button::handleHover(const sf::Vector2f& mousePos) {

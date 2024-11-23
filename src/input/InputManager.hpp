@@ -4,6 +4,7 @@
 #include <vector>
 #include "devices/InputDevice.hpp"
 #include "devices/KeyboardDevice.hpp"
+#include "devices/MouseDevice.hpp"
 #include "devices/ControllerDevice.hpp"
 #include "Action.hpp"
 

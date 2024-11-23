@@ -2,6 +2,7 @@
 #include "../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
 #include <algorithm>
+#include "devices/MouseDevice.hpp"
 
 namespace game {
 
@@ -32,6 +33,11 @@ void InputManager::init() {
     auto keyboardDevice = std::make_unique<KeyboardDevice>();
     keyboardDevice->init();
     devices.push_back(std::move(keyboardDevice));
+
+    // Add mouse device
+    auto mouseDevice = std::make_unique<MouseDevice>();
+    mouseDevice->init();
+    devices.push_back(std::move(mouseDevice));
 
     // Check for already connected controllers
     for (unsigned int i = 0; i < sf::Joystick::Count; ++i) {
