@@ -18,6 +18,9 @@ void KeyboardDevice::init() {
 }
 
 void KeyboardDevice::update() {
+    // Store previous key states
+    previousKeyStates = keyStates;
+
     // Update key states for continuous input
     for (const auto& binding : keyBindings) {
         keyStates[binding.first] = sf::Keyboard::isKeyPressed(binding.first);
@@ -27,6 +30,26 @@ void KeyboardDevice::update() {
 bool KeyboardDevice::isActionPressed(Action action) {
     for (const auto& binding : keyBindings) {
         if (binding.second == action && keyStates[binding.first]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool KeyboardDevice::isActionJustPressed(Action action) {
+    for (const auto& binding : keyBindings) {
+        if (binding.second == action &&
+            keyStates[binding.first] &&
+            !previousKeyStates[binding.first]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool KeyboardDevice::isActionReleased(Action action) {
+    for (const auto& binding : keyBindings) {
+        if (binding.second == action && !keyStates[binding.first]) {
             return true;
         }
     }

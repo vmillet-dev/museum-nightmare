@@ -29,7 +29,7 @@ void MouseDevice::update() {
     lastMousePos = sf::Mouse::getPosition(window);
 }
 
-bool MouseDevice::isActionPressed(Action action) const {
+bool MouseDevice::isActionPressed(Action action) {
     switch (action) {
         case Action::MouseLeft:
             return leftButtonPressed;
@@ -40,7 +40,7 @@ bool MouseDevice::isActionPressed(Action action) const {
     }
 }
 
-bool MouseDevice::isActionJustPressed(Action action) const {
+bool MouseDevice::isActionJustPressed(Action action) {
     switch (action) {
         case Action::MouseLeft:
             return leftButtonJustPressed;
@@ -51,7 +51,7 @@ bool MouseDevice::isActionJustPressed(Action action) const {
     }
 }
 
-bool MouseDevice::isActionReleased(Action action) const {
+bool MouseDevice::isActionReleased(Action action) {
     switch (action) {
         case Action::MouseLeft:
             return !leftButtonPressed;

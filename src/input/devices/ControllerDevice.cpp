@@ -57,6 +57,9 @@ void ControllerDevice::update() {
         return;
     }
 
+    // Store previous button states
+    previousButtonStates = buttonStates;
+
     // Update button states
     for (const auto& [action, button] : buttonBindings) {
         buttonStates[action] = sf::Joystick::isButtonPressed(controllerId, button);
@@ -97,6 +100,44 @@ bool ControllerDevice::isActionPressed(Action action) {
     }
 
     return false;
+}
+
+bool ControllerDevice::isActionJustPressed(Action action) {
+    if (!connected) return false;
+
+    auto buttonIt = buttonBindings.find(action);
+    if (buttonIt != buttonBindings.end()) {
+        return buttonStates[action] && !previousButtonStates[action];
+    }
+
+    // For axis-based actions, we don't track "just pressed" state
+    return false;
+}
+
+bool ControllerDevice::isActionReleased(Action action) {
+    if (!connected) return false;
+
+    auto buttonIt = buttonBindings.find(action);
+    if (buttonIt != buttonBindings.end()) {
+        return !buttonStates[action];
+    }
+
+    auto axisIt = axisBindings.find(action);
+    if (axisIt != axisBindings.end()) {
+        float position = axisStates[action];
+        switch(action) {
+            case Action::MoveUp:
+            case Action::MoveDown:
+                return std::abs(position) <= 0.5f;
+            case Action::MoveLeft:
+            case Action::MoveRight:
+                return std::abs(position) <= 0.5f;
+            default:
+                return true;
+        }
+    }
+
+    return true;
 }
 
 void ControllerDevice::handleEvent(const sf::Event& event) {

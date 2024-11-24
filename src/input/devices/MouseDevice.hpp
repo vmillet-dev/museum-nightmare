@@ -8,10 +8,12 @@ class MouseDevice : public InputDevice {
 public:
     explicit MouseDevice(sf::RenderWindow& window);
 
+    void init() override {}  // No initialization needed for mouse
     void update() override;
-    bool isActionPressed(Action action) const override;
-    bool isActionJustPressed(Action action) const override;
-    bool isActionReleased(Action action) const override;
+    bool isActionPressed(Action action) override;
+    bool isActionJustPressed(Action action) override;
+    bool isActionReleased(Action action) override;
+    void handleEvent(const sf::Event& event) override { /* No mouse events to handle */ }
 
     sf::Vector2i getMousePosition() const;
     bool isLeftButtonPressed() const;

@@ -40,11 +40,11 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
 }
 
 void PauseScreen::handleInput(const sf::Event& event) {
-    if (event.type == sf::Event::MouseMoved) {
-        sf::Vector2f mousePos(event.mouseMove.x, event.mouseMove.y);
-        resumeButton->update(mousePos);
-        mainMenuButton->update(mousePos);
-    }
+    auto& inputManager = game.getInputManager();
+
+    // Update buttons with input manager
+    resumeButton->update(inputManager);
+    mainMenuButton->update(inputManager);
 
     if (resumeButton->isClicked()) {
         spdlog::info("Resuming game");

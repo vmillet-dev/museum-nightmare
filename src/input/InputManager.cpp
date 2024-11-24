@@ -35,6 +35,7 @@ void InputManager::init() {
 
     // Add mouse device
     auto mouseDevice = std::make_unique<MouseDevice>(window);
+    mouseDevice->init();
     devices.push_back(std::move(mouseDevice));
 
     // Check for already connected controllers
@@ -70,6 +71,24 @@ void InputManager::handleEvent(const sf::Event& event) {
 bool InputManager::isActionPressed(Action action) {
     for (auto& device : devices) {
         if (device->isActionPressed(action)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputManager::isActionJustPressed(Action action) {
+    for (auto& device : devices) {
+        if (device->isActionJustPressed(action)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputManager::isActionReleased(Action action) {
+    for (auto& device : devices) {
+        if (device->isActionReleased(action)) {
             return true;
         }
     }
