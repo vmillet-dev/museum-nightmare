@@ -31,10 +31,10 @@ void ControllerDevice::init() {
 
     // Initialize action states
     for (const auto& [action, _] : buttonBindings) {
-        actionStates[action] = ActionState::NONE;
+        actionStates[action] = InputDevice::ActionState::NONE;
     }
     for (const auto& [action, _] : axisBindings) {
-        actionStates[action] = ActionState::NONE;
+        actionStates[action] = InputDevice::ActionState::NONE;
     }
 
     // Load controller settings
@@ -43,10 +43,10 @@ void ControllerDevice::init() {
 }
 
 InputDevice::ActionState ControllerDevice::getActionState(Action action) const {
-    if (!connected) return ActionState::NONE;
+    if (!connected) return InputDevice::ActionState::NONE;
 
     auto stateIt = actionStates.find(action);
-    return stateIt != actionStates.end() ? stateIt->second : ActionState::NONE;
+    return stateIt != actionStates.end() ? stateIt->second : InputDevice::ActionState::NONE;
 }
 
 void ControllerDevice::handleEvent(const sf::Event& event) {
@@ -72,14 +72,14 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
         event.type == sf::Event::JoystickButtonReleased) {
         for (const auto& [action, button] : buttonBindings) {
             if (event.joystickButton.button == button) {
-                ActionState newState;
+                InputDevice::ActionState newState;
                 if (event.type == sf::Event::JoystickButtonPressed) {
-                    newState = actionStates[action] == ActionState::NONE ?
-                              ActionState::JUST_PRESSED : ActionState::PRESSED;
+                    newState = actionStates[action] == InputDevice::ActionState::NONE ?
+                              InputDevice::ActionState::JUST_PRESSED : InputDevice::ActionState::PRESSED;
                     spdlog::debug("Controller button {} pressed for action {}",
                                 button, static_cast<int>(action));
                 } else {
-                    newState = ActionState::RELEASED;
+                    newState = InputDevice::ActionState::RELEASED;
                 }
                 actionStates[action] = newState;
             }
@@ -102,7 +102,7 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
 
         for (const auto& [action, axis] : axisBindings) {
             if (event.joystickMove.axis == axis) {
-                ActionState newState = ActionState::NONE;
+                InputDevice::ActionState newState = InputDevice::ActionState::NONE;
                 bool isActive = false;
 
                 // More forgiving thresholds for menu navigation
@@ -127,15 +127,15 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
 
                 if (isActive) {
                     auto currentState = actionStates[action];
-                    newState = (currentState == ActionState::NONE ||
-                              currentState == ActionState::RELEASED) ?
-                              ActionState::JUST_PRESSED : ActionState::PRESSED;
+                    newState = (currentState == InputDevice::ActionState::NONE ||
+                              currentState == InputDevice::ActionState::RELEASED) ?
+                              InputDevice::ActionState::JUST_PRESSED : InputDevice::ActionState::PRESSED;
                     spdlog::debug("Controller axis {} activated: position={}, action={}, newState={}",
                                 static_cast<int>(axis), position, static_cast<int>(action),
                                 static_cast<int>(newState));
                 } else {
-                    newState = actionStates[action] != ActionState::NONE ?
-                              ActionState::RELEASED : ActionState::NONE;
+                    newState = actionStates[action] != InputDevice::ActionState::NONE ?
+                              InputDevice::ActionState::RELEASED : InputDevice::ActionState::NONE;
                 }
 
                 actionStates[action] = newState;
@@ -145,10 +145,10 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
 
     // Reset JUST_PRESSED and RELEASED states after they've been consumed
     for (auto& [action, state] : actionStates) {
-        if (state == ActionState::JUST_PRESSED) {
-            state = ActionState::PRESSED;
-        } else if (state == ActionState::RELEASED) {
-            state = ActionState::NONE;
+        if (state == InputDevice::ActionState::JUST_PRESSED) {
+            state = InputDevice::ActionState::PRESSED;
+        } else if (state == InputDevice::ActionState::RELEASED) {
+            state = InputDevice::ActionState::NONE;
         }
     }
 }
