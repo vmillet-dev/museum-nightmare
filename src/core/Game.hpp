@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "core/GameState.hpp"
+#include "./GameState.hpp"
 #include "../screens/ScreenManager.hpp"
 #include "../screens/MainMenuScreen.hpp"
 #include "../screens/GameScreen.hpp"
