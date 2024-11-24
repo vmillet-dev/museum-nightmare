@@ -1,36 +1,5 @@
 include(FetchContent)
 
-# Configure SFML build options based on required libraries
-function(configure_sfml_build_options)
-    # Default all SFML modules to OFF
-    set(SFML_BUILD_GRAPHICS OFF CACHE BOOL "" FORCE)
-    set(SFML_BUILD_WINDOW OFF CACHE BOOL "" FORCE)
-    set(SFML_BUILD_SYSTEM OFF CACHE BOOL "" FORCE)
-    set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
-    set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
-
-    # Enable required modules based on SFML_LIBRARIES
-    foreach(lib IN LISTS SFML_LIBRARIES)
-        if(lib STREQUAL "sfml-graphics")
-            set(SFML_BUILD_GRAPHICS ON CACHE BOOL "" FORCE)
-        elseif(lib STREQUAL "sfml-window")
-            set(SFML_BUILD_WINDOW ON CACHE BOOL "" FORCE)
-        elseif(lib STREQUAL "sfml-system")
-            set(SFML_BUILD_SYSTEM ON CACHE BOOL "" FORCE)
-        elseif(lib STREQUAL "sfml-audio")
-            set(SFML_BUILD_AUDIO ON CACHE BOOL "" FORCE)
-        elseif(lib STREQUAL "sfml-network")
-            set(SFML_BUILD_NETWORK ON CACHE BOOL "" FORCE)
-        endif()
-    endforeach()
-
-    # Always disable these regardless of configuration
-    set(SFML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    set(SFML_BUILD_DOC OFF CACHE BOOL "" FORCE)
-    set(SFML_BUILD_TEST_SUITE OFF CACHE BOOL "" FORCE)
-    set(SFML_GENERATE_PDB ON CACHE BOOL "" FORCE)
-endfunction()
-
 # Set version variables
 set(SFML_VERSION "2.6.2")
 set(TOMLPLUSPLUS_VERSION "3.4.0")
