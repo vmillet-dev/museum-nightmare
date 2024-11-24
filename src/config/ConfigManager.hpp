@@ -37,6 +37,9 @@ public:
     float getMasterVolume() const;
     float getMusicVolume() const;
     float getSoundVolume() const;
+    void setMasterVolume(float volume);
+    void setMusicVolume(float volume);
+    void setSoundVolume(float volume);
 
     struct SoundResource {
         std::string filepath;

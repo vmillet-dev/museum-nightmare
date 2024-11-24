@@ -102,22 +102,19 @@ void SoundManager::resumeMusic() {
 
 void SoundManager::setMasterVolume(float volume) {
     auto& config = ConfigManager::getInstance();
-    config["audio"]["master_volume"] = volume;
-    config.saveConfig();
+    config.setMasterVolume(volume);
     updateAllVolumes();
 }
 
 void SoundManager::setMusicVolume(float volume) {
     auto& config = ConfigManager::getInstance();
-    config["audio"]["music_volume"] = volume;
-    config.saveConfig();
+    config.setMusicVolume(volume);
     updateAllVolumes();
 }
 
 void SoundManager::setSoundVolume(float volume) {
     auto& config = ConfigManager::getInstance();
-    config["audio"]["sound_volume"] = volume;
-    config.saveConfig();
+    config.setSoundVolume(volume);
     updateAllVolumes();
 }
 

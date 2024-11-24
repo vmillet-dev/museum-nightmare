@@ -176,6 +176,27 @@ float ConfigManager::getSoundVolume() const {
     return config["audio"]["sound_volume"].value_or(100.0f);
 }
 
+void ConfigManager::setMasterVolume(float volume) {
+    if (auto* audio = config.get_as<toml::table>("audio")) {
+        audio->insert_or_assign("master_volume", volume);
+        saveConfig();
+    }
+}
+
+void ConfigManager::setMusicVolume(float volume) {
+    if (auto* audio = config.get_as<toml::table>("audio")) {
+        audio->insert_or_assign("music_volume", volume);
+        saveConfig();
+    }
+}
+
+void ConfigManager::setSoundVolume(float volume) {
+    if (auto* audio = config.get_as<toml::table>("audio")) {
+        audio->insert_or_assign("sound_volume", volume);
+        saveConfig();
+    }
+}
+
 std::optional<ConfigManager::SoundResource> ConfigManager::getSoundResource(const std::string& id) const {
     auto sounds = config["audio"]["sounds"];
     if (!sounds || !sounds.is_table() || !sounds[id]) {

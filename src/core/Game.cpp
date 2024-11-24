@@ -14,7 +14,7 @@ Game::Game() :
         ),
         ConfigManager::getInstance().getWindowTitle()
     ),
-    soundManager("assets/config/audio.toml")
+    soundManager()
 {
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
@@ -28,8 +28,6 @@ void Game::run() {
 
     while (window.isOpen()) {
         sf::Time deltaTime = clock.restart();
-        float dt = deltaTime.asSeconds();
-
         // Handle real events
         handleEvents();
         update(deltaTime.asSeconds());

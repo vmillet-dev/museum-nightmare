@@ -24,7 +24,7 @@ sf::FloatRect Enemy::getBounds() const {
 
 void Enemy::handleCollision(GameObject* other) {
     // Basic collision response - move away from collision
-    if (auto* player = dynamic_cast<Player*>(other)) {
+    if (dynamic_cast<Player*>(other)) {
         sf::Vector2f moveBack = getPosition() - other->getPosition();
         float length = std::sqrt(moveBack.x * moveBack.x + moveBack.y * moveBack.y);
         if (length > 0) {

@@ -3,8 +3,8 @@
 
 namespace game {
 
-Actor::Actor(float x, float y, std::unique_ptr<InputProvider> provider, float speed)
-    : GameObject(x, y), inputProvider(std::move(provider)), speed(speed) {}
+Actor::Actor(float x, float y, std::unique_ptr<InputProvider> provider, float initialSpeed)
+    : GameObject(x, y), inputProvider(std::move(provider)), speed(initialSpeed) {}
 
 void Actor::update(float deltaTime) {
     if (inputProvider) {
