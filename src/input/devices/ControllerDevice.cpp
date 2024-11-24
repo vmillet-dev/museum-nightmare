@@ -29,12 +29,12 @@ void ControllerDevice::init() {
     axisBindings[Action::MoveLeft] = sf::Joystick::X;
     axisBindings[Action::MoveRight] = sf::Joystick::X;
 
-    // Initialize states
-    for (const auto& [action, button] : buttonBindings) {
-        buttonStates[action] = false;
+    // Initialize action states
+    for (const auto& [action, _] : buttonBindings) {
+        actionStates[action] = InputDevice::ActionState::NONE;
     }
-    for (const auto& [action, axis] : axisBindings) {
-        axisStates[action] = 0.0f;
+    for (const auto& [action, _] : axisBindings) {
+        actionStates[action] = InputDevice::ActionState::NONE;
     }
 
     // Load controller settings
@@ -42,164 +42,107 @@ void ControllerDevice::init() {
     setSensitivity(config.getControllerSensitivity());
 }
 
-void ControllerDevice::update() {
-    if (!connected) {
-        // Check for new controller connection
-        for (int i = 0; i < sf::Joystick::Count; ++i) {
-            if (sf::Joystick::isConnected(i)) {
-                connected = true;
-                controllerId = i;
-                spdlog::info("Controller connected on port {}", i);
-                init();
-                break;
-            }
-        }
-        return;
-    }
+InputDevice::ActionState ControllerDevice::getActionState(Action action) const {
+    if (!connected) return InputDevice::ActionState::NONE;
 
-    // Store previous states
-    previousButtonStates = buttonStates;
-
-    // Convert current axis states to boolean for previous state tracking
-    for (const auto& [action, axis] : axisBindings) {
-        float position = axisStates[action];
-        switch(action) {
-            case Action::MoveUp:
-                previousAxisStates[action] = position < -0.5f;
-                break;
-            case Action::MoveDown:
-                previousAxisStates[action] = position > 0.5f;
-                break;
-            case Action::MoveLeft:
-                previousAxisStates[action] = position < -0.5f;
-                break;
-            case Action::MoveRight:
-                previousAxisStates[action] = position > 0.5f;
-                break;
-            default:
-                break;
-        }
-    }
-
-    // Update button states
-    for (const auto& [action, button] : buttonBindings) {
-        buttonStates[action] = sf::Joystick::isButtonPressed(controllerId, button);
-        if (buttonStates[action]) {
-            spdlog::debug("Controller button {} pressed", button);
-        }
-    }
-
-    // Update axis states
-    for (const auto& [action, axis] : axisBindings) {
-        float position = sf::Joystick::getAxisPosition(controllerId, axis);
-        axisStates[action] = std::abs(position) < deadzone ? 0.0f : position / sensitivity;
-        if (std::abs(axisStates[action]) > 0.5f) {
-            spdlog::debug("Controller axis {} value: {}", static_cast<int>(axis), axisStates[action]);
-        }
-    }
-}
-
-bool ControllerDevice::isActionPressed(Action action) {
-    if (!connected) return false;
-
-    // Check button states
-    auto buttonIt = buttonBindings.find(action);
-    if (buttonIt != buttonBindings.end()) {
-        return buttonStates[action];
-    }
-
-    // Check axis states
-    auto axisIt = axisBindings.find(action);
-    if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
-        switch(action) {
-            case Action::MoveUp:
-                return position < -0.5f;
-            case Action::MoveDown:
-                return position > 0.5f;
-            case Action::MoveLeft:
-                return position < -0.5f;
-            case Action::MoveRight:
-                return position > 0.5f;
-            default:
-                return false;
-        }
-    }
-
-    return false;
-}
-
-bool ControllerDevice::isActionJustPressed(Action action) {
-    if (!connected) return false;
-
-    // Check button states
-    auto buttonIt = buttonBindings.find(action);
-    if (buttonIt != buttonBindings.end()) {
-        return buttonStates[action] && !previousButtonStates[action];
-    }
-
-    // Check axis states for movement actions
-    auto axisIt = axisBindings.find(action);
-    if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
-        bool currentState = false;
-        switch(action) {
-            case Action::MoveUp:
-                currentState = position < -0.5f;
-                break;
-            case Action::MoveDown:
-                currentState = position > 0.5f;
-                break;
-            case Action::MoveLeft:
-                currentState = position < -0.5f;
-                break;
-            case Action::MoveRight:
-                currentState = position > 0.5f;
-                break;
-            default:
-                return false;
-        }
-        // Add debug logging
-        if (currentState) {
-            spdlog::debug("Controller axis {} state: {}", static_cast<int>(axisIt->second), position);
-        }
-        return currentState && !previousAxisStates[action];
-    }
-
-    return false;
-}
-
-bool ControllerDevice::isActionReleased(Action action) {
-    if (!connected) return false;
-
-    auto buttonIt = buttonBindings.find(action);
-    if (buttonIt != buttonBindings.end()) {
-        return !buttonStates[action];
-    }
-
-    auto axisIt = axisBindings.find(action);
-    if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
-        switch(action) {
-            case Action::MoveUp:
-            case Action::MoveDown:
-                return std::abs(position) <= 0.5f;
-            case Action::MoveLeft:
-            case Action::MoveRight:
-                return std::abs(position) <= 0.5f;
-            default:
-                return true;
-        }
-    }
-
-    return true;
+    auto stateIt = actionStates.find(action);
+    return stateIt != actionStates.end() ? stateIt->second : InputDevice::ActionState::NONE;
 }
 
 void ControllerDevice::handleEvent(const sf::Event& event) {
-    if (event.type == sf::Event::JoystickDisconnected &&
-        event.joystickConnect.joystickId == controllerId) {
+    // Handle controller connection/disconnection
+    if (event.type == sf::Event::JoystickConnected) {
+        if (!connected) {
+            connected = true;
+            controllerId = event.joystickConnect.joystickId;
+            spdlog::info("Controller {} connected", controllerId);
+            init();
+        }
+    } else if (event.type == sf::Event::JoystickDisconnected &&
+               event.joystickConnect.joystickId == controllerId) {
         connected = false;
         spdlog::info("Controller {} disconnected", controllerId);
+        return;
+    }
+
+    if (!connected) return;
+
+    // Handle button events
+    if (event.type == sf::Event::JoystickButtonPressed ||
+        event.type == sf::Event::JoystickButtonReleased) {
+        for (const auto& [action, button] : buttonBindings) {
+            if (event.joystickButton.button == button) {
+                InputDevice::ActionState newState;
+                if (event.type == sf::Event::JoystickButtonPressed) {
+                    newState = actionStates[action] == InputDevice::ActionState::NONE ?
+                              InputDevice::ActionState::JUST_PRESSED : InputDevice::ActionState::PRESSED;
+                    spdlog::debug("Controller button {} pressed for action {}",
+                                button, static_cast<int>(action));
+                } else {
+                    newState = InputDevice::ActionState::RELEASED;
+                }
+                actionStates[action] = newState;
+            }
+        }
+    }
+
+    // Handle axis movement
+    if (event.type == sf::Event::JoystickMoved) {
+        float position = event.joystickMove.position;
+        // Apply deadzone with smoother transition
+        if (std::abs(position) < deadzone) {
+            position = 0.0f;
+        } else {
+            float normalizedPosition = (std::abs(position) - deadzone) / (100.0f - deadzone);
+            position = (position > 0 ? 1 : -1) * normalizedPosition * sensitivity;
+        }
+
+        for (const auto& [action, axis] : axisBindings) {
+            if (event.joystickMove.axis == axis) {
+                InputDevice::ActionState newState = InputDevice::ActionState::NONE;
+                bool isActive = false;
+
+                switch(action) {
+                    case Action::MoveUp:
+                        isActive = position < -0.3f;  // More sensitive threshold
+                        break;
+                    case Action::MoveDown:
+                        isActive = position > 0.3f;   // More sensitive threshold
+                        break;
+                    case Action::MoveLeft:
+                        isActive = position < -0.3f;  // More sensitive threshold
+                        break;
+                    case Action::MoveRight:
+                        isActive = position > 0.3f;   // More sensitive threshold
+                        break;
+                    default:
+                        break;
+                }
+
+                if (isActive) {
+                    auto currentState = actionStates[action];
+                    newState = (currentState == InputDevice::ActionState::NONE ||
+                              currentState == InputDevice::ActionState::RELEASED) ?
+                              InputDevice::ActionState::JUST_PRESSED : InputDevice::ActionState::PRESSED;
+                    spdlog::debug("Controller axis {} value: {} for action {}",
+                                static_cast<int>(axis), position, static_cast<int>(action));
+                } else {
+                    newState = actionStates[action] != InputDevice::ActionState::NONE ?
+                              InputDevice::ActionState::RELEASED : InputDevice::ActionState::NONE;
+                }
+
+                actionStates[action] = newState;
+            }
+        }
+    }
+
+    // Reset JUST_PRESSED and RELEASED states after they've been consumed
+    for (auto& [action, state] : actionStates) {
+        if (state == InputDevice::ActionState::JUST_PRESSED) {
+            state = InputDevice::ActionState::PRESSED;
+        } else if (state == InputDevice::ActionState::RELEASED) {
+            state = InputDevice::ActionState::NONE;
+        }
     }
 }
 
