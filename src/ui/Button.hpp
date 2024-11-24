@@ -12,6 +12,8 @@ public:
     void update(InputManager& inputManager);
     bool isClicked() const { return clicked; }
     void render(sf::RenderWindow& window);
+    void setSelected(bool selected) { isSelected = selected; }
+    bool getSelected() const { return isSelected; }
 
 private:
     bool isMouseOver(const sf::Vector2f& mousePos) const;
@@ -22,8 +24,10 @@ private:
     bool isHovered;
     bool clicked;
     bool wasPressed;  // Track previous frame's press state
+    bool isSelected{false};  // Track if button is selected via keyboard/controller
     sf::Color defaultColor{sf::Color(100, 100, 100)};
     sf::Color hoverColor{sf::Color(150, 150, 150)};
+    sf::Color selectedColor{sf::Color(200, 200, 200)};
 };
 
 } // namespace game

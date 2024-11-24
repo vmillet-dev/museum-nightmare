@@ -23,6 +23,7 @@ private:
     std::vector<std::unique_ptr<Button>> buttons;
     bool shouldQuit = false;
     Game& game;
+    size_t selectedButtonIndex;  // Track currently selected button
 };
 
 } // namespace game

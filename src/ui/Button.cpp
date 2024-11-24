@@ -45,9 +45,15 @@ void Button::update(InputManager& inputManager) {
         shape.setFillColor(isHovered ? hoverColor : defaultColor);
     }
 
-    // Handle click using InputManager
-    bool isPressed = inputManager.isActionPressed(Action::MouseLeft);
-    clicked = isHovered && isPressed && !wasPressed;
+    // Update color based on selection state
+    if (isSelected) {
+        shape.setFillColor(selectedColor);
+    }
+
+    // Handle click using InputManager (mouse or confirm action)
+    bool isPressed = inputManager.isActionPressed(Action::MouseLeft) ||
+                    (isSelected && inputManager.isActionPressed(Action::Confirm));
+    clicked = (isHovered || isSelected) && isPressed && !wasPressed;
     wasPressed = isPressed;
 }
 

@@ -27,6 +27,7 @@ private:
     sf::Font font;
     sf::Text pauseText;
     Game& game;
+    size_t selectedButtonIndex{0};  // Track currently selected button
 };
 
 } // namespace game
