@@ -2,23 +2,51 @@
 #include "../core/Game.hpp"
 #include "../input/InputManager.hpp"
 #include "../game/levels/Level2.hpp"
+#include "../game/levels/LevelLoader.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-GameScreen::GameScreen(Game& game) : game(game) {
+GameScreen::GameScreen(Game& game, const std::string& levelFile) : game(game) {
     spdlog::info("Initializing game screen");
-
-    // Initialize game objects
     gameObjectManager = std::make_unique<GameObjectManager>();
+    loadLevel(levelFile);
+}
 
-    // Create player at a better starting position for the larger level
-    auto player = std::make_unique<Player>(100.0f, 100.0f, game);
-    playerPtr = player.get();  // Store raw pointer before moving ownership
-    gameObjectManager->addObject(std::move(player));
+GameScreen::GameScreen(Game& game, bool procedural) : game(game) {
+    spdlog::info("Initializing game screen with procedural level");
+    gameObjectManager = std::make_unique<GameObjectManager>();
+    if (procedural) {
+        loadProceduralLevel();
+    } else {
+        loadLevel("assets/levels/level1.toml");
+    }
+}
 
-    // Load level
-    Level2::loadLevel(*gameObjectManager);
+void GameScreen::loadLevel(const std::string& levelFile) {
+    auto levelData = LevelLoader::loadFromFile(levelFile);
+    LevelLoader::createGameObjects(levelData, *gameObjectManager, game);
+
+    // Find and store player pointer
+    for (const auto& obj : gameObjectManager->getObjects()) {
+        if (auto player = dynamic_cast<Player*>(obj.get())) {
+            playerPtr = player;
+            break;
+        }
+    }
+}
+
+void GameScreen::loadProceduralLevel() {
+    auto levelData = LevelLoader::generateProceduralLevel(64.0f);
+    LevelLoader::createGameObjects(levelData, *gameObjectManager, game);
+
+    // Find and store player pointer
+    for (const auto& obj : gameObjectManager->getObjects()) {
+        if (auto player = dynamic_cast<Player*>(obj.get())) {
+            playerPtr = player;
+            break;
+        }
+    }
 }
 
 void GameScreen::handleInput(const sf::Event& event) {

@@ -37,6 +37,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SFML_LIBRARIES}
     tomlplusplus::tomlplusplus
     spdlog::spdlog
+    X11
+    Xrandr
+    Xcursor
+)
+
+# Copy assets and levels to build directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets
 )
 
 # Configure cross-platform compile options
@@ -63,6 +72,3 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
         )
     endif()
 endif()
-
-# Copy assets to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
