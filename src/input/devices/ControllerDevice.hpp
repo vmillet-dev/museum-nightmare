@@ -7,7 +7,7 @@ namespace game {
 class ControllerDevice : public InputDevice {
 public:
     void init() override;
-    InputDevice::ActionState getActionState(Action action) const override;
+    ActionState getActionState(Action action) const override;
     void handleEvent(const sf::Event& event) override;
 
     void setButtonBinding(Action action, unsigned int button);
@@ -22,7 +22,7 @@ public:
 private:
     std::unordered_map<Action, unsigned int> buttonBindings;
     std::unordered_map<Action, sf::Joystick::Axis> axisBindings;
-    std::unordered_map<Action, InputDevice::ActionState> actionStates;
+    std::unordered_map<Action, ActionState> actionStates;
     bool connected = false;
     float deadzone = 20.0f;
     float sensitivity = 100.0f;
