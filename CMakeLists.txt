@@ -9,7 +9,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# Include dependencies and configure SFML
+# Include SFML configuration and dependencies
+include(${CMAKE_SOURCE_DIR}/cmake/sfml_config.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
