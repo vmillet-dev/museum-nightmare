@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-project(sfml_game)
+
+# Project version
+set(PROJECT_VERSION_MAJOR 1)
+set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_PATCH 0)
+
+project(sfml_game VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,6 +38,29 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     tomlplusplus::tomlplusplus
     spdlog::spdlog
 )
+
+# Configure cross-platform compile options
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        /W4     # Warning level 4
+        /WX     # Treat warnings as errors
+        /MP     # Multi-processor compilation
+        /EHsc   # Exception handling model
+        /permissive-  # Strict C++ conformance
+    )
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+        -Wconversion
+        -Wshadow
+        -Wcast-align
+        -Wunused
+        -Wnull-dereference
+    )
+endif()
 
 # Copy assets to build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
