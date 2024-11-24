@@ -2,6 +2,7 @@
 #include "Screen.hpp"
 #include "../ui/Button.hpp"
 #include "ScreenManager.hpp"
+#include "../input/devices/InputDevice.hpp"
 #include <memory>
 #include <vector>
 #include <spdlog/spdlog.h>
