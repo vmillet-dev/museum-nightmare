@@ -9,11 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(MSVC)
-    add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
-endif()
-
-# Include dependencies
+# Include dependencies and configure SFML
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
@@ -29,11 +25,9 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
-# Link SFML, toml++ and spdlog
+# Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    sfml-graphics
-    sfml-window
-    sfml-system
+    ${SFML_LIBRARIES}
     tomlplusplus::tomlplusplus
     spdlog::spdlog
 )
