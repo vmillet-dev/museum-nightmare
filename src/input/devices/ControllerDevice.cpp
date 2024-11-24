@@ -89,12 +89,15 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
     // Handle axis movement
     if (event.type == sf::Event::JoystickMoved) {
         float position = event.joystickMove.position;
+        spdlog::debug("Raw joystick position: {}", position);
+
         // Apply deadzone with smoother transition
         if (std::abs(position) < deadzone) {
             position = 0.0f;
         } else {
             float normalizedPosition = (std::abs(position) - deadzone) / (100.0f - deadzone);
             position = (position > 0 ? 1 : -1) * normalizedPosition * sensitivity;
+            spdlog::debug("Normalized position after deadzone: {}", position);
         }
 
         for (const auto& [action, axis] : axisBindings) {
@@ -102,18 +105,21 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
                 InputDevice::ActionState newState = InputDevice::ActionState::NONE;
                 bool isActive = false;
 
+                // More forgiving thresholds for menu navigation
+                const float MENU_THRESHOLD = 0.5f;
+
                 switch(action) {
                     case Action::MoveUp:
-                        isActive = position < -0.3f;  // More sensitive threshold
+                        isActive = position < -MENU_THRESHOLD;
                         break;
                     case Action::MoveDown:
-                        isActive = position > 0.3f;   // More sensitive threshold
+                        isActive = position > MENU_THRESHOLD;
                         break;
                     case Action::MoveLeft:
-                        isActive = position < -0.3f;  // More sensitive threshold
+                        isActive = position < -MENU_THRESHOLD;
                         break;
                     case Action::MoveRight:
-                        isActive = position > 0.3f;   // More sensitive threshold
+                        isActive = position > MENU_THRESHOLD;
                         break;
                     default:
                         break;
@@ -124,8 +130,9 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
                     newState = (currentState == InputDevice::ActionState::NONE ||
                               currentState == InputDevice::ActionState::RELEASED) ?
                               InputDevice::ActionState::JUST_PRESSED : InputDevice::ActionState::PRESSED;
-                    spdlog::debug("Controller axis {} value: {} for action {}",
-                                static_cast<int>(axis), position, static_cast<int>(action));
+                    spdlog::debug("Controller axis {} activated: position={}, action={}, newState={}",
+                                static_cast<int>(axis), position, static_cast<int>(action),
+                                static_cast<int>(newState));
                 } else {
                     newState = actionStates[action] != InputDevice::ActionState::NONE ?
                               InputDevice::ActionState::RELEASED : InputDevice::ActionState::NONE;
