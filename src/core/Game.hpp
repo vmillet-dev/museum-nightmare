@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "./GameState.hpp"
 #include "../screens/ScreenManager.hpp"
 #include "../screens/MainMenuScreen.hpp"
 #include "../screens/GameScreen.hpp"
@@ -17,6 +18,7 @@ public:
     void quit();
     sf::RenderWindow& getWindow();
     InputManager& getInputManager() { return inputManager; }
+    ScreenManager& getScreenManager() { return screenManager; }
 
 private:
     void handleEvent(const sf::Event& event);
@@ -25,7 +27,8 @@ private:
     void render();
 
     sf::RenderWindow window;
-    InputManager inputManager;
+    InputManager inputManager{window};  // Initialize with window reference
+    ScreenManager screenManager;
 };
 
 } // namespace game
