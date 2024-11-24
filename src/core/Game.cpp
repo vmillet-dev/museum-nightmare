@@ -6,13 +6,16 @@
 
 namespace game {
 
-Game::Game() : window(
-    sf::VideoMode(
-        ConfigManager::getInstance().getWindowWidth(),
-        ConfigManager::getInstance().getWindowHeight()
+Game::Game() :
+    window(
+        sf::VideoMode(
+            ConfigManager::getInstance().getWindowWidth(),
+            ConfigManager::getInstance().getWindowHeight()
+        ),
+        ConfigManager::getInstance().getWindowTitle()
     ),
-    ConfigManager::getInstance().getWindowTitle()
-) {
+    soundManager("assets/config/audio.toml")
+{
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
     inputManager.init();

@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <SFML/Window/Keyboard.hpp>
 #include <unordered_map>
+#include <optional>
 #include "KeyMapper.hpp"
 
 namespace game {
@@ -31,6 +32,27 @@ public:
     float getControllerDeadzone() const;
     float getControllerSensitivity() const;
     unsigned int getControllerButton(const std::string& action) const;
+
+    // Audio configuration methods
+    float getMasterVolume() const;
+    float getMusicVolume() const;
+    float getSoundVolume() const;
+
+    struct SoundResource {
+        std::string filepath;
+        float volume;
+        float minDistance;
+        float attenuation;
+    };
+
+    struct MusicResource {
+        std::string filepath;
+        float volume;
+        bool looping;
+    };
+
+    std::optional<SoundResource> getSoundResource(const std::string& id) const;
+    std::optional<MusicResource> getMusicResource(const std::string& id) const;
 
 private:
     ConfigManager();

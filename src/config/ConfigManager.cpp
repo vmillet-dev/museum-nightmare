@@ -33,7 +33,7 @@ void ConfigManager::loadConfig() {
 }
 
 void ConfigManager::createDefaultConfig() {
-    spdlog::info("Creating default config with controller settings");
+    spdlog::info("Creating default config with controller and audio settings");
     config = toml::table{
         {"window", toml::table{
             {"width", 800},
@@ -65,6 +65,43 @@ void ConfigManager::createDefaultConfig() {
             {"controller_pause", 7},
             {"controller_confirm", 4},
             {"controller_cancel", 5}
+        }},
+        {"audio", toml::table{
+            {"master_volume", 100.0},
+            {"music_volume", 80.0},
+            {"sound_volume", 100.0},
+            {"sounds", toml::table{
+                {"player_move", toml::table{
+                    {"path", "assets/audio/sfx/player_move.ogg"},
+                    {"volume", 100.0},
+                    {"min_distance", 1.0},
+                    {"attenuation", 1.0}
+                }},
+                {"player_collision", toml::table{
+                    {"path", "assets/audio/sfx/player_collision.ogg"},
+                    {"volume", 100.0},
+                    {"min_distance", 1.0},
+                    {"attenuation", 1.0}
+                }},
+                {"enemy_collision", toml::table{
+                    {"path", "assets/audio/sfx/enemy_collision.ogg"},
+                    {"volume", 100.0},
+                    {"min_distance", 1.0},
+                    {"attenuation", 1.0}
+                }}
+            }},
+            {"music", toml::table{
+                {"main_theme", toml::table{
+                    {"path", "assets/audio/music/main_theme.ogg"},
+                    {"volume", 80.0},
+                    {"looping", true}
+                }},
+                {"battle_theme", toml::table{
+                    {"path", "assets/audio/music/battle_theme.ogg"},
+                    {"volume", 80.0},
+                    {"looping", true}
+                }}
+            }}
         }}
     };
     saveConfig();
@@ -125,6 +162,47 @@ unsigned int ConfigManager::getControllerButton(const std::string& action) const
     unsigned int button = static_cast<unsigned int>(config["controls"][action].value_or(0));
     spdlog::debug("Controller button for {}: {}", action, button);
     return button;
+}
+
+float ConfigManager::getMasterVolume() const {
+    return config["audio"]["master_volume"].value_or(100.0f);
+}
+
+float ConfigManager::getMusicVolume() const {
+    return config["audio"]["music_volume"].value_or(80.0f);
+}
+
+float ConfigManager::getSoundVolume() const {
+    return config["audio"]["sound_volume"].value_or(100.0f);
+}
+
+std::optional<ConfigManager::SoundResource> ConfigManager::getSoundResource(const std::string& id) const {
+    auto sounds = config["audio"]["sounds"];
+    if (!sounds || !sounds.is_table() || !sounds[id]) {
+        return std::nullopt;
+    }
+
+    auto sound = sounds[id];
+    SoundResource resource;
+    resource.filepath = sound["path"].value_or("");
+    resource.volume = sound["volume"].value_or(100.0f);
+    resource.minDistance = sound["min_distance"].value_or(1.0f);
+    resource.attenuation = sound["attenuation"].value_or(1.0f);
+    return resource;
+}
+
+std::optional<ConfigManager::MusicResource> ConfigManager::getMusicResource(const std::string& id) const {
+    auto music = config["audio"]["music"];
+    if (!music || !music.is_table() || !music[id]) {
+        return std::nullopt;
+    }
+
+    auto track = music[id];
+    MusicResource resource;
+    resource.filepath = track["path"].value_or("");
+    resource.volume = track["volume"].value_or(80.0f);
+    resource.looping = track["looping"].value_or(true);
+    return resource;
 }
 
 } // namespace game
