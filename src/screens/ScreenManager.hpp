@@ -2,6 +2,7 @@
 #include <memory>
 #include <map>
 #include "Screen.hpp"
+#include "../core/GameState.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
