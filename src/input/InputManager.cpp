@@ -49,9 +49,7 @@ void InputManager::init() {
 }
 
 void InputManager::update() {
-    for (auto& device : devices) {
-        device->update();
-    }
+    // No longer needed as state updates happen in handleEvent
 }
 
 void InputManager::handleEvent(const sf::Event& event) {
@@ -68,34 +66,34 @@ void InputManager::handleEvent(const sf::Event& event) {
     }
 }
 
-bool InputManager::isActionPressed(Action action) {
-    for (auto& device : devices) {
-        if (device->isActionPressed(action)) {
-            spdlog::debug("Action {} pressed on {}", static_cast<int>(action), typeid(*device).name());
-            return true;
-        }
-    }
-    return false;
-}
+InputDevice::ActionState InputManager::getActionState(Action action) const {
+    InputDevice::ActionState highestPriorityState = InputDevice::ActionState::NONE;
 
-bool InputManager::isActionJustPressed(Action action) {
-    for (auto& device : devices) {
-        if (device->isActionJustPressed(action)) {
-            spdlog::debug("Action {} just pressed on {}", static_cast<int>(action), typeid(*device).name());
-            return true;
+    // Check all devices and return the highest priority state
+    for (const auto& device : devices) {
+        InputDevice::ActionState state = device->getActionState(action);
+        if (state == InputDevice::ActionState::JUST_PRESSED) {
+            spdlog::debug("Action {} JUST_PRESSED on {}", static_cast<int>(action), typeid(*device).name());
+            return state;
+        }
+        else if (state == InputDevice::ActionState::PRESSED &&
+                 highestPriorityState != InputDevice::ActionState::JUST_PRESSED) {
+            highestPriorityState = state;
+        }
+        else if (state == InputDevice::ActionState::RELEASED &&
+                 highestPriorityState != InputDevice::ActionState::JUST_PRESSED &&
+                 highestPriorityState != InputDevice::ActionState::PRESSED) {
+            highestPriorityState = state;
         }
     }
-    return false;
-}
 
-bool InputManager::isActionReleased(Action action) {
-    for (auto& device : devices) {
-        if (device->isActionReleased(action)) {
-            spdlog::debug("Action {} released on {}", static_cast<int>(action), typeid(*device).name());
-            return true;
-        }
+    if (highestPriorityState != InputDevice::ActionState::NONE) {
+        spdlog::debug("Action {} {} on devices",
+            static_cast<int>(action),
+            static_cast<int>(highestPriorityState));
     }
-    return false;
+
+    return highestPriorityState;
 }
 
 } // namespace game

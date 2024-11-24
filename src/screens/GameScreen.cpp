@@ -22,7 +22,8 @@ GameScreen::GameScreen(Game& game) : game(game) {
 }
 
 void GameScreen::handleInput(const sf::Event& event) {
-    if (game.getInputManager().isActionPressed(Action::Pause)) {
+    auto pauseState = game.getInputManager().getActionState(Action::Pause);
+    if (pauseState == InputDevice::ActionState::JUST_PRESSED) {
         spdlog::info("Opening pause menu");
         game.getScreenManager().setState(GameState::Paused);
     }

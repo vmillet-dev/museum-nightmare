@@ -12,13 +12,13 @@ namespace game {
 
 class InputManager {
 public:
+    using ActionState = InputDevice::ActionState;  // Add this line
+
     explicit InputManager(sf::RenderWindow& window) : window(window) {}
     void init();
     void update();
     void handleEvent(const sf::Event& event);
-    bool isActionPressed(Action action);
-    bool isActionJustPressed(Action action);
-    bool isActionReleased(Action action);
+    ActionState getActionState(Action action) const;
     sf::RenderWindow& getWindow() { return window; }
 
 private:

@@ -1,6 +1,7 @@
 #include "MainMenuScreen.hpp"
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
+#include "../input/devices/InputDevice.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -16,32 +17,34 @@ void MainMenuScreen::handleInput(const sf::Event& event) {
     auto& inputManager = game.getInputManager();
 
     // Handle button navigation
-    if (inputManager.isActionJustPressed(Action::MoveDown)) {
+    if (inputManager.getActionState(Action::MoveDown) == InputDevice::ActionState::JUST_PRESSED) {
         buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
         buttons[selectedButtonIndex]->setSelected(true);
+        spdlog::debug("Menu: Selected button index {}", selectedButtonIndex);
     }
-    if (inputManager.isActionJustPressed(Action::MoveUp)) {
+    if (inputManager.getActionState(Action::MoveUp) == InputDevice::ActionState::JUST_PRESSED) {
         buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
         buttons[selectedButtonIndex]->setSelected(true);
+        spdlog::debug("Menu: Selected button index {}", selectedButtonIndex);
+    }
+
+    // Handle button activation
+    if (inputManager.getActionState(Action::Confirm) == InputDevice::ActionState::JUST_PRESSED) {
+        spdlog::debug("Menu: Confirming button {}", selectedButtonIndex);
+        if (selectedButtonIndex == 0) {  // Play button
+            spdlog::info("Starting game");
+            game.getScreenManager().setState(GameState::Playing);
+        } else if (selectedButtonIndex == 1) {  // Quit button
+            spdlog::info("Quitting game");
+            shouldQuit = true;
+        }
     }
 
     // Update all buttons with input manager
     for (auto& button : buttons) {
         button->update(inputManager);
-    }
-
-    // Play button clicked
-    if (buttons[0]->isClicked()) {
-        spdlog::info("Starting game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
-
-    // Quit button clicked
-    if (buttons[1]->isClicked()) {
-        spdlog::info("Quitting game");
-        shouldQuit = true;
     }
 }
 

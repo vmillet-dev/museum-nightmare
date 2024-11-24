@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "InputDevice.hpp"
+#include <unordered_map>
 
 namespace game {
 
@@ -9,11 +10,8 @@ public:
     explicit MouseDevice(sf::RenderWindow& window);
 
     void init() override {}  // No initialization needed for mouse
-    void update() override;
-    bool isActionPressed(Action action) override;
-    bool isActionJustPressed(Action action) override;
-    bool isActionReleased(Action action) override;
-    void handleEvent(const sf::Event& event) override { /* No mouse events to handle */ }
+    InputDevice::ActionState getActionState(Action action) const override;
+    void handleEvent(const sf::Event& event) override;
 
     sf::Vector2i getMousePosition() const;
     bool isLeftButtonPressed() const;
@@ -21,10 +19,7 @@ public:
 
 private:
     sf::RenderWindow& window;
-    bool leftButtonPressed;
-    bool rightButtonPressed;
-    bool leftButtonJustPressed;
-    bool rightButtonJustPressed;
+    std::unordered_map<Action, InputDevice::ActionState> actionStates;
     sf::Vector2i lastMousePos;
 };
 

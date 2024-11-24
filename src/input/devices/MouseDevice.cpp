@@ -1,64 +1,54 @@
 #include "MouseDevice.hpp"
+#include <spdlog/spdlog.h>
 
 namespace game {
 
 MouseDevice::MouseDevice(sf::RenderWindow& window)
     : window(window)
-    , leftButtonPressed(false)
-    , rightButtonPressed(false)
-    , leftButtonJustPressed(false)
-    , rightButtonJustPressed(false)
     , lastMousePos(sf::Mouse::getPosition(window))
 {
+    actionStates[Action::MouseLeft] = InputDevice::ActionState::NONE;
+    actionStates[Action::MouseRight] = InputDevice::ActionState::NONE;
 }
 
-void MouseDevice::update() {
-    // Store previous state
-    bool wasLeftPressed = leftButtonPressed;
-    bool wasRightPressed = rightButtonPressed;
+InputDevice::ActionState MouseDevice::getActionState(Action action) const {
+    auto stateIt = actionStates.find(action);
+    return stateIt != actionStates.end() ? stateIt->second : InputDevice::ActionState::NONE;
+}
 
-    // Update current state
-    leftButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-    rightButtonPressed = sf::Mouse::isButtonPressed(sf::Mouse::Right);
+void MouseDevice::handleEvent(const sf::Event& event) {
+    if (event.type == sf::Event::MouseButtonPressed ||
+        event.type == sf::Event::MouseButtonReleased) {
+        Action action;
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            action = Action::MouseLeft;
+        } else if (event.mouseButton.button == sf::Mouse::Right) {
+            action = Action::MouseRight;
+        } else {
+            return;
+        }
 
-    // Update "just pressed" states
-    leftButtonJustPressed = leftButtonPressed && !wasLeftPressed;
-    rightButtonJustPressed = rightButtonPressed && !wasRightPressed;
+        if (event.type == sf::Event::MouseButtonPressed) {
+            actionStates[action] = (actionStates[action] == InputDevice::ActionState::NONE) ?
+                InputDevice::ActionState::JUST_PRESSED : InputDevice::ActionState::PRESSED;
+            spdlog::debug("Mouse button {} pressed at position ({}, {})",
+                static_cast<int>(event.mouseButton.button),
+                event.mouseButton.x, event.mouseButton.y);
+        } else {
+            actionStates[action] = InputDevice::ActionState::RELEASED;
+        }
+    }
 
     // Update mouse position
     lastMousePos = sf::Mouse::getPosition(window);
-}
 
-bool MouseDevice::isActionPressed(Action action) {
-    switch (action) {
-        case Action::MouseLeft:
-            return leftButtonPressed;
-        case Action::MouseRight:
-            return rightButtonPressed;
-        default:
-            return false;
-    }
-}
-
-bool MouseDevice::isActionJustPressed(Action action) {
-    switch (action) {
-        case Action::MouseLeft:
-            return leftButtonJustPressed;
-        case Action::MouseRight:
-            return rightButtonJustPressed;
-        default:
-            return false;
-    }
-}
-
-bool MouseDevice::isActionReleased(Action action) {
-    switch (action) {
-        case Action::MouseLeft:
-            return !leftButtonPressed;
-        case Action::MouseRight:
-            return !rightButtonPressed;
-        default:
-            return false;
+    // Reset JUST_PRESSED and RELEASED states after they've been consumed
+    for (auto& [action, state] : actionStates) {
+        if (state == InputDevice::ActionState::JUST_PRESSED) {
+            state = InputDevice::ActionState::PRESSED;
+        } else if (state == InputDevice::ActionState::RELEASED) {
+            state = InputDevice::ActionState::NONE;
+        }
     }
 }
 
@@ -67,11 +57,13 @@ sf::Vector2i MouseDevice::getMousePosition() const {
 }
 
 bool MouseDevice::isLeftButtonPressed() const {
-    return leftButtonPressed;
+    return getActionState(Action::MouseLeft) == InputDevice::ActionState::PRESSED ||
+           getActionState(Action::MouseLeft) == InputDevice::ActionState::JUST_PRESSED;
 }
 
 bool MouseDevice::isRightButtonPressed() const {
-    return rightButtonPressed;
+    return getActionState(Action::MouseRight) == InputDevice::ActionState::PRESSED ||
+           getActionState(Action::MouseRight) == InputDevice::ActionState::JUST_PRESSED;
 }
 
 } // namespace game
