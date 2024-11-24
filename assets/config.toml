@@ -34,3 +34,20 @@ controller_move_right = 0  # Usually X/A button
 controller_pause = 7      # Usually Start button
 controller_confirm = 4    # Usually L1 button
 controller_cancel = 5     # Usually R1 button
+
+[audio]
+# Global volume settings (0-100)
+master_volume = 100.0
+music_volume = 80.0
+sound_volume = 100.0
+
+# Sound effects configuration
+[audio.sounds]
+player_move = { path = "assets/audio/sfx/player_move.ogg", volume = 100.0, min_distance = 1.0, attenuation = 1.0 }
+player_collision = { path = "assets/audio/sfx/player_collision.ogg", volume = 100.0, min_distance = 1.0, attenuation = 1.0 }
+enemy_collision = { path = "assets/audio/sfx/enemy_collision.ogg", volume = 100.0, min_distance = 1.0, attenuation = 1.0 }
+
+# Music configuration
+[audio.music]
+main_theme = { path = "assets/audio/music/main_theme.ogg", volume = 80.0, looping = true }
+battle_theme = { path = "assets/audio/music/battle_theme.ogg", volume = 80.0, looping = true }

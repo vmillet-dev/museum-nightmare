@@ -29,6 +29,9 @@ file(GLOB_RECURSE SOURCES
 # Remove main.cpp from sources
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
+# Add subdirectories
+add_subdirectory(src/audio)
+
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
