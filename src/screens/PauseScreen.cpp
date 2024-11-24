@@ -2,6 +2,7 @@
 #include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
 #include "../input/devices/InputDevice.hpp"
+#include "../input/InputManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
