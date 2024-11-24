@@ -1,4 +1,5 @@
 #include "Button.hpp"
+#include "../input/devices/InputDevice.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -51,9 +52,14 @@ void Button::update(InputManager& inputManager) {
     }
 
     // Handle click using InputManager (mouse or confirm action)
-    bool isPressed = inputManager.isActionPressed(Action::MouseLeft) ||
-                    (isSelected && inputManager.isActionPressed(Action::Confirm));
+    bool isPressed = inputManager.getActionState(Action::MouseLeft) == InputDevice::ActionState::PRESSED ||
+                    (isSelected && inputManager.getActionState(Action::Confirm) == InputDevice::ActionState::JUST_PRESSED);
     clicked = (isHovered || isSelected) && isPressed && !wasPressed;
+
+    if (clicked) {
+        spdlog::debug("Button clicked: {}", text.getString().toAnsiString());
+    }
+
     wasPressed = isPressed;
 }
 
