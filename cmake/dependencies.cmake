@@ -10,6 +10,7 @@ set(SFML_LIBRARIES
     sfml-graphics
     sfml-window
     sfml-system
+    sfml-audio
 )
 
 # Configure SFML build options before fetching
