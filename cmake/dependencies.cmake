@@ -7,7 +7,6 @@ set(SPDLOG_VERSION "1.12.0")
 
 # Configure spdlog to use external fmt
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "" FORCE)
-set(SPDLOG_FMT_EXTERNAL_HO ON CACHE BOOL "" FORCE)
 
 # Configure SFML build options
 set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
