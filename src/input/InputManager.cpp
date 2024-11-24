@@ -71,6 +71,7 @@ void InputManager::handleEvent(const sf::Event& event) {
 bool InputManager::isActionPressed(Action action) {
     for (auto& device : devices) {
         if (device->isActionPressed(action)) {
+            spdlog::debug("Action {} pressed on {}", static_cast<int>(action), typeid(*device).name());
             return true;
         }
     }
@@ -80,6 +81,7 @@ bool InputManager::isActionPressed(Action action) {
 bool InputManager::isActionJustPressed(Action action) {
     for (auto& device : devices) {
         if (device->isActionJustPressed(action)) {
+            spdlog::debug("Action {} just pressed on {}", static_cast<int>(action), typeid(*device).name());
             return true;
         }
     }
@@ -89,6 +91,7 @@ bool InputManager::isActionJustPressed(Action action) {
 bool InputManager::isActionReleased(Action action) {
     for (auto& device : devices) {
         if (device->isActionReleased(action)) {
+            spdlog::debug("Action {} released on {}", static_cast<int>(action), typeid(*device).name());
             return true;
         }
     }

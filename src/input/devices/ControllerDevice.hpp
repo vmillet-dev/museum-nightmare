@@ -28,6 +28,7 @@ private:
     std::unordered_map<Action, bool> buttonStates;
     std::unordered_map<Action, bool> previousButtonStates;  // For just pressed detection
     std::unordered_map<Action, float> axisStates;
+    std::unordered_map<Action, bool> previousAxisStates;  // For just pressed detection on axes
     bool connected = false;
     float deadzone = 20.0f;
     float sensitivity = 100.0f;

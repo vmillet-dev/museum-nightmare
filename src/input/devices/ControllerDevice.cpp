@@ -57,18 +57,45 @@ void ControllerDevice::update() {
         return;
     }
 
-    // Store previous button states
+    // Store previous states
     previousButtonStates = buttonStates;
+
+    // Convert current axis states to boolean for previous state tracking
+    for (const auto& [action, axis] : axisBindings) {
+        float position = axisStates[action];
+        switch(action) {
+            case Action::MoveUp:
+                previousAxisStates[action] = position < -0.5f;
+                break;
+            case Action::MoveDown:
+                previousAxisStates[action] = position > 0.5f;
+                break;
+            case Action::MoveLeft:
+                previousAxisStates[action] = position < -0.5f;
+                break;
+            case Action::MoveRight:
+                previousAxisStates[action] = position > 0.5f;
+                break;
+            default:
+                break;
+        }
+    }
 
     // Update button states
     for (const auto& [action, button] : buttonBindings) {
         buttonStates[action] = sf::Joystick::isButtonPressed(controllerId, button);
+        if (buttonStates[action]) {
+            spdlog::debug("Controller button {} pressed", button);
+        }
     }
 
     // Update axis states
     for (const auto& [action, axis] : axisBindings) {
         float position = sf::Joystick::getAxisPosition(controllerId, axis);
         axisStates[action] = std::abs(position) < deadzone ? 0.0f : position / sensitivity;
+        if (std::abs(axisStates[action]) > 0.5f) {
+            spdlog::debug("Controller axis {} value: {}", static_cast<int>(axis), axisStates[action]);
+        }
     }
 }
 
@@ -105,12 +132,40 @@ bool ControllerDevice::isActionPressed(Action action) {
 bool ControllerDevice::isActionJustPressed(Action action) {
     if (!connected) return false;
 
+    // Check button states
     auto buttonIt = buttonBindings.find(action);
     if (buttonIt != buttonBindings.end()) {
         return buttonStates[action] && !previousButtonStates[action];
     }
 
-    // For axis-based actions, we don't track "just pressed" state
+    // Check axis states for movement actions
+    auto axisIt = axisBindings.find(action);
+    if (axisIt != axisBindings.end()) {
+        float position = axisStates[action];
+        bool currentState = false;
+        switch(action) {
+            case Action::MoveUp:
+                currentState = position < -0.5f;
+                break;
+            case Action::MoveDown:
+                currentState = position > 0.5f;
+                break;
+            case Action::MoveLeft:
+                currentState = position < -0.5f;
+                break;
+            case Action::MoveRight:
+                currentState = position > 0.5f;
+                break;
+            default:
+                return false;
+        }
+        // Add debug logging
+        if (currentState) {
+            spdlog::debug("Controller axis {} state: {}", static_cast<int>(axisIt->second), position);
+        }
+        return currentState && !previousAxisStates[action];
+    }
+
     return false;
 }
 
