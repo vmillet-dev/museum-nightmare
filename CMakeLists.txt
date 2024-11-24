@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set build type if not set
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 # Include utils and dependencies
@@ -40,26 +40,28 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # Configure cross-platform compile options
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        /W4     # Warning level 4
-        /WX     # Treat warnings as errors
-        /MP     # Multi-processor compilation
-        /EHsc   # Exception handling model
-        /permissive-  # Strict C++ conformance
-    )
-else()
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Werror
-        -Wconversion
-        -Wshadow
-        -Wcast-align
-        -Wunused
-        -Wnull-dereference
-    )
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(MSVC)
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            /W4     # Warning level 4
+            /WX     # Treat warnings as errors
+            /MP     # Multi-processor compilation
+            /EHsc   # Exception handling model
+            /permissive-  # Strict C++ conformance
+        )
+    else()
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+            -Wconversion
+            -Wshadow
+            -Wcast-align
+            -Wunused
+            -Wnull-dereference
+        )
+    endif()
 endif()
 
 # Copy assets to build directory
