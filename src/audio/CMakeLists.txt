@@ -1,7 +1,5 @@
 set(AUDIO_SOURCES
     AudioTypes.hpp
-    AudioConfig.hpp
-    AudioConfig.cpp
     SoundManager.hpp
     SoundManager.cpp
 )
