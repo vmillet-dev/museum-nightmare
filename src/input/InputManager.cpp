@@ -33,6 +33,10 @@ void InputManager::init() {
     keyboardDevice->init();
     devices.push_back(std::move(keyboardDevice));
 
+    // Add mouse device
+    auto mouseDevice = std::make_unique<MouseDevice>(window);
+    devices.push_back(std::move(mouseDevice));
+
     // Check for already connected controllers
     for (unsigned int i = 0; i < sf::Joystick::Count; ++i) {
         if (sf::Joystick::isConnected(i)) {

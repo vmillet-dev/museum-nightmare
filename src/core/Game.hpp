@@ -27,7 +27,7 @@ private:
     void render();
 
     sf::RenderWindow window;
-    InputManager inputManager;
+    InputManager inputManager{window};  // Initialize with window reference
     ScreenManager screenManager;
 };
 
