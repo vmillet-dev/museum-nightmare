@@ -13,6 +13,9 @@ public:
     void render(sf::RenderWindow& window);
     void clear();
 
+    // Add getter for objects
+    const std::vector<std::unique_ptr<GameObject>>& getObjects() const { return objects; }
+
 private:
     std::vector<std::unique_ptr<GameObject>> objects;
 };
