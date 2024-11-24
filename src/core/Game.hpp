@@ -6,6 +6,7 @@
 #include "../screens/PauseScreen.hpp"
 #include "../input/InputManager.hpp"
 #include "../config/ConfigManager.hpp"
+#include "../audio/SoundManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -17,6 +18,7 @@ public:
     void quit();
     sf::RenderWindow& getWindow();
     InputManager& getInputManager() { return inputManager; }
+    SoundManager& getSoundManager() { return soundManager; }
 
 private:
     void handleEvent(const sf::Event& event);
@@ -26,6 +28,7 @@ private:
 
     sf::RenderWindow window;
     InputManager inputManager;
+    SoundManager soundManager;
 };
 
 } // namespace game

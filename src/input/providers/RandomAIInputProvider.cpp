@@ -12,7 +12,7 @@ RandomAIInputProvider::RandomAIInputProvider()
 
 sf::Vector2f RandomAIInputProvider::getMovementVector() {
     auto now = std::chrono::steady_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+    auto elapsed = std::chrono::duration_cast<std::chrono::duration<float>>(
         now - lastChangeTime).count();
 
     if (elapsed >= movementDuration) {
@@ -36,7 +36,7 @@ void RandomAIInputProvider::updateMovement() {
     }
 }
 
-bool RandomAIInputProvider::isActionActive(Action action) {
+bool RandomAIInputProvider::isActionActive([[maybe_unused]] Action action) {
     return false; // AI doesn't use actions for now
 }
 

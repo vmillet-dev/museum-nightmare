@@ -50,7 +50,7 @@ void Button::setCallback(std::function<void()> newCallback) {
     callback = std::move(newCallback);
 }
 
-void Button::handleClick(const sf::Vector2f& mousePos) {
+void Button::handleClick([[maybe_unused]] const sf::Vector2f& mousePos) {
     if (callback) {
         callback();
     }
@@ -61,7 +61,7 @@ void Button::handleHover(const sf::Vector2f& mousePos) {
     shape.setFillColor(isHovered ? hoverColor : defaultColor);
 }
 
-void Button::update(float deltaTime) {
+void Button::update([[maybe_unused]] float deltaTime) {
     // Animation or other updates can be added here
 }
 

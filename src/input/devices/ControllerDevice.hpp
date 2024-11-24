@@ -18,7 +18,7 @@ public:
 
     // Add methods to check controller status
     bool isConnected() const { return connected; }
-    int getControllerId() const { return controllerId; }
+    unsigned int getControllerId() const { return controllerId; }
 
 private:
     std::unordered_map<Action, unsigned int> buttonBindings;
@@ -28,7 +28,7 @@ private:
     bool connected = false;
     float deadzone = 20.0f;
     float sensitivity = 100.0f;
-    int controllerId = 0;
+    unsigned int controllerId = 0;
 };
 
 } // namespace game

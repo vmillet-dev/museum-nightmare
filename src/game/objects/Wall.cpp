@@ -11,7 +11,7 @@ Wall::Wall(float x, float y, float width, float height) : GameObject(x, y) {
     spdlog::debug("Wall created: pos({:.1f},{:.1f}) size({:.1f},{:.1f})", x, y, width, height);
 }
 
-void Wall::update(float deltaTime) {
+void Wall::update([[maybe_unused]] float deltaTime) {
     // Walls are static, no update needed
 }
 
@@ -23,7 +23,7 @@ sf::FloatRect Wall::getBounds() const {
     return shape.getGlobalBounds();
 }
 
-void Wall::handleCollision(GameObject* other) {
+void Wall::handleCollision([[maybe_unused]] GameObject* other) {
     //if (other) { spdlog::debug("Wall collision at ({:.1f},{:.1f})", position.x, position.y); }
 }
 

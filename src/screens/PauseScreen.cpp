@@ -5,7 +5,7 @@
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game) {
+PauseScreen::PauseScreen(Game& gameRef) : game(gameRef) {
     spdlog::info("Initializing pause screen");
 
     // Create resume button
@@ -25,13 +25,13 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(400, 350),
         sf::Vector2f(200, 50)
     );
-    mainMenuButton->setCallback([this, &game]() {
+    mainMenuButton->setCallback([this, &gameRef]() {
         spdlog::info("Returning to main menu");
         // Pop both pause screen and game screen
         ScreenManager::getInstance().popScreen();
         ScreenManager::getInstance().popScreen();
         // Push new main menu screen
-        ScreenManager::getInstance().pushScreen(std::make_unique<MainMenuScreen>(game));
+        ScreenManager::getInstance().pushScreen(std::make_unique<MainMenuScreen>(gameRef));
     });
 
     // Load font
@@ -66,7 +66,7 @@ void PauseScreen::handleInput(const sf::Event& event) {
     }
 }
 
-void PauseScreen::update(float deltaTime) {
+void PauseScreen::update([[maybe_unused]] float deltaTime) {
     // No update needed for buttons in our implementation
 }
 

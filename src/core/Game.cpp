@@ -6,13 +6,16 @@
 
 namespace game {
 
-Game::Game() : window(
-    sf::VideoMode(
-        ConfigManager::getInstance().getWindowWidth(),
-        ConfigManager::getInstance().getWindowHeight()
+Game::Game() :
+    window(
+        sf::VideoMode(
+            ConfigManager::getInstance().getWindowWidth(),
+            ConfigManager::getInstance().getWindowHeight()
+        ),
+        ConfigManager::getInstance().getWindowTitle()
     ),
-    ConfigManager::getInstance().getWindowTitle()
-) {
+    soundManager()
+{
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
     inputManager.init();
@@ -25,8 +28,6 @@ void Game::run() {
 
     while (window.isOpen()) {
         sf::Time deltaTime = clock.restart();
-        float dt = deltaTime.asSeconds();
-
         // Handle real events
         handleEvents();
         update(deltaTime.asSeconds());
