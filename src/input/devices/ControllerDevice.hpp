@@ -22,7 +22,7 @@ public:
 private:
     std::unordered_map<Action, unsigned int> buttonBindings;
     std::unordered_map<Action, sf::Joystick::Axis> axisBindings;
-    std::unordered_map<Action, ActionState> actionStates;
+    std::unordered_map<Action, InputDevice::ActionState> actionStates;
     bool connected = false;
     float deadzone = 20.0f;
     float sensitivity = 100.0f;
