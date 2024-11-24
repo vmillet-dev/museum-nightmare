@@ -37,6 +37,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SFML_LIBRARIES}
     tomlplusplus::tomlplusplus
     spdlog::spdlog
+    X11
+    Xrandr
+    Xcursor
 )
 
 # Copy assets and levels to build directory
