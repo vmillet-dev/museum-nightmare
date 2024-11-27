@@ -18,20 +18,34 @@ void Enemy::render(sf::RenderWindow& window) {
     window.draw(shape);
 }
 
-sf::FloatRect Enemy::getBounds() const {
-    return shape.getGlobalBounds();
-}
+void Enemy::initPhysics(b2WorldId worldId) {
+    // Call parent's initPhysics first
+    Actor::initPhysics(worldId);
 
-void Enemy::handleCollision(GameObject* other) {
-    // Basic collision response - move away from collision
-    if (auto* player = dynamic_cast<Player*>(other)) {
-        sf::Vector2f moveBack = getPosition() - other->getPosition();
-        float length = std::sqrt(moveBack.x * moveBack.x + moveBack.y * moveBack.y);
-        if (length > 0) {
-            moveBack /= length;
-            setPosition(getPosition() + moveBack * 5.0f);
+    // Customize enemy's physics properties
+    if (b2Body_IsValid(bodyId)) {
+        // Get all shapes
+        const int32_t MAX_SHAPES = 1;
+        b2ShapeId shapes[MAX_SHAPES];
+        int32_t shapeCount = b2Body_GetShapes(bodyId, shapes, MAX_SHAPES);
+
+        if (shapeCount > 0) {
+            b2ShapeId shapeId = shapes[0];
+            if (b2Shape_IsValid(shapeId)) {
+                b2Shape_SetDensity(shapeId, ENEMY_DENSITY);
+                b2Shape_SetFriction(shapeId, ENEMY_FRICTION);
+
+                // Update mass data
+                b2MassData massData = b2Body_GetMassData(bodyId);
+                b2Body_SetMassData(bodyId, massData);
+            }
         }
+
+        // Set user data for collision handling
+        b2Body_SetUserData(bodyId, this);
     }
+
+    spdlog::debug("Enemy physics initialized");
 }
 
 } // namespace game

@@ -21,40 +21,34 @@ void Player::render(sf::RenderWindow& window) {
     window.draw(shape);
 }
 
-sf::FloatRect Player::getBounds() const {
-    return shape.getGlobalBounds();
-}
+void Player::initPhysics(b2WorldId worldId) {
+    // Call parent's initPhysics first
+    Actor::initPhysics(worldId);
 
-void Player::handleCollision(GameObject* other) {
-    if (auto* wall = dynamic_cast<Wall*>(other)) {
-        sf::FloatRect playerBounds = getBounds();
-        sf::FloatRect wallBounds = wall->getBounds();
+    // Customize player's physics properties
+    if (b2Body_IsValid(bodyId)) {
+        // Get all shapes
+        const int32_t MAX_SHAPES = 1;
+        b2ShapeId shapes[MAX_SHAPES];
+        int32_t shapeCount = b2Body_GetShapes(bodyId, shapes, MAX_SHAPES);
 
-        // Calculate overlap
-        float overlapLeft = playerBounds.left + playerBounds.width - wallBounds.left;
-        float overlapRight = wallBounds.left + wallBounds.width - playerBounds.left;
-        float overlapTop = playerBounds.top + playerBounds.height - wallBounds.top;
-        float overlapBottom = wallBounds.top + wallBounds.height - playerBounds.top;
+        if (shapeCount > 0) {
+            b2ShapeId shapeId = shapes[0];
+            if (b2Shape_IsValid(shapeId)) {
+                b2Shape_SetDensity(shapeId, PLAYER_DENSITY);
+                b2Shape_SetFriction(shapeId, PLAYER_FRICTION);
 
-        // Find smallest overlap
-        float minOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
-
-        sf::Vector2f oldPos = position;
-        // Resolve collision
-        if (minOverlap == overlapLeft) {
-            position.x = wallBounds.left - (playerBounds.width / 2);
-        } else if (minOverlap == overlapRight) {
-            position.x = wallBounds.left + wallBounds.width + (playerBounds.width / 2);
-        } else if (minOverlap == overlapTop) {
-            position.y = wallBounds.top - (playerBounds.height / 2);
-        } else if (minOverlap == overlapBottom) {
-            position.y = wallBounds.top + wallBounds.height + (playerBounds.height / 2);
+                // Update mass data
+                b2MassData massData = b2Body_GetMassData(bodyId);
+                b2Body_SetMassData(bodyId, massData);
+            }
         }
 
-        // Update shape position
-        shape.setPosition(position);
-        spdlog::debug("Collision resolved: from({:.1f},{:.1f}) to({:.1f},{:.1f})", oldPos.x, oldPos.y, position.x, position.y);
+        // Set user data for collision handling
+        b2Body_SetUserData(bodyId, this);
     }
+
+    spdlog::debug("Player physics initialized");
 }
 
 } // namespace game

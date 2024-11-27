@@ -21,6 +21,13 @@ include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
+# Box2D build options
+set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(BOX2D_USER_SETTINGS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_STATIC ON CACHE BOOL "" FORCE)  # Add this line to build static library
+
 # Add source files
 file(GLOB_RECURSE SOURCES
     "src/*.cpp"
@@ -37,7 +44,24 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SFML_LIBRARIES}
     tomlplusplus::tomlplusplus
     spdlog::spdlog
+    box2d::box2d
 )
+
+# Add include directories for Box2D
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${box2d_SOURCE_DIR}/include
+    ${box2d_SOURCE_DIR}/src
+    ${box2d_BINARY_DIR}/generated
+)
+
+# Set Box2D-specific compile definitions
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    B2_USER_SETTINGS=0
+    B2_API=
+)
+
+# Ensure Box2D is built before our project
+add_dependencies(${PROJECT_NAME} box2d)
 
 # Configure cross-platform compile options
 if(CMAKE_BUILD_TYPE STREQUAL "Release")

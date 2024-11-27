@@ -36,5 +36,22 @@ FetchContent_Declare(
     GIT_TAG v${SPDLOG_VERSION}
 )
 
+# box2d
+set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(BOX2D_USER_SETTINGS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_SHARED OFF CACHE BOOL "" FORCE)  # Changed to static build
+set(BOX2D_BUILD_STATIC ON CACHE BOOL "" FORCE)   # Ensure static library is built
+
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.0.0
+)
+
 # Make dependencies available
-FetchContent_MakeAvailable(SFML tomlplusplus spdlog)
+FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+
+# Create an alias target for Box2D
+add_library(box2d::box2d ALIAS box2d)
