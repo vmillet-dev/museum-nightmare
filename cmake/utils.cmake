@@ -27,13 +27,18 @@ endfunction()
 
 # Configure Box2D build options
 function(configure_box2d_build_options)
+    # Basic Box2D options
     set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_SHARED OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_STATIC ON CACHE BOOL "" FORCE)
 
+    # Windows-specific Box2D configuration
     if(MSVC)
-        set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+        # Ensure Box2D uses static runtime
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+        # Disable C11 atomics for Box2D specifically
+        set(BOX2D_USER_SETTINGS ON CACHE BOOL "" FORCE)
     endif()
 endfunction()
