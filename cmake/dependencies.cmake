@@ -23,18 +23,14 @@ set(PROJECT_DEPENDENCIES
 if(MSVC)
     message(STATUS "Configuring for MSVC build...")
 
-    # Check compiler version
-    message(STATUS "MSVC Version: ${MSVC_VERSION}")
-
-    # Enable C11 atomics support for MSVC
-    foreach(lang C CXX)
-        message(STATUS "Configuring ${lang} compiler flags...")
-        string(APPEND CMAKE_${lang}_FLAGS " /std:c11 /experimental:c11atomics")
-        message(STATUS "CMAKE_${lang}_FLAGS: ${CMAKE_${lang}_FLAGS}")
-    endforeach()
-
-    add_compile_definitions(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+    # Set runtime library to match main project
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+    # Configure Box2D user settings path
+    add_compile_definitions(
+        B2_USER_SETTINGS
+        B2_USER_SETTINGS_PATH="${CMAKE_SOURCE_DIR}/src/game/physics/b2_user_settings.h"
+    )
 endif()
 
 # Configure build options
@@ -77,15 +73,8 @@ if(TARGET box2d)
     if(MSVC)
         message(STATUS "Configuring Box2D for MSVC...")
 
-        target_compile_options(box2d PRIVATE
-            /std:c11
-            /experimental:c11atomics
-            /Zc:preprocessor  # Standards-conforming preprocessor
-        )
-
-        target_compile_definitions(box2d PRIVATE
-            _ENABLE_ATOMIC_ALIGNMENT_FIX
-            B2_USER_SETTINGS
+        target_include_directories(box2d PRIVATE
+            "${CMAKE_SOURCE_DIR}/src/game/physics"
         )
 
         set_target_properties(box2d PROPERTIES
