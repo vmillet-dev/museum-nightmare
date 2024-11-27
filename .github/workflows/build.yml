@@ -38,43 +38,36 @@ jobs:
     - name: Install OpenAL
       shell: pwsh
       run: |
-        # Download OpenAL Soft
         $openalUrl = "https://openal-soft.org/openal-binaries/openal-soft-1.21.1-bin.zip"
         $openalZip = "openal-soft.zip"
-
         Write-Output "Downloading OpenAL from $openalUrl"
         Invoke-WebRequest -Uri $openalUrl -OutFile $openalZip
-
         Write-Output "Creating SDK directories"
         $sdkPath = "C:\Program Files (x86)\OpenAL 1.1 SDK"
         New-Item -ItemType Directory -Force -Path "$sdkPath\libs\Win64"
         New-Item -ItemType Directory -Force -Path "$sdkPath\include"
-
         Write-Output "Extracting OpenAL archive"
         Expand-Archive -Path $openalZip -DestinationPath openal-temp -Force
         Get-ChildItem openal-temp -Recurse
-
         Write-Output "Copying OpenAL files"
         Copy-Item "openal-temp\*\bin\Win64\soft_oal.dll" -Destination "$sdkPath\libs\Win64\OpenAL32.dll" -Force
         Copy-Item "openal-temp\*\include\*" -Destination "$sdkPath\include" -Force -Recurse
         Copy-Item "$sdkPath\libs\Win64\OpenAL32.dll" -Destination "C:\Windows\System32\OpenAL32.dll" -Force
 
-        if (Test-Path "C:\Windows\System32\OpenAL32.dll") {
-          Write-Output "OpenAL installation successful"
-        } else {
-          Write-Error "OpenAL32.dll not found in System32"
-          exit 1
-        }
-
     - name: Configure CMake
+      shell: cmd
       run: |
-        cmake -B build -G Ninja `
-          -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_CXX_COMPILER=cl `
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cmake -B build -G Ninja ^
+          -DCMAKE_BUILD_TYPE=Release ^
+          -DCMAKE_CXX_COMPILER=cl ^
           -DOPENAL_SDK_PATH="C:\Program Files (x86)\OpenAL 1.1 SDK"
 
     - name: Build
-      run: cmake --build build --config Release
+      shell: cmd
+      run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cmake --build build --config Release
 
   build-and-test-linux:
     runs-on: ubuntu-latest
@@ -103,7 +96,8 @@ jobs:
           libopenal-dev \
           libvorbis-dev \
           libflac-dev \
-          libfreetype-dev
+          libfreetype-dev \
+          libxrandr-dev
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
