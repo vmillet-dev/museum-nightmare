@@ -36,9 +36,18 @@ function(configure_box2d_build_options)
 
     # Windows-specific Box2D configuration
     if(MSVC)
-        # Ensure Box2D uses static runtime
+        # Set C++17 standard for Box2D
+        set(CMAKE_CXX_STANDARD 17 CACHE STRING "" FORCE)
+        set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE BOOL "" FORCE)
+        set(CMAKE_CXX_EXTENSIONS OFF CACHE BOOL "" FORCE)
+
+        # Use static runtime library
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
-        # Disable C11 atomics for Box2D specifically
+
+        # Enable Box2D user settings
         set(BOX2D_USER_SETTINGS ON CACHE BOOL "" FORCE)
+
+        # Add Windows-specific compile options
+        add_compile_options(/W4 /WX- /EHsc /Zc:__cplusplus /std:c++17)
     endif()
 endfunction()
