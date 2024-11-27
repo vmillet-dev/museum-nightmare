@@ -1,7 +1,7 @@
 include(FetchContent)
 
 # Dependencies versions
-set(BOX2D_VERSION "2.4.1")  # Downgrade to 2.4.1 which doesn't require C11 atomics
+set(BOX2D_VERSION "3.0.0")  # Keep v3.0.0 but handle Windows properly
 set(SFML_VERSION "2.6.2")
 set(TOMLPLUSPLUS_VERSION "3.4.0")
 set(SPDLOG_VERSION "1.15.0")
@@ -21,9 +21,8 @@ set(PROJECT_DEPENDENCIES
 
 # Windows-specific configuration
 if(MSVC)
-    # Enable C11 atomics support for MSVC globally
-    add_compile_options(/std:c11 /experimental:c11atomics)
-    add_compile_definitions(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+    # Set runtime library to match main project
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 # Configure build options
@@ -51,7 +50,7 @@ FetchContent_Declare(
     GIT_TAG v${SPDLOG_VERSION}
 )
 
-# box2d
+# box2d - use legacy API for Windows compatibility
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d.git
@@ -64,11 +63,14 @@ FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 # Post-fetch configuration for Box2D
 if(TARGET box2d)
     if(MSVC)
-        # Ensure Box2D uses the same runtime library as the main project
+        target_compile_definitions(box2d PRIVATE
+            B2_USER_SETTINGS
+            B2_API=__declspec\(dllexport\)
+            B2_USE_LEGACY_API=1
+        )
         set_target_properties(box2d PROPERTIES
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
             VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
-        target_compile_definitions(box2d PRIVATE _ENABLE_ATOMIC_ALIGNMENT_FIX)
     endif()
 endif()
