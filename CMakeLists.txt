@@ -15,6 +15,7 @@ if(MSVC)
         /W4     # Warning level 4
         /wd4251 # Disable class needs to have dll-interface warning
         /wd4275 # Disable non dll-interface class warning
+        /std:c++latest  # Enable latest C++ features
     )
 
     # Enable proper runtime library

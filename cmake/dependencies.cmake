@@ -47,11 +47,11 @@ if(MSVC)
     # Add Windows-specific compile options
     add_compile_options(
         /W4     # Warning level 4
-        /WX-    # Treat warnings as warnings (not errors)
+        /WX-    # Warnings as warnings
         /MP     # Multi-processor compilation
-        /EHsc   # Exception handling model
-        /Zc:__cplusplus  # Enable proper __cplusplus macro
-        /std:c++17       # Explicitly set C++17 mode
+        /EHsc   # Exception handling
+        /Zc:__cplusplus  # Proper __cplusplus macro
+        /std:c++17       # C++17 mode
     )
 
     # Set runtime library
@@ -91,49 +91,83 @@ FetchContent_Declare(
 )
 
 # Make dependencies available
-FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+FetchContent_MakeAvailable(SFML tomlplusplus spdlog)
 
-# Post-fetch configuration for Box2D
-if(TARGET box2d)
-    message(STATUS "Configuring Box2D...")
+# Configure Box2D separately
+FetchContent_GetProperties(box2d)
+if(NOT box2d_POPULATED)
+    FetchContent_Populate(box2d)
 
-    # Configure Box2D properties for all platforms
-    set_target_properties(box2d PROPERTIES
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS OFF
-    )
+    # Configure Box2D build options before adding subdirectory
+    set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_STATIC ON CACHE BOOL "" FORCE)
 
-    # Add Box2D-specific definitions for all platforms
-    target_compile_definitions(box2d PRIVATE
-        B2_USER_SETTINGS
-        B2_HAS_ATOMIC=1
-    )
+    # Add Box2D subdirectory
+    add_subdirectory(${box2d_SOURCE_DIR} ${box2d_BINARY_DIR})
 
-    if(MSVC)
-        message(STATUS "Applying MSVC-specific Box2D configuration...")
-
-        # Set MSVC runtime library
+    # Configure Box2D properties
+    if(TARGET box2d)
         set_target_properties(box2d PROPERTIES
-            MSVC_RUNTIME_LIBRARY ${CMAKE_MSVC_RUNTIME_LIBRARY}
+            CXX_STANDARD 17
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
         )
 
-        # Add MSVC-specific compile options
-        target_compile_options(box2d PRIVATE
-            /W4
-            /WX-
-            /EHsc
-            /Zc:__cplusplus
-            /std:c++17
-        )
-
-        # Add Windows-specific definitions
+        # Add Box2D-specific definitions
         target_compile_definitions(box2d PRIVATE
-            NOMINMAX
-            WIN32_LEAN_AND_MEAN
-            _CRT_SECURE_NO_WARNINGS
+            B2_USER_SETTINGS
+            B2_HAS_ATOMIC=1
         )
+
+        if(MSVC)
+            set_target_properties(box2d PROPERTIES
+                MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+            )
+
+            target_compile_options(box2d PRIVATE
+                /W4
+                /WX-
+                /EHsc
+                /Zc:__cplusplus
+                /std:c++17
+            )
+
+            target_compile_definitions(box2d PRIVATE
+                NOMINMAX
+                WIN32_LEAN_AND_MEAN
+                _CRT_SECURE_NO_WARNINGS
+            )
+        endif()
+    endif()
+endif()
+
+# Handle OpenAL for Windows
+if(WIN32)
+    set(OPENAL_ROOT "$ENV{OPENAL_SDK_PATH}" CACHE PATH "OpenAL SDK root directory")
+
+    if(NOT OPENAL_ROOT)
+        set(OPENAL_ROOT "C:/Program Files (x86)/OpenAL 1.1 SDK" CACHE PATH "OpenAL SDK root directory" FORCE)
     endif()
 
-    message(STATUS "Box2D configuration complete")
+    if(EXISTS "${OPENAL_ROOT}")
+        set(OPENAL_INCLUDE_DIR "${OPENAL_ROOT}/include")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(OPENAL_LIBRARY "${OPENAL_ROOT}/libs/Win64/OpenAL32.lib")
+            set(OPENAL_BINARY "${OPENAL_ROOT}/redist/Win64/OpenAL32.dll")
+        else()
+            set(OPENAL_LIBRARY "${OPENAL_ROOT}/libs/Win32/OpenAL32.lib")
+            set(OPENAL_BINARY "${OPENAL_ROOT}/redist/Win32/OpenAL32.dll")
+        endif()
+
+        if(EXISTS "${OPENAL_BINARY}")
+            add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${OPENAL_BINARY}"
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            )
+        endif()
+    endif()
 endif()
