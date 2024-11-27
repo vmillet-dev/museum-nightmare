@@ -47,7 +47,7 @@ jobs:
       - name: Build
         run: |
           cd build
-          make -j$(nproc) CXXFLAGS="-m64"
+          make -j$(nproc)
 
   build-windows:
     runs-on: windows-latest
