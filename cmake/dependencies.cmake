@@ -21,10 +21,19 @@ set(PROJECT_DEPENDENCIES
 
 # Windows-specific configuration
 if(MSVC)
+    message(STATUS "Configuring for MSVC build...")
+
+    # Check compiler version
+    message(STATUS "MSVC Version: ${MSVC_VERSION}")
+
     # Enable C11 atomics support for MSVC
-    add_compile_options(/std:c11 /experimental:c11atomics)
+    foreach(lang C CXX)
+        message(STATUS "Configuring ${lang} compiler flags...")
+        string(APPEND CMAKE_${lang}_FLAGS " /std:c11 /experimental:c11atomics")
+        message(STATUS "CMAKE_${lang}_FLAGS: ${CMAKE_${lang}_FLAGS}")
+    endforeach()
+
     add_compile_definitions(_ENABLE_ATOMIC_ALIGNMENT_FIX)
-    # Set runtime library to match main project
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
@@ -66,17 +75,24 @@ FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 # Post-fetch configuration for Box2D
 if(TARGET box2d)
     if(MSVC)
+        message(STATUS "Configuring Box2D for MSVC...")
+
         target_compile_options(box2d PRIVATE
             /std:c11
             /experimental:c11atomics
+            /Zc:preprocessor  # Standards-conforming preprocessor
         )
+
         target_compile_definitions(box2d PRIVATE
             _ENABLE_ATOMIC_ALIGNMENT_FIX
             B2_USER_SETTINGS
         )
+
         set_target_properties(box2d PROPERTIES
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
             VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
+
+        message(STATUS "Box2D configuration complete")
     endif()
 endif()
