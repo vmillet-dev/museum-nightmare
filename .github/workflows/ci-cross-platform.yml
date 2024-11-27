@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-linux:
+  build-and-test-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -36,7 +36,8 @@ jobs:
             libflac-dev \
             libfreetype-dev \
             xorg-dev \
-            libogg-dev
+            libogg-dev \
+            xvfb
 
       - name: Configure CMake
         run: |
@@ -49,47 +50,12 @@ jobs:
           cd build
           make -j$(nproc)
 
-      - name: Prepare Runtime Dependencies
-        run: |
-          cd build
-          mkdir -p runtime
-          cp sfml_game runtime/
-          cp _deps/sfml-build/lib/*.so* runtime/
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-build
-          path: build/runtime
-
-  test-linux:
-    needs: build-linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb libopenal1 libvorbis0a libvorbisfile3 libflac8 libfreetype6
-
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: linux-build
-          path: build/runtime
-
-      - name: Make Executable
-        run: |
-          ls -la build/runtime
-          chmod +x build/runtime/sfml_game
-
       - name: Run Tests with Virtual Display
         run: |
-          cd build/runtime
-          LD_LIBRARY_PATH=. xvfb-run --auto-servernum ./sfml_game --test-mode
+          cd build
+          xvfb-run --auto-servernum ./sfml_game --test-mode
 
-  build-windows:
+  build-and-test-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -139,36 +105,6 @@ jobs:
           cd build
           ninja
 
-      - name: Prepare Runtime Dependencies
-        shell: cmd
-        run: |
-          cd build
-          mkdir runtime
-          copy sfml_game.exe runtime\
-          copy _deps\sfml-build\lib\*.dll runtime\
-          copy _deps\sfml-src\extlibs\bin\x64\*.dll runtime\
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows-build
-          path: build/runtime
-
-  test-windows:
-    needs: build-windows
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install OpenAL
-        run: choco install openal -y
-
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: windows-build
-          path: build/runtime
-
       - name: Setup Virtual Display
         shell: powershell
         run: |
@@ -181,6 +117,5 @@ jobs:
       - name: Run Tests
         shell: cmd
         run: |
-          cd build\runtime
-          REM Use RDP session for display
+          cd build
           .\sfml_game.exe --test-mode
