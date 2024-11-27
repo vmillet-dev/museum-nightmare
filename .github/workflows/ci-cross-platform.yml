@@ -118,5 +118,5 @@ jobs:
         shell: cmd
         run: |
           cd build
-          set PATH=%PATH%;%CD%\_deps\sfml-build\lib
+          copy _deps\sfml-build\lib\*.dll .
           .\sfml_game.exe --test-mode
