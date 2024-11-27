@@ -65,13 +65,14 @@ jobs:
             ${{ runner.os }}-deps-
 
       - name: Setup Visual Studio Environment
-        uses: microsoft/setup-msbuild@v1.1
+        uses: actions/setup-vs-dev-env@v1.0.0
         with:
-          vs-version: '16.0'
+          vs-version: '2019'
 
       - name: Install Visual Studio Components
         run: |
-          choco install visualstudio2019-workload-nativedesktop -y --package-parameters "--includeOptional"
+          choco install visualstudio2019buildtools -y
+          choco install visualstudio2019-workload-vctools -y
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
