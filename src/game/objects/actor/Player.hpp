@@ -1,6 +1,7 @@
 #pragma once
 #include "Actor.hpp"
 #include <SFML/Graphics.hpp>
+#include "../../../core/const.hpp"
 
 namespace game {
 
@@ -13,10 +14,6 @@ public:
 private:
     sf::RectangleShape shape;
     sf::Vector2u windowSize;  // Store window size
-
-    // Box2D specific properties
-    static constexpr float PLAYER_DENSITY = 1.0f;
-    static constexpr float PLAYER_FRICTION = 0.3f;
 };
 
 } // namespace game

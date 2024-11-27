@@ -1,6 +1,7 @@
 #pragma once
 #include "Actor.hpp"
 #include "../../../input/providers/RandomAIInputProvider.hpp"
+#include "../../../core/const.hpp"
 
 namespace game {
 
@@ -12,8 +13,6 @@ public:
 
 private:
     sf::RectangleShape shape;
-    static constexpr float ENEMY_DENSITY = 1.0f;
-    static constexpr float ENEMY_FRICTION = 0.3f;
 };
 
 } // namespace game

@@ -1,4 +1,5 @@
 #include "Wall.hpp"
+#include "../../core/const.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -38,7 +39,7 @@ void Wall::initPhysics(b2WorldId worldId) {
 
     // Create shape definition
     b2ShapeDef shapeDef = b2DefaultShapeDef();
-    shapeDef.friction = WALL_FRICTION;
+    shapeDef.friction = Constants::Physics::WALL_FRICTION;
 
     // Create box polygon
     float hx = width / 2.0f;

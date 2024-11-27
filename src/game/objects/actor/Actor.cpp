@@ -1,4 +1,5 @@
 #include "Actor.hpp"
+#include "../../../core/const.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -34,11 +35,11 @@ void Actor::initPhysics(b2WorldId worldId) {
 
     // Create shape definition
     b2ShapeDef shapeDef = b2DefaultShapeDef();
-    shapeDef.density = DENSITY;
-    shapeDef.friction = FRICTION;
+    shapeDef.density = Constants::Physics::ACTOR_DENSITY;
+    shapeDef.friction = Constants::Physics::ACTOR_FRICTION;
 
     // Create box shape
-    float halfSize = ACTOR_SIZE;
+    float halfSize = Constants::Physics::ACTOR_SIZE;
     b2Polygon boxShape = b2MakeBox(halfSize, halfSize);
 
     // Create the fixture with the box shape

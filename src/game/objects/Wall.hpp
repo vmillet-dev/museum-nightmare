@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.hpp"
+#include "../../core/const.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -15,8 +16,6 @@ private:
     sf::RectangleShape shape;
     float width;
     float height;
-
-    static constexpr float WALL_FRICTION = 0.3f;
 };
 
 } // namespace game

@@ -3,6 +3,7 @@
 #include "ContactListener.hpp"
 #include <memory>
 #include <cstdint>
+#include "../../core/const.hpp"
 
 namespace game {
 
@@ -20,9 +21,6 @@ public:
 
 private:
     b2WorldId worldId;
-    static constexpr float GRAVITY_Y = 9.8f;
-    static constexpr int32_t VELOCITY_ITERATIONS = 8;
-    static constexpr int32_t POSITION_ITERATIONS = 3;
 };
 
 } // namespace game

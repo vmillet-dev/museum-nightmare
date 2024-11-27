@@ -24,3 +24,13 @@ function(configure_sfml_build_options)
     set(SFML_BUILD_TEST_SUITE OFF CACHE BOOL "" FORCE)
     set(SFML_GENERATE_PDB ON CACHE BOOL "" FORCE)
 endfunction()
+
+# Configure Box2D build options
+function(configure_box2d_build_options)
+    set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+    set(BOX2D_USER_SETTINGS OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_STATIC ON CACHE BOOL "" FORCE)
+endfunction()

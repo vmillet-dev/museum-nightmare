@@ -6,9 +6,9 @@ namespace game {
 
 Enemy::Enemy(float x, float y)
     : Actor(x, y, std::make_unique<RandomAIInputProvider>(), 150.0f) {
-    shape.setSize(sf::Vector2f(32.0f, 32.0f));
+    shape.setSize(sf::Vector2f(Constants::Physics::ACTOR_SIZE * 2, Constants::Physics::ACTOR_SIZE * 2));
     shape.setFillColor(sf::Color::Red);
-    shape.setOrigin(16.0f, 16.0f);
+    shape.setOrigin(Constants::Physics::ACTOR_SIZE, Constants::Physics::ACTOR_SIZE);
     shape.setPosition(x, y);
     spdlog::info("Enemy created at position ({}, {})", x, y);
 }
@@ -32,8 +32,8 @@ void Enemy::initPhysics(b2WorldId worldId) {
         if (shapeCount > 0) {
             b2ShapeId shapeId = shapes[0];
             if (b2Shape_IsValid(shapeId)) {
-                b2Shape_SetDensity(shapeId, ENEMY_DENSITY);
-                b2Shape_SetFriction(shapeId, ENEMY_FRICTION);
+                b2Shape_SetDensity(shapeId, Constants::Physics::ENEMY_DENSITY);
+                b2Shape_SetFriction(shapeId, Constants::Physics::ENEMY_FRICTION);
 
                 // Update mass data
                 b2MassData massData = b2Body_GetMassData(bodyId);

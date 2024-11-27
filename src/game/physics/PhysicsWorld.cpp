@@ -1,14 +1,15 @@
 #include "PhysicsWorld.hpp"
 #include "ContactListener.hpp"
 #include <spdlog/spdlog.h>
+#include "../../core/const.hpp"
 
 namespace game {
 
 PhysicsWorld::PhysicsWorld() {
     b2WorldDef worldDef = b2DefaultWorldDef();
-    worldDef.gravity = {0.0f, GRAVITY_Y};
+    worldDef.gravity = {0.0f, Constants::Physics::GRAVITY_Y};
     worldId = b2CreateWorld(&worldDef);
-    spdlog::debug("PhysicsWorld initialized with gravity {}", GRAVITY_Y);
+    spdlog::debug("PhysicsWorld initialized with gravity {}", Constants::Physics::GRAVITY_Y);
 }
 
 PhysicsWorld::~PhysicsWorld() {
@@ -21,7 +22,7 @@ void PhysicsWorld::update(float deltaTime) {
     if (!b2World_IsValid(worldId)) return;
 
     // Step the physics simulation
-    b2World_Step(worldId, deltaTime, VELOCITY_ITERATIONS);
+    b2World_Step(worldId, deltaTime, Constants::Physics::VELOCITY_ITERATIONS);
 
     // Process any contact events that occurred during the step
     ContactListener::processContactEvents(worldId);

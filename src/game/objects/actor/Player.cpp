@@ -8,9 +8,9 @@ namespace game {
 
 Player::Player(float x, float y, Game& game)
     : Actor(x, y, std::make_unique<PlayerInputProvider>(game.getInputManager()), 200.0f) {
-    shape.setSize(sf::Vector2f(32.0f, 32.0f));
+    shape.setSize(sf::Vector2f(Constants::Physics::ACTOR_SIZE * 2, Constants::Physics::ACTOR_SIZE * 2));
     shape.setFillColor(sf::Color::Green);
-    shape.setOrigin(16.0f, 16.0f);
+    shape.setOrigin(Constants::Physics::ACTOR_SIZE, Constants::Physics::ACTOR_SIZE);
     shape.setPosition(position);
     spdlog::info("Player created at position ({}, {})", x, y);
 }
@@ -35,8 +35,8 @@ void Player::initPhysics(b2WorldId worldId) {
         if (shapeCount > 0) {
             b2ShapeId shapeId = shapes[0];
             if (b2Shape_IsValid(shapeId)) {
-                b2Shape_SetDensity(shapeId, PLAYER_DENSITY);
-                b2Shape_SetFriction(shapeId, PLAYER_FRICTION);
+                b2Shape_SetDensity(shapeId, Constants::Physics::PLAYER_DENSITY);
+                b2Shape_SetFriction(shapeId, Constants::Physics::PLAYER_FRICTION);
 
                 // Update mass data
                 b2MassData massData = b2Body_GetMassData(bodyId);
