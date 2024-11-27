@@ -52,18 +52,11 @@ if(MSVC)
         /EHsc   # Exception handling model
         /Zc:__cplusplus  # Enable proper __cplusplus macro
         /std:c++17       # Explicitly set C++17 mode
+        /DWIN32_LEAN_AND_MEAN
     )
 
     # Set runtime library
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
-    # Add Box2D-specific definitions
-    add_compile_definitions(
-        B2_USER_SETTINGS
-        B2_HAS_ATOMIC=1
-        NOMINMAX
-        WIN32_LEAN_AND_MEAN
-    )
 endif()
 
 # Configure build options
@@ -103,70 +96,39 @@ FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 
 # Post-fetch configuration for Box2D
 if(TARGET box2d)
-    if(MSVC)
-        message(STATUS "Configuring Box2D for MSVC...")
+    message(STATUS "Configuring Box2D...")
 
-        # Configure Box2D properties
+    # Configure Box2D properties
+    set_target_properties(box2d PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS OFF
+    )
+
+    if(MSVC)
+        message(STATUS "Applying MSVC-specific Box2D configuration...")
+
+        # Set MSVC runtime library
         set_target_properties(box2d PROPERTIES
-            CXX_STANDARD 17
-            CXX_STANDARD_REQUIRED ON
-            CXX_EXTENSIONS OFF
             MSVC_RUNTIME_LIBRARY ${CMAKE_MSVC_RUNTIME_LIBRARY}
         )
 
-        # Add Box2D-specific definitions
+        # Add MSVC-specific compile options
+        target_compile_options(box2d PRIVATE
+            /W4
+            /WX-
+            /EHsc
+            /Zc:__cplusplus
+        )
+
+        # Add Box2D-specific definitions for MSVC
         target_compile_definitions(box2d PRIVATE
             B2_USER_SETTINGS
             B2_HAS_ATOMIC=1
             NOMINMAX
             WIN32_LEAN_AND_MEAN
         )
-
-        message(STATUS "Box2D configuration complete")
     endif()
-endif()
 
-# OpenAL configuration for Windows
-if(WIN32)
-    # Try to find OpenAL SDK
-    find_package(OpenAL QUIET)
-
-    if(NOT OPENAL_FOUND)
-        # Try multiple possible OpenAL SDK locations
-        set(OPENAL_SEARCH_PATHS
-            "$ENV{OPENAL_SDK_PATH}"
-            "C:/Program Files (x86)/OpenAL 1.1 SDK"
-            "C:/Program Files/OpenAL 1.1 SDK"
-        )
-
-        foreach(SEARCH_PATH ${OPENAL_SEARCH_PATHS})
-            if(EXISTS "${SEARCH_PATH}")
-                set(OPENAL_ROOT "${SEARCH_PATH}")
-                break()
-            endif()
-        endforeach()
-
-        if(OPENAL_ROOT)
-            message(STATUS "Found OpenAL SDK at: ${OPENAL_ROOT}")
-
-            # Add OpenAL include and library directories
-            include_directories("${OPENAL_ROOT}/include")
-            if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-                set(OPENAL_LIB_DIR "${OPENAL_ROOT}/libs/Win64")
-            else()
-                set(OPENAL_LIB_DIR "${OPENAL_ROOT}/libs/Win32")
-            endif()
-            link_directories("${OPENAL_LIB_DIR}")
-
-            # Copy OpenAL32.dll to build directory during configuration
-            if(EXISTS "${OPENAL_LIB_DIR}/OpenAL32.dll")
-                file(COPY "${OPENAL_LIB_DIR}/OpenAL32.dll" DESTINATION "${CMAKE_BINARY_DIR}")
-                message(STATUS "Copied OpenAL32.dll to build directory")
-            else()
-                message(WARNING "OpenAL32.dll not found in ${OPENAL_LIB_DIR}")
-            endif()
-        else()
-            message(STATUS "OpenAL SDK not found in standard locations. Using system OpenAL.")
-        endif()
-    endif()
+    message(STATUS "Box2D configuration complete")
 endif()
