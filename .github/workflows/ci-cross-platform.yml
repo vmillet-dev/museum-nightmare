@@ -77,15 +77,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-build
-          path: build
+          path: build/runtime
 
       - name: Make Executable
-        run: chmod +x build/runtime/sfml_game
+        run: |
+          ls -la build/runtime
+          chmod +x build/runtime/sfml_game
 
       - name: Run Tests with Virtual Display
         run: |
           cd build/runtime
-          xvfb-run --auto-servernum ./sfml_game --test-mode
+          LD_LIBRARY_PATH=. xvfb-run --auto-servernum ./sfml_game --test-mode
 
   build-windows:
     runs-on: windows-latest
@@ -165,19 +167,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: windows-build
-          path: build
+          path: build/runtime
 
       - name: Setup Virtual Display
         shell: powershell
         run: |
-          Install-WindowsFeature -Name Remote-Desktop-Services
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          $sessionID = (qwinsta | Select-String "services" | ForEach-Object { $_.ToString().Trim() -split '\s+' })[2]
-          $env:SESSIONNAME = $sessionID
+          # Use dummy display for headless operation
+          $env:DISPLAY=":0"
+          # Install virtual display driver
+          choco install winvnc -y
 
       - name: Run Tests
         shell: cmd
         run: |
           cd build\runtime
+          set DISPLAY=:0
           .\sfml_game.exe --test-mode
