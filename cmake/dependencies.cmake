@@ -1,4 +1,5 @@
 include(FetchContent)
+include(CheckCXXSourceCompiles)
 
 # Dependencies versions
 set(BOX2D_VERSION "3.0.0")  # Keep v3.0.0 but handle Windows properly
@@ -18,6 +19,21 @@ set(PROJECT_DEPENDENCIES
     spdlog::spdlog
     box2d
 )
+
+# Check for atomic support
+check_cxx_source_compiles("
+    #include <atomic>
+    int main() {
+        std::atomic<int> x;
+        return 0;
+    }"
+    HAVE_ATOMIC_SUPPORT
+)
+
+if(NOT HAVE_ATOMIC_SUPPORT)
+    find_package(Threads REQUIRED)
+    link_libraries(${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 # Windows-specific configuration
 if(MSVC)
@@ -83,7 +99,12 @@ if(TARGET box2d)
 
         target_compile_definitions(box2d PRIVATE
             B2_USER_SETTINGS
+            _ENABLE_ATOMIC_ALIGNMENT_FIX
         )
+
+        if(NOT HAVE_ATOMIC_SUPPORT)
+            target_link_libraries(box2d PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+        endif()
 
         message(STATUS "Box2D configuration complete")
     endif()
