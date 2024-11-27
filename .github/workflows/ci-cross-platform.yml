@@ -43,7 +43,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=23 -DCMAKE_SYSTEM_PROCESSOR=x86_64
+          cmake ..
 
       - name: Build
         run: |
@@ -97,7 +97,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=23 -DSFML_STATIC_LIBRARIES=TRUE -DBUILD_SHARED_LIBS=FALSE
+          cmake .. -G "Ninja" -DSFML_STATIC_LIBRARIES=TRUE -DBUILD_SHARED_LIBS=FALSE
 
       - name: Build
         shell: cmd
