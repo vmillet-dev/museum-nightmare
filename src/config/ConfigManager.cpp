@@ -1,6 +1,7 @@
 #include "ConfigManager.hpp"
 #include <spdlog/spdlog.h>
 #include <fstream>
+#include "../core/const.hpp"
 
 namespace game {
 
@@ -42,7 +43,7 @@ void ConfigManager::createDefaultConfig() {
         }},
         {"player", toml::table{
             {"speed", 200.0},
-            {"size", 32.0}
+            {"size", Constants::Physics::ACTOR_SIZE * 2}  // Full size is twice the half-size
         }},
         {"debug", toml::table{
             {"level", "info"}
@@ -93,7 +94,7 @@ float ConfigManager::getPlayerSpeed() const {
 }
 
 float ConfigManager::getPlayerSize() const {
-    return config["player"]["size"].value_or(32.0f);
+    return config["player"]["size"].value_or(Constants::Physics::ACTOR_SIZE * 2);  // Default to twice ACTOR_SIZE
 }
 
 sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {

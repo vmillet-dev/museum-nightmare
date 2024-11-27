@@ -1,0 +1,106 @@
+name: CI Cross-Platform Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test-windows:
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/vcpkg
+          ./build/_deps
+        key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-deps-
+
+    - name: Install Ninja
+      run: choco install ninja
+
+    - name: Setup Visual Studio Environment
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Install Visual Studio Components
+      run: |
+        choco install visualstudio2022-workload-nativedesktop
+
+    - name: Setup CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Install OpenAL
+      shell: pwsh
+      run: |
+        $openalUrl = "https://openal-soft.org/openal-binaries/openal-soft-1.21.1-bin.zip"
+        $openalZip = "openal-soft.zip"
+        Write-Output "Downloading OpenAL from $openalUrl"
+        Invoke-WebRequest -Uri $openalUrl -OutFile $openalZip
+        Write-Output "Creating SDK directories"
+        $sdkPath = "C:\Program Files (x86)\OpenAL 1.1 SDK"
+        New-Item -ItemType Directory -Force -Path "$sdkPath\libs\Win64"
+        New-Item -ItemType Directory -Force -Path "$sdkPath\include"
+        Write-Output "Extracting OpenAL archive"
+        Expand-Archive -Path $openalZip -DestinationPath openal-temp -Force
+        Get-ChildItem openal-temp -Recurse
+        Write-Output "Copying OpenAL files"
+        Copy-Item "openal-temp\*\bin\Win64\soft_oal.dll" -Destination "$sdkPath\libs\Win64\OpenAL32.dll" -Force
+        Copy-Item "openal-temp\*\include\*" -Destination "$sdkPath\include" -Force -Recurse
+        Copy-Item "$sdkPath\libs\Win64\OpenAL32.dll" -Destination "C:\Windows\System32\OpenAL32.dll" -Force
+
+    - name: Configure CMake
+      shell: cmd
+      run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cmake -B build -G Ninja ^
+          -DCMAKE_BUILD_TYPE=Release ^
+          -DCMAKE_CXX_COMPILER=cl ^
+          -DOPENAL_SDK_PATH="C:\Program Files (x86)\OpenAL 1.1 SDK"
+
+    - name: Build
+      shell: cmd
+      run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        cmake --build build --config Release
+
+  build-and-test-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/vcpkg
+          ./build/_deps
+        key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-deps-
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          libx11-dev \
+          libgl1-mesa-dev \
+          libudev-dev \
+          libopenal-dev \
+          libvorbis-dev \
+          libflac-dev \
+          libfreetype-dev \
+          libxrandr-dev
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release

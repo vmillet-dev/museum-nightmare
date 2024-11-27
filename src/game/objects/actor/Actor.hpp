@@ -1,6 +1,7 @@
 #pragma once
 #include "../GameObject.hpp"
 #include "../../../input/providers/InputProvider.hpp"
+#include "../../../core/const.hpp"
 #include <memory>
 
 namespace game {
@@ -15,6 +16,7 @@ public:
     virtual ~Actor() = default;
 
     void update(float deltaTime) override;
+    void initPhysics(b2WorldId worldId) override;  // Updated to use new Box2D v3.0.0 API
     void move(float x, float y, float deltaTime);
 };
 
