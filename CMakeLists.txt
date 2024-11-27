@@ -5,6 +5,13 @@ project(sfml_game VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Windows-specific configuration
+if(MSVC)
+    # Enable C11 atomics support for Box2D
+    add_compile_definitions(_ENABLE_ATOMIC_ALIGNMENT_FIX)
+    add_compile_options(/std:c11 /experimental:c11atomics)
+endif()
+
 # Set build type if not set
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
