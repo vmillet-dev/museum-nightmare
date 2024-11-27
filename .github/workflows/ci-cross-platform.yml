@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_CXX_FLAGS="-Wno-error"
+          cmake .. -DCMAKE_CXX_STANDARD=23 -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_CXX_FLAGS="-Wno-error"
 
       - name: Build
         run: |
@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -A x64 -DSFML_STATIC_LIBRARIES=TRUE -DBUILD_SHARED_LIBS=FALSE -DCMAKE_CXX_FLAGS="/WX-"
+          cmake .. -DCMAKE_CXX_STANDARD=23 -A x64 -DSFML_STATIC_LIBRARIES=TRUE -DBUILD_SHARED_LIBS=FALSE -DCMAKE_CXX_FLAGS="/WX-"
 
       - name: Build
         shell: cmd
