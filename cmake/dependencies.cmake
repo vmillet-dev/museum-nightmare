@@ -23,14 +23,13 @@ set(PROJECT_DEPENDENCIES
 if(MSVC)
     message(STATUS "Configuring for MSVC build...")
 
+    # Use C++17 which has better atomic support
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+
     # Set runtime library to match main project
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
-    # Configure Box2D user settings path
-    add_compile_definitions(
-        B2_USER_SETTINGS
-        B2_USER_SETTINGS_PATH="${CMAKE_SOURCE_DIR}/src/game/physics/b2_user_settings.h"
-    )
 endif()
 
 # Configure build options
@@ -73,13 +72,17 @@ if(TARGET box2d)
     if(MSVC)
         message(STATUS "Configuring Box2D for MSVC...")
 
-        target_include_directories(box2d PRIVATE
-            "${CMAKE_SOURCE_DIR}/src/game/physics"
-        )
-
+        # Use modern C++ for Box2D
         set_target_properties(box2d PROPERTIES
+            CXX_STANDARD 17
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
             VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
+
+        target_compile_definitions(box2d PRIVATE
+            B2_USER_SETTINGS
         )
 
         message(STATUS "Box2D configuration complete")
