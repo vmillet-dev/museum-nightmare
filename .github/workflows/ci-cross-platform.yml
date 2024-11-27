@@ -1,0 +1,92 @@
+name: CI Cross-Platform Build
+
+on:
+  push:
+    branches: [ "main", "feature/*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            build/_deps
+            ~/.cache/ccache
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake', 'CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libx11-dev \
+            libgl1-mesa-dev \
+            libudev-dev \
+            libopenal-dev \
+            libvorbis-dev \
+            libflac-dev \
+            libfreetype-dev \
+            xorg-dev \
+            libogg-dev
+
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_SYSTEM_PROCESSOR=x86_64
+
+      - name: Build
+        run: |
+          cd build
+          make -j$(nproc) CXXFLAGS="-m64"
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            build\_deps
+            ~\AppData\Local\ccache
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake', 'CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+      - name: Setup Visual Studio Environment
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          vs-version: '[17.0,18.0)'
+
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "3.16"
+
+      - name: Install OpenAL
+        run: |
+          choco install openal -y
+
+      - name: Configure CMake
+        shell: cmd
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -A x64 -DSFML_STATIC_LIBRARIES=TRUE -DBUILD_SHARED_LIBS=FALSE
+
+      - name: Build
+        shell: cmd
+        run: |
+          cd build
+          cmake --build . --config Release --parallel
