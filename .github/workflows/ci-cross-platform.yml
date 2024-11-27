@@ -69,6 +69,10 @@ jobs:
         with:
           vs-version: '[17.0,18.0)'
 
+      - name: Install Visual Studio Components
+        run: |
+          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional"
+
       - name: Setup CMake
         uses: lukka/get-cmake@latest
         with:
