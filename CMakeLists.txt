@@ -7,9 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Windows-specific configuration
 if(MSVC)
-    # Enable C11 atomics support for Box2D
-    add_compile_definitions(_ENABLE_ATOMIC_ALIGNMENT_FIX)
-    add_compile_options(/std:c11 /experimental:c11atomics)
+    add_compile_options(/MP)  # Enable multi-processor compilation
 endif()
 
 # Set build type if not set
