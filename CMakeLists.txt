@@ -2,8 +2,25 @@ cmake_minimum_required(VERSION 3.16)
 
 project(sfml_game VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 23)
+# Set C++ standard before any targets are created
+set(CMAKE_CXX_STANDARD 17)  # Use C++17 for better atomic support
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Check for atomic support
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+    #include <atomic>
+    int main() {
+        std::atomic<int> x;
+        return 0;
+    }"
+    HAVE_ATOMIC_SUPPORT
+)
+
+if(NOT HAVE_ATOMIC_SUPPORT)
+    message(FATAL_ERROR "Compiler does not support std::atomic")
+endif()
 
 # Windows-specific configuration
 if(MSVC)
