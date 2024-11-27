@@ -29,9 +29,14 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
     text.setPosition(position.x, position.y);
 
     isHovered = false;
+    clicked = false;
+    wasPressed = false;
 }
 
-void Button::handleInput(const sf::Vector2f& mousePos) {
+void Button::update(InputManager& inputManager) {
+    // Get mouse position from window
+    sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(inputManager.getWindow()));
+
     bool wasHovered = isHovered;
     isHovered = isMouseOver(mousePos);
 
@@ -40,29 +45,16 @@ void Button::handleInput(const sf::Vector2f& mousePos) {
         shape.setFillColor(isHovered ? hoverColor : defaultColor);
     }
 
-    // Handle click
-    if (isHovered && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        handleClick(mousePos);
+    // Update color based on selection state
+    if (isSelected) {
+        shape.setFillColor(selectedColor);
     }
-}
 
-void Button::setCallback(std::function<void()> newCallback) {
-    callback = std::move(newCallback);
-}
-
-void Button::handleClick(const sf::Vector2f& mousePos) {
-    if (callback) {
-        callback();
-    }
-}
-
-void Button::handleHover(const sf::Vector2f& mousePos) {
-    isHovered = isMouseOver(mousePos);
-    shape.setFillColor(isHovered ? hoverColor : defaultColor);
-}
-
-void Button::update(float deltaTime) {
-    // Animation or other updates can be added here
+    // Handle click using InputManager (mouse or confirm action)
+    bool isPressed = inputManager.isActionPressed(Action::MouseLeft) ||
+                    (isSelected && inputManager.isActionPressed(Action::Confirm));
+    clicked = (isHovered || isSelected) && isPressed && !wasPressed;
+    wasPressed = isPressed;
 }
 
 void Button::render(sf::RenderWindow& window) {

@@ -1,9 +1,39 @@
 #include "InputManager.hpp"
 #include "../config/ConfigManager.hpp"
+#include "../core/Utils.hpp"
 #include <spdlog/spdlog.h>
 #include <algorithm>
 
 namespace game {
+
+InputManager::InputManager(sf::RenderWindow& window) : window(window) {
+    spdlog::info("Initializing InputManager");
+
+    // Add keyboard device by default
+    auto keyboardDevice = std::make_unique<KeyboardDevice>();
+    keyboardDevice->init();
+    devices.push_back(std::move(keyboardDevice));
+
+    // Add mouse device
+    auto mouseDevice = std::make_unique<MouseDevice>(window);
+    mouseDevice->init();
+    devices.push_back(std::move(mouseDevice));
+
+    // Check for already connected controllers
+    for (unsigned int i = 0; i < sf::Joystick::Count; ++i) {
+        if (sf::Joystick::isConnected(i)) {
+            createControllerDevice();
+        }
+    }
+
+    spdlog::info("Input devices initialized");
+}
+
+void InputManager::update() {
+    for (auto& device : devices) {
+        device->update();
+    }
+}
 
 void InputManager::createControllerDevice() {
     auto controllerDevice = std::make_unique<ControllerDevice>();
@@ -25,30 +55,6 @@ void InputManager::removeControllerDevice() {
     spdlog::info("Controller disconnected and removed");
 }
 
-void InputManager::init() {
-    spdlog::info("Initializing InputManager");
-
-    // Add keyboard device by default
-    auto keyboardDevice = std::make_unique<KeyboardDevice>();
-    keyboardDevice->init();
-    devices.push_back(std::move(keyboardDevice));
-
-    // Check for already connected controllers
-    for (unsigned int i = 0; i < sf::Joystick::Count; ++i) {
-        if (sf::Joystick::isConnected(i)) {
-            createControllerDevice();
-        }
-    }
-
-    spdlog::info("Input devices initialized");
-}
-
-void InputManager::update() {
-    for (auto& device : devices) {
-        device->update();
-    }
-}
-
 void InputManager::handleEvent(const sf::Event& event) {
     if (event.type == sf::Event::JoystickConnected) {
         createControllerDevice();
@@ -66,6 +72,26 @@ void InputManager::handleEvent(const sf::Event& event) {
 bool InputManager::isActionPressed(Action action) {
     for (auto& device : devices) {
         if (device->isActionPressed(action)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputManager::isActionJustPressed(Action action) {
+    for (auto& device : devices) {
+        if (device->isActionJustPressed(action)) {
+            spdlog::debug("Action {} just pressed on {}", Utils::actionToString(action), typeid(*device).name());
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputManager::isActionReleased(Action action) {
+    for (auto& device : devices) {
+        if (device->isActionReleased(action)) {
+            spdlog::debug("Action {} released on {}", Utils::actionToString(action), typeid(*device).name());
             return true;
         }
     }

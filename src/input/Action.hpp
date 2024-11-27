@@ -9,7 +9,9 @@ enum class Action {
     MoveRight,
     Pause,
     Confirm,
-    Cancel
+    Cancel,
+    MouseLeft,
+    MouseRight
 };
 
 } // namespace game
