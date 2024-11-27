@@ -52,9 +52,6 @@ if(MSVC)
         /EHsc   # Exception handling model
         /Zc:__cplusplus  # Enable proper __cplusplus macro
         /std:c++17       # Explicitly set C++17 mode
-        /wd4324         # Disable structure padding warning
-        /DWIN32_LEAN_AND_MEAN
-        /DB2_HAS_ATOMIC=1
     )
 
     # Set runtime library
@@ -63,8 +60,9 @@ if(MSVC)
     # Add Box2D-specific definitions
     add_compile_definitions(
         B2_USER_SETTINGS
+        B2_HAS_ATOMIC=1
         NOMINMAX
-        _ENABLE_ATOMIC_ALIGNMENT_FIX
+        WIN32_LEAN_AND_MEAN
     )
 endif()
 
