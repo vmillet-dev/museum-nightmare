@@ -28,24 +28,31 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Find OpenAL for Windows
 if(WIN32)
-    set(OPENAL_SDK_PATH "C:/Program Files (x86)/OpenAL 1.1 SDK" CACHE PATH "Path to OpenAL SDK")
+    find_package(OpenAL)
+    if(NOT OPENAL_FOUND)
+        set(OPENAL_ROOT "$ENV{OPENAL_SDK_PATH}")
+        if(NOT OPENAL_ROOT)
+            set(OPENAL_ROOT "C:/Program Files (x86)/OpenAL 1.1 SDK")
+        endif()
 
-    # Try environment variable if default path doesn't exist
-    if(NOT EXISTS "${OPENAL_SDK_PATH}")
-        set(OPENAL_SDK_PATH $ENV{OPENAL_SDK_PATH} CACHE PATH "Path to OpenAL SDK" FORCE)
+        if(EXISTS "${OPENAL_ROOT}")
+            set(OPENAL_INCLUDE_DIR "${OPENAL_ROOT}/include")
+            if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+                set(OPENAL_LIBRARY "${OPENAL_ROOT}/libs/Win64/OpenAL32.lib")
+                set(OPENAL_DLL "${OPENAL_ROOT}/redist/Win64/OpenAL32.dll")
+            else()
+                set(OPENAL_LIBRARY "${OPENAL_ROOT}/libs/Win32/OpenAL32.lib")
+                set(OPENAL_DLL "${OPENAL_ROOT}/redist/Win32/OpenAL32.dll")
+            endif()
+        else()
+            message(FATAL_ERROR "OpenAL SDK not found. Please install OpenAL SDK or set OPENAL_SDK_PATH.")
+        endif()
     endif()
-
-    if(NOT EXISTS "${OPENAL_SDK_PATH}")
-        message(FATAL_ERROR "OpenAL SDK not found. Please install OpenAL SDK or set OPENAL_SDK_PATH.")
-    endif()
-
-    message(STATUS "Using OpenAL SDK at: ${OPENAL_SDK_PATH}")
 endif()
 
 # Add source files
@@ -59,21 +66,25 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
-# Configure OpenAL for Windows after target creation
-if(WIN32 AND EXISTS "${OPENAL_SDK_PATH}")
-    target_include_directories(${PROJECT_NAME} PRIVATE "${OPENAL_SDK_PATH}/include")
+# Include compiler flags after target creation
+include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
-    # Copy OpenAL DLL to output directory
-    set(OPENAL_DLL "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
-    if(EXISTS "${OPENAL_DLL}")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${OPENAL_DLL}"
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "Copying OpenAL32.dll to output directory"
-        )
-    else()
-        message(FATAL_ERROR "OpenAL32.dll not found at ${OPENAL_DLL}")
+# Configure OpenAL for Windows after target creation
+if(WIN32)
+    if(OPENAL_FOUND)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENAL_INCLUDE_DIR})
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENAL_LIBRARY})
+
+        if(EXISTS "${OPENAL_DLL}")
+            add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${OPENAL_DLL}"
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+                COMMENT "Copying OpenAL32.dll to output directory"
+            )
+        else()
+            message(WARNING "OpenAL32.dll not found at ${OPENAL_DLL}")
+        endif()
     endif()
 endif()
 
