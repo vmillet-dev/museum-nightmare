@@ -3,28 +3,22 @@ cmake_minimum_required(VERSION 3.16)
 project(sfml_game VERSION 0.1.0)
 
 # Set C++ standard before any targets are created
-set(CMAKE_CXX_STANDARD 17)  # Use C++17 for better atomic support
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Check for atomic support
-include(CheckCXXSourceCompiles)
-check_cxx_source_compiles("
-    #include <atomic>
-    int main() {
-        std::atomic<int> x;
-        return 0;
-    }"
-    HAVE_ATOMIC_SUPPORT
-)
-
-if(NOT HAVE_ATOMIC_SUPPORT)
-    message(FATAL_ERROR "Compiler does not support std::atomic")
-endif()
-
 # Windows-specific configuration
 if(MSVC)
-    add_compile_options(/MP)  # Enable multi-processor compilation
+    # Add Windows-specific compile options
+    add_compile_options(
+        /MP     # Enable multi-processor compilation
+        /W4     # Warning level 4
+        /wd4251 # Disable class needs to have dll-interface warning
+        /wd4275 # Disable non dll-interface class warning
+    )
+
+    # Enable proper runtime library
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 # Set build type if not set
@@ -40,12 +34,18 @@ option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Find OpenAL for Windows
 if(WIN32)
-    # Define OpenAL paths before target creation
     set(OPENAL_SDK_PATH "C:/Program Files (x86)/OpenAL 1.1 SDK" CACHE PATH "Path to OpenAL SDK")
+
+    # Try environment variable if default path doesn't exist
     if(NOT EXISTS "${OPENAL_SDK_PATH}")
-        message(WARNING "OpenAL SDK not found at default path. Please set OPENAL_SDK_PATH if OpenAL is installed elsewhere.")
         set(OPENAL_SDK_PATH $ENV{OPENAL_SDK_PATH} CACHE PATH "Path to OpenAL SDK" FORCE)
     endif()
+
+    if(NOT EXISTS "${OPENAL_SDK_PATH}")
+        message(FATAL_ERROR "OpenAL SDK not found. Please install OpenAL SDK or set OPENAL_SDK_PATH.")
+    endif()
+
+    message(STATUS "Using OpenAL SDK at: ${OPENAL_SDK_PATH}")
 endif()
 
 # Add source files
@@ -64,13 +64,16 @@ if(WIN32 AND EXISTS "${OPENAL_SDK_PATH}")
     target_include_directories(${PROJECT_NAME} PRIVATE "${OPENAL_SDK_PATH}/include")
 
     # Copy OpenAL DLL to output directory
-    if(EXISTS "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
+    set(OPENAL_DLL "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
+    if(EXISTS "${OPENAL_DLL}")
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll"
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+            "${OPENAL_DLL}"
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            COMMENT "Copying OpenAL32.dll to output directory"
+        )
     else()
-        message(WARNING "OpenAL32.dll not found at ${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
+        message(FATAL_ERROR "OpenAL32.dll not found at ${OPENAL_DLL}")
     endif()
 endif()
 
