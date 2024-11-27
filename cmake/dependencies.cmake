@@ -39,7 +39,7 @@ endif()
 if(MSVC)
     message(STATUS "Configuring for MSVC build...")
 
-    # Force C++17 for better atomic support
+    # Force C++17 for std::atomic support
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
@@ -51,8 +51,10 @@ if(MSVC)
         /MP     # Multi-processor compilation
         /EHsc   # Exception handling model
         /Zc:__cplusplus  # Enable proper __cplusplus macro
-        /std:c++latest   # Use latest C++ features
-        /permissive-     # Strict C++ conformance
+        /std:c++17       # Explicitly set C++17 mode
+        /wd4324         # Disable structure padding warning
+        /DWIN32_LEAN_AND_MEAN
+        /DB2_HAS_ATOMIC=1
     )
 
     # Set runtime library
@@ -61,10 +63,8 @@ if(MSVC)
     # Add Box2D-specific definitions
     add_compile_definitions(
         B2_USER_SETTINGS
-        B2_HAS_ATOMIC=1
         NOMINMAX
-        WIN32_LEAN_AND_MEAN
-        _WIN32_WINNT=0x0601  # Target Windows 7 or later
+        _ENABLE_ATOMIC_ALIGNMENT_FIX
     )
 endif()
 
