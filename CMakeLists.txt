@@ -18,19 +18,12 @@ option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Find OpenAL for Windows
 if(WIN32)
+    # Define OpenAL paths before target creation
     set(OPENAL_SDK_PATH "C:/Program Files (x86)/OpenAL 1.1 SDK" CACHE PATH "Path to OpenAL SDK")
     if(NOT EXISTS "${OPENAL_SDK_PATH}")
-        message(FATAL_ERROR "OpenAL SDK not found. Please set OPENAL_SDK_PATH to the correct location.")
+        message(WARNING "OpenAL SDK not found at default path. Please set OPENAL_SDK_PATH if OpenAL is installed elsewhere.")
+        set(OPENAL_SDK_PATH $ENV{OPENAL_SDK_PATH} CACHE PATH "Path to OpenAL SDK" FORCE)
     endif()
-
-    # Add OpenAL include directory
-    target_include_directories(${PROJECT_NAME} PRIVATE "${OPENAL_SDK_PATH}/include")
-
-    # Copy OpenAL DLL to output directory
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 endif()
 
 # Add source files
@@ -43,6 +36,21 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
+
+# Configure OpenAL for Windows after target creation
+if(WIN32 AND EXISTS "${OPENAL_SDK_PATH}")
+    target_include_directories(${PROJECT_NAME} PRIVATE "${OPENAL_SDK_PATH}/include")
+
+    # Copy OpenAL DLL to output directory
+    if(EXISTS "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll"
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    else()
+        message(WARNING "OpenAL32.dll not found at ${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
+    endif()
+endif()
 
 # Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
