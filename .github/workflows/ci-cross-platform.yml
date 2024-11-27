@@ -97,7 +97,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DSFML_STATIC_LIBRARIES=TRUE -DBUILD_SHARED_LIBS=FALSE
+          cmake .. -G "Ninja"
 
       - name: Build
         shell: cmd
