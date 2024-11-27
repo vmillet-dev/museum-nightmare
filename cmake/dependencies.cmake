@@ -51,10 +51,21 @@ if(MSVC)
         /MP     # Multi-processor compilation
         /EHsc   # Exception handling model
         /Zc:__cplusplus  # Enable proper __cplusplus macro
+        /std:c++latest   # Use latest C++ features
+        /permissive-     # Strict C++ conformance
     )
 
     # Set runtime library
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+    # Add Box2D-specific definitions
+    add_compile_definitions(
+        B2_USER_SETTINGS
+        B2_HAS_ATOMIC=1
+        NOMINMAX
+        WIN32_LEAN_AND_MEAN
+        _WIN32_WINNT=0x0601  # Target Windows 7 or later
+    )
 endif()
 
 # Configure build options

@@ -3,15 +3,17 @@
 
 #ifdef _MSC_VER
     #include <atomic>
+    #include <cstdint>
 
-    // Ensure we're using C++17
-    #if _MSVC_LANG < 201703L
-        #error "Box2D requires C++17 or later for proper atomic support"
-    #endif
+    // Use C++17 standard atomics
+    namespace b2 {
+        template<typename T>
+        using atomic = std::atomic<T>;
+    }
 
-    // Use standard C++17 atomics
-    #define b2Atomic(T) std::atomic<T>
-    #define b2AtomicInit(ptr, val) (ptr)->store(val, std::memory_order_release)
+    // Define atomic operations using C++17 std::atomic
+    #define b2Atomic(T) b2::atomic<T>
+    #define b2AtomicInit(ptr, val) new (ptr) b2::atomic<decltype(val)>(val)
     #define b2AtomicLoad(ptr) (ptr)->load(std::memory_order_acquire)
     #define b2AtomicStore(ptr, val) (ptr)->store(val, std::memory_order_release)
     #define b2AtomicExchange(ptr, val) (ptr)->exchange(val, std::memory_order_acq_rel)
@@ -25,4 +27,7 @@
     #define B2_FORCE_INLINE __forceinline
     #define B2_ALIGN16 __declspec(align(16))
     #define B2_HAS_ATOMIC 1
+
+    // Disable specific MSVC warnings
+    #pragma warning(disable: 4324)  // structure was padded due to alignment specifier
 #endif
