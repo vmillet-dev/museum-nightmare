@@ -5,7 +5,8 @@ namespace game {
 enum class GameState {
     MainMenu,
     Playing,
-    Paused
+    Paused,
+    Quit
 };
 
 } // namespace game

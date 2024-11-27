@@ -12,12 +12,17 @@ ScreenManager::ScreenManager(Game& game) : game(game) {
     registerScreen<GameScreen>(GameState::Playing);
     registerScreen<PauseScreen>(GameState::Paused);
 
-    currentScreen = screens[GameState::MainMenu].get();
+    currentScreen = screens[GameState::Playing].get(); //TODO 
     spdlog::info("ScreenManager initialized with MainMenu screen");
 }
 
 void ScreenManager::setState(GameState newState) {
     if (currentState == newState) return;
+
+    if (newState == GameState::Quit) {
+        game.quit();
+        return;
+    }
 
     auto it = screens.find(newState);
     if (it != screens.end()) {
@@ -26,12 +31,6 @@ void ScreenManager::setState(GameState newState) {
         spdlog::info("Screen state changed to: {}", static_cast<int>(newState));
     } else {
         spdlog::error("Attempted to switch to invalid screen state: {}", static_cast<int>(newState));
-    }
-}
-
-void ScreenManager::handleInput(const sf::Event& event) {
-    if (currentScreen) {
-        currentScreen->handleInput(event);
     }
 }
 

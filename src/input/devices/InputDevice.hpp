@@ -4,6 +4,11 @@
 
 namespace game {
 
+struct KeyState {
+    bool current;
+    bool previous;
+};
+
 class InputDevice {
 public:
     virtual ~InputDevice() = default;

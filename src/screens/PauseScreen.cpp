@@ -44,7 +44,7 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     buttons[selectedButtonIndex]->setSelected(true);
 }
 
-void PauseScreen::handleInput(const sf::Event& event) {
+void PauseScreen::update(float deltaTime) {
     auto& inputManager = game.getInputManager();
 
     // Handle button navigation
@@ -74,10 +74,6 @@ void PauseScreen::handleInput(const sf::Event& event) {
         spdlog::info("Returning to main menu");
         game.getScreenManager().setState(GameState::MainMenu);
     }
-}
-
-void PauseScreen::update(float deltaTime) {
-    // No update needed for pause screen
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {

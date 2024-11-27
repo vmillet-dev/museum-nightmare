@@ -12,7 +12,7 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) 
     buttons[selectedButtonIndex]->setSelected(true);
 }
 
-void MainMenuScreen::handleInput(const sf::Event& event) {
+void MainMenuScreen::update(float deltaTime) {
     auto& inputManager = game.getInputManager();
 
     // Handle button navigation
@@ -32,20 +32,18 @@ void MainMenuScreen::handleInput(const sf::Event& event) {
         button->update(inputManager);
     }
 
-    // Play button clicked
-    if (buttons[0]->isClicked()) {
-        spdlog::info("Starting game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
+    //// Play button clicked
+    //if (buttons[0]->isClicked()) {
+    //    spdlog::info("Starting game");
+    //    game.getScreenManager().setState(GameState::Playing);
+    //}
 
-    // Quit button clicked
-    if (buttons[1]->isClicked()) {
-        spdlog::info("Quitting game");
-        shouldQuit = true;
-    }
+    //// Quit button clicked
+    //if (buttons[1]->isClicked()) {
+    //    spdlog::info("Quitting game");
+    //    game.getScreenManager().setState(GameState::Quit);
+    //}
 }
-
-void MainMenuScreen::update(float deltaTime) {}
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
     for (auto& button : buttons) {

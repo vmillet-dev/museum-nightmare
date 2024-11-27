@@ -22,7 +22,6 @@ public:
         screens[state] = std::make_unique<T>(game);
     }
 
-    void handleInput(const sf::Event& event);
     void update(float deltaTime);
     void render(sf::RenderWindow& window);
 

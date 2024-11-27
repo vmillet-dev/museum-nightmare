@@ -24,7 +24,7 @@ sf::FloatRect Wall::getBounds() const {
 }
 
 void Wall::handleCollision(GameObject* other) {
-    if (other) { spdlog::debug("Wall collision at ({:.1f},{:.1f})", position.x, position.y); }
+    //if (other) { spdlog::debug("Wall collision at ({:.1f},{:.1f})", position.x, position.y); }
 }
 
 } // namespace game

@@ -16,7 +16,7 @@ public:
     Game();
     void run();
     void quit();
-    sf::RenderWindow& getWindow();
+    sf::RenderWindow& getWindow() { return window;  }
     InputManager& getInputManager() { return inputManager; }
     ScreenManager& getScreenManager() { return screenManager; }
 
@@ -27,8 +27,8 @@ private:
     void render();
 
     sf::RenderWindow window;
-    InputManager inputManager{window};  // Initialize with window reference
-    ScreenManager screenManager;
+    InputManager inputManager{ window };  // Initialize with window reference
+    ScreenManager screenManager{ *this };
 };
 
 } // namespace game

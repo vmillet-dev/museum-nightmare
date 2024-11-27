@@ -14,7 +14,6 @@ class GameScreen;  // Forward declaration
 class MainMenuScreen : public Screen {
 public:
     MainMenuScreen(Game& game);
-    void handleInput(const sf::Event& event) override;
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
     bool shouldExitGame() const { return shouldQuit; }

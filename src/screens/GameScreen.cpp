@@ -21,14 +21,16 @@ GameScreen::GameScreen(Game& game) : game(game) {
     Level2::loadLevel(*gameObjectManager);
 }
 
-void GameScreen::handleInput(const sf::Event& event) {
+void GameScreen::update(float deltaTime) {
+    // TODO for testing purpose
+    game.getInputManager().isActionJustPressed(Action::MoveLeft);
+    game.getInputManager().isActionReleased(Action::MoveLeft);
+
     if (game.getInputManager().isActionPressed(Action::Pause)) {
         spdlog::info("Opening pause menu");
         game.getScreenManager().setState(GameState::Paused);
     }
-}
 
-void GameScreen::update(float deltaTime) {
     // Update all game objects
     gameObjectManager->update(deltaTime);
 }

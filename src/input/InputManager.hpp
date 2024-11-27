@@ -12,8 +12,7 @@ namespace game {
 
 class InputManager {
 public:
-    explicit InputManager(sf::RenderWindow& window) : window(window) {}
-    void init();
+    explicit InputManager(sf::RenderWindow& window);
     void update();
     void handleEvent(const sf::Event& event);
     bool isActionPressed(Action action);
