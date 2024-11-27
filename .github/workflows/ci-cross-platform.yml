@@ -172,14 +172,15 @@ jobs:
       - name: Setup Virtual Display
         shell: powershell
         run: |
-          # Use dummy display for headless operation
+          # Use RDP Session for headless operation
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          # Set display settings
           $env:DISPLAY=":0"
-          # Install virtual display driver
-          choco install winvnc -y
 
       - name: Run Tests
         shell: cmd
         run: |
           cd build\runtime
-          set DISPLAY=:0
+          REM Use RDP session for display
           .\sfml_game.exe --test-mode
