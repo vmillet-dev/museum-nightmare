@@ -33,4 +33,11 @@ function(configure_box2d_build_options)
     set(BOX2D_USER_SETTINGS OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_SHARED OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_STATIC ON CACHE BOOL "" FORCE)
+
+    if(MSVC)
+        # Enable C11 atomics support for MSVC
+        add_compile_options(/std:c11 /experimental:c11atomics)
+        # Disable warnings as errors for Box2D
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX-")
+    endif()
 endfunction()
