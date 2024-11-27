@@ -81,7 +81,7 @@ jobs:
 
       - name: Install Visual Studio Components
         run: |
-          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional"
+          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
@@ -91,19 +91,26 @@ jobs:
       - name: Install OpenAL
         run: |
           choco install openal -y
+          # Verify OpenAL installation
+          if (Test-Path "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll") {
+            echo "OpenAL32.dll found"
+          } else {
+            echo "OpenAL32.dll not found"
+            exit 1
+          }
 
       - name: Configure CMake
         shell: cmd
         run: |
           mkdir build
           cd build
-          cmake .. -G "Ninja"
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17
 
       - name: Build
         shell: cmd
         run: |
           cd build
-          ninja
+          ninja -v  # Use verbose output to see detailed build messages
 
       - name: Setup Virtual Display
         shell: powershell
