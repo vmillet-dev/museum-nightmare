@@ -23,8 +23,7 @@ set(PROJECT_DEPENDENCIES
 if(MSVC)
     # Enable C11 atomics support for MSVC globally
     add_compile_options(/std:c11 /experimental:c11atomics)
-    # Disable warnings as errors for external dependencies
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX-")
+    add_compile_definitions(_ENABLE_ATOMIC_ALIGNMENT_FIX)
 endif()
 
 # Configure build options
@@ -62,9 +61,14 @@ FetchContent_Declare(
 # Make dependencies available
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 
-# Post-fetch configuration for Box2D on Windows
-if(MSVC)
-    if(TARGET box2d)
-        target_compile_options(box2d PRIVATE /std:c11 /experimental:c11atomics)
+# Post-fetch configuration for Box2D
+if(TARGET box2d)
+    if(MSVC)
+        # Ensure Box2D uses the same runtime library as the main project
+        set_target_properties(box2d PROPERTIES
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+            VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
+        target_compile_definitions(box2d PRIVATE _ENABLE_ATOMIC_ALIGNMENT_FIX)
     endif()
 endif()
