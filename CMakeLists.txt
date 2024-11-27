@@ -29,6 +29,10 @@ endif()
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
+# Configure Box2D settings
+add_compile_definitions(B2_USER_SETTINGS)
+include_directories(${CMAKE_SOURCE_DIR}/src/game/physics)
+
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Find OpenAL for Windows
