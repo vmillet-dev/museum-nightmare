@@ -19,6 +19,14 @@ set(PROJECT_DEPENDENCIES
     box2d
 )
 
+# Windows-specific configuration
+if(MSVC)
+    # Enable C11 atomics support for MSVC globally
+    add_compile_options(/std:c11 /experimental:c11atomics)
+    # Disable warnings as errors for external dependencies
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX-")
+endif()
+
 # Configure build options
 configure_sfml_build_options()
 configure_box2d_build_options()
@@ -53,3 +61,10 @@ FetchContent_Declare(
 
 # Make dependencies available
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+
+# Post-fetch configuration for Box2D on Windows
+if(MSVC)
+    if(TARGET box2d)
+        target_compile_options(box2d PRIVATE /std:c11 /experimental:c11atomics)
+    endif()
+endif()
