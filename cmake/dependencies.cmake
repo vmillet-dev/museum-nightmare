@@ -52,7 +52,6 @@ if(MSVC)
         /EHsc   # Exception handling model
         /Zc:__cplusplus  # Enable proper __cplusplus macro
         /std:c++17       # Explicitly set C++17 mode
-        /DWIN32_LEAN_AND_MEAN
     )
 
     # Set runtime library
@@ -98,11 +97,17 @@ FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 if(TARGET box2d)
     message(STATUS "Configuring Box2D...")
 
-    # Configure Box2D properties
+    # Configure Box2D properties for all platforms
     set_target_properties(box2d PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
+    )
+
+    # Add Box2D-specific definitions for all platforms
+    target_compile_definitions(box2d PRIVATE
+        B2_USER_SETTINGS
+        B2_HAS_ATOMIC=1
     )
 
     if(MSVC)
@@ -119,14 +124,14 @@ if(TARGET box2d)
             /WX-
             /EHsc
             /Zc:__cplusplus
+            /std:c++17
         )
 
-        # Add Box2D-specific definitions for MSVC
+        # Add Windows-specific definitions
         target_compile_definitions(box2d PRIVATE
-            B2_USER_SETTINGS
-            B2_HAS_ATOMIC=1
             NOMINMAX
             WIN32_LEAN_AND_MEAN
+            _CRT_SECURE_NO_WARNINGS
         )
     endif()
 
