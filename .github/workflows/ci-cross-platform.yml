@@ -91,25 +91,20 @@ jobs:
       - name: Install OpenAL
         shell: powershell
         run: |
-          choco install openal -y
-          # Wait for installation to complete and verify OpenAL installation
-          Start-Sleep -Seconds 5
-          $openalPaths = @(
-            "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll",
-            "C:\Windows\System32\OpenAL32.dll",
-            "C:\Users\runneradmin\AppData\Local\Temp\chocolatey\openal\2.7.0.20170623\Win64\soft_oal.dll"
-          )
-          $found = $false
-          foreach ($path in $openalPaths) {
-            if (Test-Path $path) {
-              echo "OpenAL DLL found at: $path"
-              Copy-Item $path -Destination "C:\Windows\System32\OpenAL32.dll" -Force
-              $found = $true
-              break
-            }
-          }
-          if (-not $found) {
-            echo "OpenAL32.dll not found in any expected location"
+          # Download OpenAL SDK directly
+          $openalUrl = "https://openal-soft.org/openal-binaries/openal-soft-1.21.1-bin.zip"
+          $openalZip = "openal-soft.zip"
+          Invoke-WebRequest -Uri $openalUrl -OutFile $openalZip
+          Expand-Archive -Path $openalZip -DestinationPath openal-soft
+
+          # Copy DLL to System32 and build directory
+          Copy-Item "openal-soft\bin\Win64\soft_oal.dll" -Destination "C:\Windows\System32\OpenAL32.dll" -Force
+          New-Item -ItemType Directory -Force -Path "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64"
+          Copy-Item "openal-soft\bin\Win64\soft_oal.dll" -Destination "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" -Force
+
+          # Verify installation
+          if (!(Test-Path "C:\Windows\System32\OpenAL32.dll")) {
+            Write-Error "OpenAL32.dll not found in System32"
             exit 1
           }
 
