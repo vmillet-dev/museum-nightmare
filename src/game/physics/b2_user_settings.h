@@ -2,8 +2,8 @@
 #pragma once
 
 #ifdef _MSC_VER
-    // Include Windows-specific configuration
-    #include "b2_windows_config.h"
+    // Include MSVC-specific settings
+    #include "b2_settings_msvc.h"
 #else
     // Standard atomic configuration for non-Windows platforms
     #include <atomic>
