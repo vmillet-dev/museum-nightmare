@@ -16,6 +16,23 @@ include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
+# Find OpenAL for Windows
+if(WIN32)
+    set(OPENAL_SDK_PATH "C:/Program Files (x86)/OpenAL 1.1 SDK" CACHE PATH "Path to OpenAL SDK")
+    if(NOT EXISTS "${OPENAL_SDK_PATH}")
+        message(FATAL_ERROR "OpenAL SDK not found. Please set OPENAL_SDK_PATH to the correct location.")
+    endif()
+
+    # Add OpenAL include directory
+    target_include_directories(${PROJECT_NAME} PRIVATE "${OPENAL_SDK_PATH}/include")
+
+    # Copy OpenAL DLL to output directory
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+endif()
+
 # Add source files
 file(GLOB_RECURSE SOURCES
     "src/*.cpp"
