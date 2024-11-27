@@ -37,26 +37,26 @@ option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Find OpenAL for Windows
 if(WIN32)
-    find_package(OpenAL)
-    if(NOT OPENAL_FOUND)
-        set(OPENAL_ROOT "$ENV{OPENAL_SDK_PATH}")
-        if(NOT OPENAL_ROOT)
-            set(OPENAL_ROOT "C:/Program Files (x86)/OpenAL 1.1 SDK")
-        endif()
+    # Check multiple possible OpenAL SDK paths
+    set(OPENAL_SEARCH_PATHS
+        "C:/Program Files (x86)/OpenAL 1.1 SDK"
+        "C:/Program Files/OpenAL 1.1 SDK"
+        "$ENV{OPENAL_SDK_PATH}"
+        "C:/Users/runneradmin/AppData/Local/Temp/chocolatey/openal/2.7.0.20170623"
+    )
 
-        if(EXISTS "${OPENAL_ROOT}")
-            set(OPENAL_INCLUDE_DIR "${OPENAL_ROOT}/include")
-            if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-                set(OPENAL_LIBRARY "${OPENAL_ROOT}/libs/Win64/OpenAL32.lib")
-                set(OPENAL_DLL "${OPENAL_ROOT}/redist/Win64/OpenAL32.dll")
-            else()
-                set(OPENAL_LIBRARY "${OPENAL_ROOT}/libs/Win32/OpenAL32.lib")
-                set(OPENAL_DLL "${OPENAL_ROOT}/redist/Win32/OpenAL32.dll")
-            endif()
-        else()
-            message(FATAL_ERROR "OpenAL SDK not found. Please install OpenAL SDK or set OPENAL_SDK_PATH.")
+    foreach(SEARCH_PATH ${OPENAL_SEARCH_PATHS})
+        if(EXISTS "${SEARCH_PATH}")
+            set(OPENAL_SDK_PATH "${SEARCH_PATH}" CACHE PATH "Path to OpenAL SDK" FORCE)
+            break()
         endif()
+    endforeach()
+
+    if(NOT EXISTS "${OPENAL_SDK_PATH}")
+        message(FATAL_ERROR "OpenAL SDK not found. Please install OpenAL SDK or set OPENAL_SDK_PATH.")
     endif()
+
+    message(STATUS "Using OpenAL SDK at: ${OPENAL_SDK_PATH}")
 endif()
 
 # Add source files
@@ -75,9 +75,15 @@ include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 # Configure OpenAL for Windows after target creation
 if(WIN32)
-    if(OPENAL_FOUND)
-        target_include_directories(${PROJECT_NAME} PRIVATE ${OPENAL_INCLUDE_DIR})
-        target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENAL_LIBRARY})
+    if(EXISTS "${OPENAL_SDK_PATH}")
+        target_include_directories(${PROJECT_NAME} PRIVATE "${OPENAL_SDK_PATH}/include")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(OPENAL_DLL "${OPENAL_SDK_PATH}/libs/Win64/OpenAL32.dll")
+        else()
+            set(OPENAL_DLL "${OPENAL_SDK_PATH}/libs/Win32/OpenAL32.dll")
+        endif()
+
+        target_link_libraries(${PROJECT_NAME} PRIVATE "${OPENAL_DLL}")
 
         if(EXISTS "${OPENAL_DLL}")
             add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

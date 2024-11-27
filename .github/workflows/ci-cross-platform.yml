@@ -89,13 +89,27 @@ jobs:
           cmakeVersion: "3.25.0"
 
       - name: Install OpenAL
+        shell: powershell
         run: |
           choco install openal -y
-          # Verify OpenAL installation
-          if (Test-Path "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll") {
-            echo "OpenAL32.dll found"
-          } else {
-            echo "OpenAL32.dll not found"
+          # Wait for installation to complete and verify OpenAL installation
+          Start-Sleep -Seconds 5
+          $openalPaths = @(
+            "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll",
+            "C:\Windows\System32\OpenAL32.dll",
+            "C:\Users\runneradmin\AppData\Local\Temp\chocolatey\openal\2.7.0.20170623\Win64\soft_oal.dll"
+          )
+          $found = $false
+          foreach ($path in $openalPaths) {
+            if (Test-Path $path) {
+              echo "OpenAL DLL found at: $path"
+              Copy-Item $path -Destination "C:\Windows\System32\OpenAL32.dll" -Force
+              $found = $true
+              break
+            }
+          }
+          if (-not $found) {
+            echo "OpenAL32.dll not found in any expected location"
             exit 1
           }
 
