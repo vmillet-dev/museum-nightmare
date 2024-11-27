@@ -128,46 +128,45 @@ endif()
 
 # OpenAL configuration for Windows
 if(WIN32)
-    # Try multiple possible OpenAL SDK locations
-    set(OPENAL_SEARCH_PATHS
-        "$ENV{OPENAL_SDK_PATH}"
-        "C:/Program Files (x86)/OpenAL 1.1 SDK"
-        "C:/Program Files/OpenAL 1.1 SDK"
-    )
+    # Try to find OpenAL SDK
+    find_package(OpenAL QUIET)
 
-    set(OPENAL_FOUND FALSE)
-    foreach(SEARCH_PATH ${OPENAL_SEARCH_PATHS})
-        if(EXISTS "${SEARCH_PATH}")
-            set(OPENAL_ROOT "${SEARCH_PATH}")
-            set(OPENAL_FOUND TRUE)
-            break()
-        endif()
-    endforeach()
+    if(NOT OPENAL_FOUND)
+        # Try multiple possible OpenAL SDK locations
+        set(OPENAL_SEARCH_PATHS
+            "$ENV{OPENAL_SDK_PATH}"
+            "C:/Program Files (x86)/OpenAL 1.1 SDK"
+            "C:/Program Files/OpenAL 1.1 SDK"
+        )
 
-    if(OPENAL_FOUND)
-        message(STATUS "Found OpenAL SDK at: ${OPENAL_ROOT}")
+        foreach(SEARCH_PATH ${OPENAL_SEARCH_PATHS})
+            if(EXISTS "${SEARCH_PATH}")
+                set(OPENAL_ROOT "${SEARCH_PATH}")
+                break()
+            endif()
+        endforeach()
 
-        # Add OpenAL include and library directories
-        include_directories("${OPENAL_ROOT}/include")
-        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-            set(OPENAL_LIB_DIR "${OPENAL_ROOT}/libs/Win64")
+        if(OPENAL_ROOT)
+            message(STATUS "Found OpenAL SDK at: ${OPENAL_ROOT}")
+
+            # Add OpenAL include and library directories
+            include_directories("${OPENAL_ROOT}/include")
+            if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+                set(OPENAL_LIB_DIR "${OPENAL_ROOT}/libs/Win64")
+            else()
+                set(OPENAL_LIB_DIR "${OPENAL_ROOT}/libs/Win32")
+            endif()
+            link_directories("${OPENAL_LIB_DIR}")
+
+            # Copy OpenAL32.dll to build directory during configuration
+            if(EXISTS "${OPENAL_LIB_DIR}/OpenAL32.dll")
+                file(COPY "${OPENAL_LIB_DIR}/OpenAL32.dll" DESTINATION "${CMAKE_BINARY_DIR}")
+                message(STATUS "Copied OpenAL32.dll to build directory")
+            else()
+                message(WARNING "OpenAL32.dll not found in ${OPENAL_LIB_DIR}")
+            endif()
         else()
-            set(OPENAL_LIB_DIR "${OPENAL_ROOT}/libs/Win32")
+            message(STATUS "OpenAL SDK not found in standard locations. Using system OpenAL.")
         endif()
-        link_directories("${OPENAL_LIB_DIR}")
-
-        # Copy OpenAL32.dll to output directory
-        if(EXISTS "${OPENAL_LIB_DIR}/OpenAL32.dll")
-            add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${OPENAL_LIB_DIR}/OpenAL32.dll"
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/OpenAL32.dll"
-                COMMENT "Copying OpenAL32.dll to output directory"
-            )
-        else()
-            message(WARNING "OpenAL32.dll not found in ${OPENAL_LIB_DIR}")
-        endif()
-    else()
-        message(FATAL_ERROR "OpenAL SDK not found. Please install it or set OPENAL_SDK_PATH environment variable.")
     endif()
 endif()
