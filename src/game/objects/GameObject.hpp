@@ -29,7 +29,7 @@ protected:
 
     // Implement sf::Drawable interface
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        render(static_cast<sf::RenderWindow&>(target));
+        const_cast<GameObject*>(this)->render(static_cast<sf::RenderWindow&>(target));
     }
 };
 

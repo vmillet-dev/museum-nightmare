@@ -11,7 +11,7 @@ public:
     ParallaxBackground(const sf::Texture& texture, const sf::Vector2f& position, float depth);
 
     void update(float deltaTime) override;
-    void render(sf::RenderWindow& window) const override;  // Made const
+    void render(sf::RenderWindow& window) override;  // Remove const to match base class
     void initPhysics(b2WorldId worldId) override;
 
     // Methods for parallax support

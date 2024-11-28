@@ -14,7 +14,7 @@ public:
     ~FloorObject() override;
 
     void update(float deltaTime) override;
-    void render(sf::RenderWindow& window) const override;  // Made const
+    void render(sf::RenderWindow& window) override;  // Remove const to match base class
     void initPhysics(b2WorldId worldId) override;
 
 private:
