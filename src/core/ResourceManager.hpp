@@ -18,7 +18,7 @@ public:
 
     // Audio getters
     const sf::SoundBuffer* getSoundBuffer(const std::string& name) const;
-    const sf::Music* getMusic(const std::string& name) const;
+    sf::Music* getMusic(const std::string& name);  // Removed const to allow modifications
 
     // Future resource getters can be added here
 

@@ -29,7 +29,7 @@ public:
 private:
     ResourceManager& resourceManager;
     std::unordered_map<std::string, std::unique_ptr<sf::Sound>> activeSounds;
-    std::unordered_map<std::string, const sf::Music*> activeMusic;
+    std::unordered_map<std::string, sf::Music*> activeMusic;  // Removed const to allow modifications
 };
 
 } // namespace core

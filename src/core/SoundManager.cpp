@@ -37,7 +37,7 @@ void SoundManager::stopAllSounds() {
 }
 
 void SoundManager::playMusic(const std::string& name, bool loop) {
-    if (const sf::Music* music = resourceManager.getMusic(name)) {
+    if (sf::Music* music = resourceManager.getMusic(name)) {
         music->setLoop(loop);
         music->play();
         activeMusic[name] = music;

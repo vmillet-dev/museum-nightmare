@@ -63,7 +63,7 @@ const sf::SoundBuffer* ResourceManager::getSoundBuffer(const std::string& name) 
     return it != soundBuffers.end() ? it->second.get() : nullptr;
 }
 
-const sf::Music* ResourceManager::getMusic(const std::string& name) const {
+sf::Music* ResourceManager::getMusic(const std::string& name) {
     auto it = music.find(name);
     return it != music.end() ? it->second.get() : nullptr;
 }

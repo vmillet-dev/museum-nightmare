@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
-#include "Action.hpp"
+#include "../input/Action.hpp"
 
 namespace core {
 
