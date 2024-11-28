@@ -112,17 +112,12 @@ jobs:
           cd build
           ninja
 
-      - name: Copy DLLs
+      - name: Copy DLLs and Run Test
         shell: cmd
         run: |
           cd build
           copy _deps\tmxlite-build\libtmxlite-d.dll .
           copy _deps\sfml-build\lib\sfml-audio-d-2.dll .
           copy _deps\sfml-build\lib\sfml-network-d-2.dll .
-          copy _deps\sfml-build\lib\sfml-graphics-d-2.dll .
-          copy _deps\sfml-build\lib\sfml-system-d-2.dll .
-          copy _deps\sfml-build\lib\sfml-window-d-2.dll .
-          copy _deps\spdlog-build\*.dll .
-          copy _deps\box2d-build\src\*.dll .
           copy "C:\Program Files\OpenAL\libs\Win64\OpenAL32.dll" .
-          dir
+          .\sfml_game.exe --test-mode
