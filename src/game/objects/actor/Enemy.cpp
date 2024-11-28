@@ -13,9 +13,11 @@ Enemy::Enemy(float x, float y)
     spdlog::info("Enemy created at position ({}, {})", x, y);
 }
 
-void Enemy::render(sf::RenderWindow& window) {
-    shape.setPosition(position);
-    window.draw(shape);
+void Enemy::render(sf::RenderWindow& window) const {
+    // Create a mutable copy of the shape for position updates
+    sf::RectangleShape renderShape = shape;
+    renderShape.setPosition(position);
+    window.draw(renderShape);
 }
 
 void Enemy::initPhysics(b2WorldId worldId) {

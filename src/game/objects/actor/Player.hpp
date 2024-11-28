@@ -8,7 +8,7 @@ namespace game {
 class Player : public Actor {
 public:
     Player(float x, float y, class Game& game);
-    void render(sf::RenderWindow& window) override;
+    void render(sf::RenderWindow& window) const override;  // Made const
     void initPhysics(b2WorldId worldId) override;  // Updated to use Box2D v3.0.0 API
 
 private:

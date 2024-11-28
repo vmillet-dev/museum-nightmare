@@ -18,7 +18,6 @@ set(PROJECT_DEPENDENCIES
     tomlplusplus::tomlplusplus
     spdlog::spdlog
     box2d::box2d
-    tmxlite
 )
 
 configure_sfml_build_options()
@@ -52,13 +51,5 @@ FetchContent_Declare(
     GIT_TAG v${BOX2D_VERSION}
 )
 
-# tmxlite
-FetchContent_Declare(
-    tmxlite
-    GIT_REPOSITORY https://github.com/fallahn/tmxlite.git
-    GIT_TAG master
-    SOURCE_SUBDIR tmxlite
-)
-
-FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d tmxlite)
+FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 add_library(box2d::box2d ALIAS box2d)
