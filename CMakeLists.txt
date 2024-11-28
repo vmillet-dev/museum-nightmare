@@ -37,6 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SFML_LIBRARIES}
     tomlplusplus::tomlplusplus
     spdlog::spdlog
+    box2d::box2d
 )
 
 # Configure cross-platform compile options
@@ -48,6 +49,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             /MP     # Multi-processor compilation
             /EHsc   # Exception handling model
             /permissive-  # Strict C++ conformance
+            /Zc:__cplusplus  # Enable correct __cplusplus macro
+            /std:c++latest   # Use latest C++ features
+        )
+        # Disable specific warnings that might conflict with Box2D
+        target_compile_definitions(${PROJECT_NAME} PRIVATE
+            _CRT_SECURE_NO_WARNINGS
+            NOMINMAX  # Prevent Windows.h from defining min/max macros
+            WIN32_LEAN_AND_MEAN  # Exclude rarely-used Windows headers
         )
     else()
         target_compile_options(${PROJECT_NAME} PRIVATE
@@ -60,6 +69,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             -Wcast-align
             -Wunused
             -Wnull-dereference
+            -fno-strict-aliasing  # Help with potential Box2D alignment issues
         )
     endif()
 endif()

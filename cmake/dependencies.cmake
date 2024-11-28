@@ -36,5 +36,22 @@ FetchContent_Declare(
     GIT_TAG v${SPDLOG_VERSION}
 )
 
-# Make dependencies available
-FetchContent_MakeAvailable(SFML tomlplusplus spdlog)
+# Box2D
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.0.0
+)
+
+# Configure Box2D build options
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_SHARED ON CACHE BOOL "" FORCE)
+
+if(MSVC)
+    # Ensure Box2D uses static runtime for MSVC
+    set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+endif()
+
+FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+add_library(box2d::box2d ALIAS box2d)
