@@ -1,0 +1,124 @@
+name: CI Cross-Platform Build
+
+on:
+  push:
+    branches: [ "main", "feature/*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            build/_deps
+            ~/.cache/ccache
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake', 'CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libx11-dev \
+            libgl1-mesa-dev \
+            libudev-dev \
+            libopenal-dev \
+            libvorbis-dev \
+            libflac-dev \
+            libfreetype-dev \
+            xorg-dev \
+            libogg-dev \
+            xvfb
+
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+
+      - name: Build
+        run: |
+          cd build
+          make -j$(nproc)
+
+      - name: Run Tests with Virtual Display
+        run: |
+          cd build
+          xvfb-run --auto-servernum ./sfml_game --test-mode
+
+  build-and-test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            build\_deps
+            ~\AppData\Local\ccache
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake', 'CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
+      - name: Install Ninja
+        run: |
+          choco install ninja -y
+
+      - name: Setup Visual Studio Environment
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          vs-version: '17.0'
+
+      - name: Install Visual Studio Components
+        run: |
+          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional"
+
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "3.25.0"
+
+      - name: Install OpenAL
+        run: |
+          choco install openal -y
+
+      - name: Configure CMake
+        shell: cmd
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Ninja"
+
+      - name: Build
+        shell: cmd
+        run: |
+          cd build
+          ninja
+
+      - name: Setup Virtual Display
+        shell: powershell
+        run: |
+          # Use RDP Session for headless operation
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          # Set display settings
+          $env:DISPLAY=":0"
+
+      - name: Run Tests
+        shell: cmd
+        run: |
+          cd build
+          copy _deps\sfml-build\lib\*.dll .
+          copy _deps\spdlog-build\*.dll .
+          copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
+          .\sfml_game.exe --test-mode
