@@ -14,7 +14,7 @@ void ParallaxBackground::update(float deltaTime) {
     // Update logic handled through position updates from Camera
 }
 
-void ParallaxBackground::render(sf::RenderWindow& window) const {  // Made const
+void ParallaxBackground::render(sf::RenderWindow& window) {  // Remove const to match base class
     window.draw(sprite);
 }
 

@@ -27,7 +27,7 @@ void FloorObject::update(float deltaTime) {
     syncPositionWithPhysics();
 }
 
-void FloorObject::render(sf::RenderWindow& window) const {  // Made const
+void FloorObject::render(sf::RenderWindow& window) {  // Remove const to match base class
     window.draw(sprite);
 }
 
