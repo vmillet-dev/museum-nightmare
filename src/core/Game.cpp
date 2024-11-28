@@ -3,6 +3,7 @@
 #include "../screens/GameScreen.hpp"
 #include <spdlog/spdlog.h>
 #include <vector>
+#include "EventSoundMap.hpp"
 
 namespace game {
 
@@ -12,9 +13,17 @@ Game::Game() : window(
         ConfigManager::getInstance().getWindowHeight()
     ),
     ConfigManager::getInstance().getWindowTitle()
-) {
+), soundManager(resourceManager) {  // Initialize soundManager with resourceManager
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
+
+    // Initialize resource manager
+    if (!resourceManager.loadResources("assets/resources.toml")) {
+        spdlog::error("Failed to load game resources!");
+    } else {
+        spdlog::info("Game resources loaded successfully");
+    }
+
     inputManager.init();
     ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
     spdlog::info("Game initialized successfully");
@@ -44,6 +53,17 @@ void Game::handleEvent(const sf::Event& event) {
 
     // Handle all input events through InputManager
     inputManager.handleEvent(event);
+
+    // Check for action-based sound triggers
+    for (const auto& [action, soundEvent] : core::EventSoundMap::actionSoundMap) {
+        if (inputManager.isActionPressed(action)) {
+            if (soundEvent.isMusic) {
+                soundManager.playMusic(soundEvent.soundName, soundEvent.loop);
+            } else {
+                soundManager.playSound(soundEvent.soundName);
+            }
+        }
+    }
 
     // Let current screen handle non-input events
     if (!ScreenManager::getInstance().isEmpty()) {
