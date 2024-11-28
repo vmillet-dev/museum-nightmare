@@ -22,7 +22,7 @@ void Wall::update(float deltaTime) {
     }
 }
 
-void Wall::render(sf::RenderWindow& window) const {  // Made const
+void Wall::render(sf::RenderWindow& window) {
     window.draw(shape);
 }
 

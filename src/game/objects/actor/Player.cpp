@@ -15,12 +15,10 @@ Player::Player(float x, float y, Game& game)
     spdlog::info("Player created at position ({}, {})", x, y);
 }
 
-void Player::render(sf::RenderWindow& window) const {
-    const_cast<Player*>(this)->windowSize = window.getSize();
-    // Create a mutable copy of the shape for position updates
-    sf::RectangleShape renderShape = shape;
-    renderShape.setPosition(position);
-    window.draw(renderShape);
+void Player::render(sf::RenderWindow& window) {
+    windowSize = window.getSize();
+    shape.setPosition(position);
+    window.draw(shape);
 }
 
 void Player::initPhysics(b2WorldId worldId) {
