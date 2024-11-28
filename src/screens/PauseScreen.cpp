@@ -12,7 +12,8 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     resumeButton = std::make_unique<Button>(
         "Resume",
         sf::Vector2f(400, 250),
-        sf::Vector2f(200, 50)
+        sf::Vector2f(200, 50),
+        game.getResourceManager()  // Pass ResourceManager reference
     );
     resumeButton->setCallback([this]() {
         spdlog::info("Resuming game");
@@ -23,7 +24,8 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     mainMenuButton = std::make_unique<Button>(
         "Main Menu",
         sf::Vector2f(400, 350),
-        sf::Vector2f(200, 50)
+        sf::Vector2f(200, 50),
+        game.getResourceManager()  // Pass ResourceManager reference
     );
     mainMenuButton->setCallback([this, &game]() {
         spdlog::info("Returning to main menu");
