@@ -124,5 +124,5 @@ jobs:
           copy _deps\tmxlite-build\libtmxlite-d.dll .
           copy _deps\sfml-build\lib\sfml-audio-d-2.dll .
           copy _deps\sfml-build\lib\sfml-network-d-2.dll .
-          copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
+          copy "C:\Program Files\OpenAL\libs\Win64\OpenAL32.dll" .
           .\sfml_game.exe --test-mode
