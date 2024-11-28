@@ -1,3 +1,4 @@
+include(./utils.cmake)
 include(FetchContent)
 
 # Dependencies versions
@@ -14,22 +15,11 @@ set(SFML_LIBRARIES
 )
 
 set(PROJECT_DEPENDENCIES
+    ${SFML_LIBRARIES}
     tomlplusplus::tomlplusplus
     spdlog::spdlog
     box2d::box2d
 )
-
-# Configure build options
-function(configure_box2d_build_options)
-    set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
-    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-    set(BOX2D_BUILD_SHARED ON CACHE BOOL "" FORCE)
-
-    if(MSVC)
-        # Ensure Box2D uses static runtime for MSVC
-        set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
-    endif()
-endfunction()
 
 configure_sfml_build_options()
 configure_box2d_build_options()
@@ -61,12 +51,6 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/erincatto/box2d.git
     GIT_TAG v${BOX2D_VERSION}
 )
-
-
-if(MSVC)
-    # Ensure Box2D uses static runtime for MSVC
-    set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
-endif()
 
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
 add_library(box2d::box2d ALIAS box2d)

@@ -18,7 +18,7 @@ jobs:
           path: |
             build/_deps
             ~/.cache/ccache
-          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake', 'CMakeLists.txt') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
 
@@ -66,7 +66,7 @@ jobs:
           path: |
             build\_deps
             ~\AppData\Local\ccache
-          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake', 'CMakeLists.txt') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
 

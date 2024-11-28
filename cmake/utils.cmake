@@ -25,9 +25,13 @@ function(configure_sfml_build_options)
     set(SFML_GENERATE_PDB ON CACHE BOOL "" FORCE)
 endfunction()
 
-# Configure Box2D build options
 function(configure_box2d_build_options)
     set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_SHARED ON CACHE BOOL "" FORCE)
+
+    if(MSVC)
+        # Ensure Box2D uses static runtime for MSVC
+        set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+    endif()
 endfunction()
