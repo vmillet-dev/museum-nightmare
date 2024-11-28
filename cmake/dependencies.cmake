@@ -1,4 +1,3 @@
-include(./utils.cmake)
 include(FetchContent)
 
 # Dependencies versions

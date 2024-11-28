@@ -10,6 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
