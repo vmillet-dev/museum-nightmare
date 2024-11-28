@@ -114,10 +114,8 @@ jobs:
         shell: cmd
         run: |
           cd build
-          copy _deps\sfml-build\lib\*.dll .
-          copy _deps\spdlog-build\*.dll .
-          copy _deps\box2d-build\src\*.dll .
-          copy _deps\tmxlite-build\tmxlite\*.dll .
-          copy "C:\Program Files (x86)\OpenAL 1.1 SDK\bin\OpenAL32.dll" .
-          dir _deps\tmxlite-build\tmxlite
+          copy _deps\tmxlite-build\libtmxlite-d.dll .
+          copy _deps\sfml-build\lib\sfml-audio-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-network-d-2.dll .
+          copy "C:\Program Files\OpenAL\libs\Win64\OpenAL32.dll" .
           dir
