@@ -22,8 +22,8 @@ file(GLOB_RECURSE SOURCES
     "src/*.cpp"
 )
 
-# Remove main.cpp from sources
-list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+# Remove main.cpp and test_parallax.cpp from sources
+list(FILTER SOURCES EXCLUDE REGEX ".*(main|test_parallax)\\.cpp$")
 
 # Create main executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
