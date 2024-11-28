@@ -25,12 +25,10 @@ int main(int argc, char* argv[]) {
     setup_logging();
 
     try {
-        bool test_mode = (argc > 1 && std::string(argv[1]) == "--test-mode");
-
-        spdlog::info("Starting game application {}", test_mode ? "in test mode" : "");
+        spdlog::info("Starting game application");
 
         game::Game game;
-        (test_mode ? game.quit() : game.run());
+        game.run();
 
         spdlog::info("Game closed successfully");
         return 0;
