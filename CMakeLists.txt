@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 
 project(sfml_game VERSION 0.1.0 LANGUAGES CXX)
 

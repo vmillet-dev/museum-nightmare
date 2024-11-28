@@ -6,7 +6,64 @@ on:
       - 'v*'
 
 jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Visual Studio Environment
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          vs-version: '17.0'
+
+      - name: Install Visual Studio Components
+        run: |
+          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional"
+
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "3.25.0"
+
+      - name: Configure CMake
+        shell: cmd
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: cmd
+        run: |
+          cd build
+          cmake --build . --config Release
+
+      - name: Prepare Release Package
+        shell: cmd
+        run: |
+          mkdir release_package
+          copy build\Release\sfml_game.exe release_package\
+          copy build\_deps\sfml-build\lib\Release\*.dll release_package\
+          copy build\_deps\spdlog-build\Release\*.dll release_package\
+          copy build\_deps\box2d-build\src\Release\*.dll release_package\
+          xcopy /E /I assets release_package\assets
+
+      - name: Create Archive using CMake
+        shell: cmd
+        run: |
+          echo "file(ARCHIVE_CREATE OUTPUT windows_release.zip FORMAT zip PATHS release_package/*)" > create_archive.cmake
+          cmake -P create_archive.cmake
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: windows_release.zip
+
   release:
+    needs: windows-build
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,10 +99,19 @@ jobs:
           commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }}"
           file_pattern: CHANGELOG.md
 
+      - name: Download Windows Build
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-build
+          path: .
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
+          files: |
+            windows_release.zip
+            CHANGELOG.md
           token: ${{ secrets.GITHUB_TOKEN }}
