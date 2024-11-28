@@ -15,6 +15,8 @@ function(configure_sfml_build_options)
             set(SFML_BUILD_WINDOW ON CACHE BOOL "" FORCE)
         elseif(module STREQUAL "sfml-graphics")
             set(SFML_BUILD_GRAPHICS ON CACHE BOOL "" FORCE)
+        elseif(module STREQUAL "sfml-audio")
+            set(SFML_BUILD_AUDIO ON CACHE BOOL "" FORCE)
         endif()
     endforeach()
 
