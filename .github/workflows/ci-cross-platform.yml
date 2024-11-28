@@ -37,6 +37,7 @@ jobs:
             libfreetype-dev \
             xorg-dev \
             libogg-dev \
+            libsfml-dev \
             xvfb
 
       - name: Configure CMake
