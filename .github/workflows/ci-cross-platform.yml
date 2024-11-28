@@ -36,7 +36,13 @@ jobs:
             libflac-dev \
             libfreetype-dev \
             xorg-dev \
-            libogg-dev
+            libogg-dev \
+            xvfb
+
+      - name: Start Xvfb
+        run: |
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
 
       - name: Configure CMake
         run: |
@@ -67,6 +73,11 @@ jobs:
       - name: Install Ninja
         run: |
           choco install ninja -y
+
+      - name: Setup Virtual Display
+        run: |
+          choco install -y virtualDisplay
+          Set-DisplayResolution -Width 1024 -Height 768 -Force
 
       - name: Setup Visual Studio Environment
         uses: microsoft/setup-msbuild@v1.1
@@ -108,4 +119,5 @@ jobs:
           copy _deps\box2d-build\src\*.dll .
           copy _deps\tmxlite-build\tmxlite\*.dll .
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\bin\OpenAL32.dll" .
+          dir _deps\tmxlite-build\tmxlite
           dir
