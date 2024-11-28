@@ -12,7 +12,40 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
+
+# Configure cross-platform compile options
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(MSVC)
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            /W4     # Warning level 4
+            /WX     # Treat warnings as errors
+            /MP     # Multi-processor compilation
+            /EHsc   # Exception handling model
+            /permissive-  # Strict C++ conformance
+            /Zc:__cplusplus  # Enable correct __cplusplus macro
+            /std:c++latest   # Use latest C++ features
+        )
+        # Disable specific warnings that might conflict with Box2D
+        target_compile_definitions(${PROJECT_NAME} PRIVATE
+            _CRT_SECURE_NO_WARNINGS
+            NOMINMAX  # Prevent Windows.h from defining min/max macros
+            WIN32_LEAN_AND_MEAN  # Exclude rarely-used Windows headers
+        )
+    else()
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+            -Wconversion
+            -Wshadow
+            -Wcast-align
+            -Wunused
+            -Wnull-dereference
+            -fno-strict-aliasing  # Help with potential Box2D alignment issues
+        )
+    endif()
+endif()
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
@@ -30,7 +63,9 @@ add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 # Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SFML_LIBRARIES}
-    ${PROJECT_DEPENDENCIES}
+    tomlplusplus::tomlplusplus
+    spdlog::spdlog
+    box2d::box2d
 )
 
 # Copy assets to build directory
