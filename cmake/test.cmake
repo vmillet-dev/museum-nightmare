@@ -23,7 +23,9 @@ target_include_directories(${PROJECT_NAME}_test PRIVATE
 # Register test
 add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
 
-# Set test properties for xvfb
-set_tests_properties(${PROJECT_NAME}_test PROPERTIES
-    ENVIRONMENT "DISPLAY=:99"
-)
+# Set test properties for xvfb (Linux only)
+if(UNIX AND NOT APPLE)
+    set_tests_properties(${PROJECT_NAME}_test PROPERTIES
+        ENVIRONMENT "DISPLAY=:99"
+    )
+endif()
