@@ -74,11 +74,6 @@ jobs:
         run: |
           choco install ninja -y
 
-      - name: Setup Virtual Display
-        run: |
-          choco install -y virtualDisplay
-          Set-DisplayResolution -Width 1024 -Height 768 -Force
-
       - name: Setup Visual Studio Environment
         uses: microsoft/setup-msbuild@v1.1
         with:
@@ -117,5 +112,10 @@ jobs:
           copy _deps\tmxlite-build\libtmxlite-d.dll .
           copy _deps\sfml-build\lib\sfml-audio-d-2.dll .
           copy _deps\sfml-build\lib\sfml-network-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-graphics-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-system-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-window-d-2.dll .
+          copy _deps\spdlog-build\*.dll .
+          copy _deps\box2d-build\src\*.dll .
           copy "C:\Program Files\OpenAL\libs\Win64\OpenAL32.dll" .
           dir
