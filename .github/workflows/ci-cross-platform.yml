@@ -92,6 +92,13 @@ jobs:
         run: |
           choco install openal -y
 
+      - name: Configure Display
+        shell: cmd
+        run: |
+          echo "Setting up display environment..."
+          set DISPLAY=:0
+          echo "DISPLAY=:0" >> %GITHUB_ENV%
+
       - name: Configure CMake
         shell: cmd
         run: |
