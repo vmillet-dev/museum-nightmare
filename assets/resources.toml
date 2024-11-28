@@ -14,4 +14,4 @@ menu_theme = "audio/MenuTheme.ogg"
 # sprite configurations will go here
 
 [fonts]
-# font configurations will go here
+arial = "fonts/arial.ttf"

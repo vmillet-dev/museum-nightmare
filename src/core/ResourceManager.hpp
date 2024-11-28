@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
 #include <string>
 #include <unordered_map>
 #include <memory>
@@ -18,18 +19,21 @@ public:
 
     // Audio getters
     const sf::SoundBuffer* getSoundBuffer(const std::string& name) const;
-    sf::Music* getMusic(const std::string& name);  // Removed const to allow modifications
+    sf::Music* getMusic(const std::string& name);
 
-    // Future resource getters can be added here
+    // Font getter
+    const sf::Font* getFont(const std::string& name) const;
 
 private:
     // Load specific resource types
     bool loadSounds(const toml::table& config);
     bool loadMusic(const toml::table& config);
+    bool loadFonts(const toml::table& config);
 
     // Resource storage
     std::unordered_map<std::string, std::unique_ptr<sf::SoundBuffer>> soundBuffers;
     std::unordered_map<std::string, std::unique_ptr<sf::Music>> music;
+    std::unordered_map<std::string, std::unique_ptr<sf::Font>> fonts;
 
     // Helper functions
     bool fileExists(const std::string& path) const;
