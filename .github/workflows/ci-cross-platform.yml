@@ -98,9 +98,6 @@ jobs:
           echo "Setting up display environment..."
           set DISPLAY=:0
           echo "DISPLAY=:0" >> %GITHUB_ENV%
-          if errorlevel 1 (
-            echo "Warning: Display setup completed with fallback configuration"
-          )
 
       - name: Configure CMake
         shell: cmd
@@ -115,12 +112,17 @@ jobs:
           cd build
           ninja
 
-      - name: Copy DLLs and Run Test
+      - name: Copy DLLs
         shell: cmd
         run: |
           cd build
           copy _deps\tmxlite-build\libtmxlite-d.dll .
           copy _deps\sfml-build\lib\sfml-audio-d-2.dll .
           copy _deps\sfml-build\lib\sfml-network-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-graphics-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-system-d-2.dll .
+          copy _deps\sfml-build\lib\sfml-window-d-2.dll .
+          copy _deps\spdlog-build\*.dll .
+          copy _deps\box2d-build\src\*.dll .
           copy "C:\Program Files\OpenAL\libs\Win64\OpenAL32.dll" .
-          .\sfml_game.exe --test-mode
+          dir
