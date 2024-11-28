@@ -107,6 +107,4 @@ jobs:
           copy _deps\spdlog-build\*.dll .
           copy _deps\box2d-build\src\*.dll .
           copy _deps\tmxlite-build\*.dll .
-          where /r "C:\Program Files (x86)" OpenAL32.dll > openal_path.txt
-          set /p OPENAL_PATH=<openal_path.txt
-          copy "%OPENAL_PATH%" .
+          copy "C:\Program Files (x86)\OpenAL 1.1 SDK\bin\OpenAL32.dll" .
