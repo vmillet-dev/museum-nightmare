@@ -51,5 +51,11 @@ FetchContent_Declare(
     GIT_TAG v${BOX2D_VERSION}
 )
 
-# Make dependencies available
+
+if(MSVC)
+    # Ensure Box2D uses static runtime for MSVC
+    set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+endif()
+
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+add_library(box2d::box2d ALIAS box2d)
