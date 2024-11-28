@@ -1,0 +1,40 @@
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="50" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" name="background" tilewidth="32" tileheight="32" tilecount="128" columns="8">
+  <image source="../textures/background_tiles.png" width="256" height="512"/>
+ </tileset>
+ <layer id="1" name="background" width="50" height="20">
+  <properties>
+   <property name="parallaxFactor" type="float" value="0.2"/>
+  </properties>
+  <data encoding="csv">
+    <!-- Background layer tiles data -->
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+  </data>
+ </layer>
+ <layer id="2" name="middleground" width="50" height="20">
+  <properties>
+   <property name="parallaxFactor" type="float" value="0.5"/>
+  </properties>
+  <data encoding="csv">
+    <!-- Middleground layer tiles data -->
+    0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <layer id="3" name="foreground" width="50" height="20">
+  <properties>
+   <property name="parallaxFactor" type="float" value="1.0"/>
+  </properties>
+  <data encoding="csv">
+    <!-- Foreground layer tiles data -->
+    0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  </data>
+ </layer>
+ <objectgroup id="4" name="objects">
+  <object id="1" type="Wall" x="0" y="608" width="1600" height="32"/>
+  <object id="2" type="Enemy" x="400" y="544" width="32" height="32"/>
+  <object id="3" type="Enemy" x="800" y="544" width="32" height="32"/>
+ </objectgroup>
+</map>
+```

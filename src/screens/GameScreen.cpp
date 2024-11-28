@@ -1,7 +1,6 @@
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
 #include "../input/InputManager.hpp"
-#include "../game/levels/Level2.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -17,8 +16,14 @@ GameScreen::GameScreen(Game& game) : game(game) {
     playerPtr = player.get();  // Store raw pointer before moving ownership
     gameObjectManager->addObject(std::move(player));
 
-    // Load level
-    Level2::loadLevel(*gameObjectManager);
+    // Initialize camera
+    camera = std::make_unique<Camera>(game.getWindow(), sf::Vector2f(100.0f, 100.0f));
+
+    // Load TMX level
+    LevelLoader levelLoader("assets/levels/level1.tmx");
+    if (!levelLoader.loadLevel(*gameObjectManager)) {
+        spdlog::error("Failed to load level!");
+    }
 }
 
 void GameScreen::handleInput(const sf::Event& event) {
@@ -29,8 +34,21 @@ void GameScreen::handleInput(const sf::Event& event) {
 }
 
 void GameScreen::update(float deltaTime) {
+    // Update camera to follow player with smooth movement
+    if (playerPtr) {
+        camera->update(playerPtr->getPosition());
+
+        // Get all parallax layers and update their positions
+        auto& objects = gameObjectManager->getObjects();
+        for (auto& obj : objects) {
+            if (auto* parallaxLayer = dynamic_cast<ParallaxLayer*>(obj.get())) {
+                parallaxLayer->setParallaxOffset(camera->getPosition());
+            }
+        }
+    }
+
     // Update all game objects
-    gameObjectManager->update(deltaTime);
+    gameObjectManager->update(deltaTime, camera->getPosition());
 }
 
 void GameScreen::render(sf::RenderWindow& window) {

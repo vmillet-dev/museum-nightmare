@@ -1,4 +1,6 @@
 #pragma once
+#include <SFML/Config.hpp>
+#include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
 

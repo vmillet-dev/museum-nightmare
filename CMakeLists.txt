@@ -14,6 +14,14 @@ include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
+# Option for enabling tests
+option(BUILD_TESTS "Build tests" OFF)
+
+if(BUILD_TESTS)
+    include(${CMAKE_SOURCE_DIR}/cmake/test_dependencies.cmake)
+    include(${CMAKE_SOURCE_DIR}/cmake/test.cmake)
+endif()
+
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Add source files
@@ -24,11 +32,14 @@ file(GLOB_RECURSE SOURCES
 # Remove main.cpp from sources
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-# Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
+# Create library target for shared code
+add_library(${PROJECT_NAME}_lib STATIC ${SOURCES})
+target_link_libraries(${PROJECT_NAME}_lib PUBLIC ${PROJECT_DEPENDENCIES})
+target_include_directories(${PROJECT_NAME}_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
-# Link required libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
+# Create main executable
+add_executable(${PROJECT_NAME} src/main.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_lib)
 
 # Copy assets to build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)

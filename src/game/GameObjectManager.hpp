@@ -11,10 +11,11 @@ class GameObjectManager {
 public:
     GameObjectManager();
     void addObject(std::unique_ptr<GameObject> object);
-    void update(float deltaTime);
+    void update(float deltaTime, const sf::Vector2f& cameraPosition);
     void render(sf::RenderWindow& window);
     void clear();
     PhysicsWorld& getPhysicsWorld() { return *physicsWorld; }
+    const std::vector<std::unique_ptr<GameObject>>& getObjects() const { return objects; }
 
 private:
     std::vector<std::unique_ptr<GameObject>> objects;

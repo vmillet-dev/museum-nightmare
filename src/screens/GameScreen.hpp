@@ -6,6 +6,8 @@
 #include "../game/objects/Wall.hpp"
 #include "../input/InputManager.hpp"
 #include "../core/Game.hpp"
+#include "../core/Camera.hpp"
+#include "../game/levels/LevelLoader.hpp"
 
 namespace game {
 
@@ -23,6 +25,7 @@ public:
 private:
     Game& game;
     std::unique_ptr<GameObjectManager> gameObjectManager;
+    std::unique_ptr<Camera> camera;  // Camera for parallax effect
     Player* playerPtr{nullptr};  // Non-owning pointer to player
 };
 
