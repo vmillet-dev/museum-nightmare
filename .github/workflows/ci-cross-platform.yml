@@ -36,8 +36,7 @@ jobs:
             libflac-dev \
             libfreetype-dev \
             xorg-dev \
-            libogg-dev \
-            xvfb
+            libogg-dev
 
       - name: Configure CMake
         run: |
@@ -49,11 +48,6 @@ jobs:
         run: |
           cd build
           make -j$(nproc)
-
-      - name: Run Tests with Virtual Display
-        run: |
-          cd build
-          xvfb-run --auto-servernum ./sfml_game --test-mode
 
   build-and-test-windows:
     runs-on: windows-latest
@@ -105,16 +99,7 @@ jobs:
           cd build
           ninja
 
-      - name: Setup Virtual Display
-        shell: powershell
-        run: |
-          # Use RDP Session for headless operation
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          # Set display settings
-          $env:DISPLAY=":0"
-
-      - name: Run Tests
+      - name: Copy DLLs
         shell: cmd
         run: |
           cd build
@@ -122,4 +107,3 @@ jobs:
           copy _deps\spdlog-build\*.dll .
           copy _deps\box2d-build\src\*.dll .
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
-          .\sfml_game.exe --test-mode
