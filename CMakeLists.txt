@@ -22,14 +22,14 @@ file(GLOB_RECURSE SOURCES
     "src/*.cpp"
 )
 
-# Remove main.cpp and test_parallax.cpp from sources
-list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$|.*test_parallax\\.cpp$")
+# Remove main.cpp from sources
+list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Create main executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
 # Create test executable
-add_executable(test_parallax ${SOURCES} src/test_parallax.cpp)
+add_executable(test_parallax src/test_parallax.cpp ${SOURCES})
 
 # Create unit tests executable
 file(GLOB_RECURSE TEST_SOURCES
