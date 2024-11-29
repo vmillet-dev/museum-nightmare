@@ -1,14 +1,15 @@
 #include "BackgroundObject.hpp"
 #include "../TextureManager.hpp"
+#include "../Camera.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-BackgroundObject::BackgroundObject(float x, float y, float depth, const std::string& texturePath, Camera& camera)
+BackgroundObject::BackgroundObject(float x, float y, float depth, const std::string& texturePath, const Camera& camera)
     : GameObject(x, y)
     , depth(depth)
-    , camera(camera)
-    , initialPosition(x, y) {
+    , initialPosition(x, y)
+    , camera(camera) {
 
     try {
         const sf::Texture& loadedTexture = TextureManager::getInstance().getTexture(texturePath);
@@ -26,8 +27,10 @@ BackgroundObject::BackgroundObject(float x, float y, float depth, const std::str
 }
 
 void BackgroundObject::update(float deltaTime) {
-    // Calculate parallax offset based on camera position and depth
+    // Get camera position directly from stored reference
     sf::Vector2f cameraCenter = camera.getView().getCenter();
+
+    // Calculate parallax offset using the TMX parallaxx value (stored in depth)
     sf::Vector2f parallaxOffset(
         (cameraCenter.x - initialPosition.x) * (1.0f - depth),
         (cameraCenter.y - initialPosition.y) * (1.0f - depth)

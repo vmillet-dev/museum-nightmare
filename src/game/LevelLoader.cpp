@@ -8,45 +8,51 @@ namespace game {
 LevelLoader::LevelLoader(const std::string& mapFilePath)
     : mapFilePath(mapFilePath), map(std::make_unique<tmx::Map>()) {}
 
-bool LevelLoader::loadLevel(GameObjectManager& manager, Camera& camera) {
+bool LevelLoader::loadLevel(GameObjectManager& manager, const Camera& camera) {  // Added camera parameter
     if (!map->load(mapFilePath)) {
         spdlog::error("Failed to load map file: {}", mapFilePath);
         return false;
     }
 
-    loadParallaxLayers(manager, camera);
+    loadParallaxLayers(manager, camera);  // Pass camera to loadParallaxLayers
     loadTerrainLayers(manager);
     return true;
 }
 
-void LevelLoader::loadParallaxLayers(GameObjectManager& manager, Camera& camera) {
+void LevelLoader::loadParallaxLayers(GameObjectManager& manager, const Camera& camera) {  // Added camera parameter
     const auto& layers = map->getLayers();
     for (const auto& layer : layers) {
         if (layer->getType() == tmx::Layer::Type::Object) {
             const auto& objectGroup = layer->getLayerAs<tmx::ObjectGroup>();
-            if (objectGroup.getName() == "objectgroup") {
-                for (const auto& obj : objectGroup.getObjects()) {
-                    if (obj.getTileID() != 0) {  // Valid tile GID
-                        const auto& tilesets = map->getTilesets();
-                        for (const auto& tileset : tilesets) {
-                            if (obj.getTileID() >= tileset.getFirstGID() &&
-                                obj.getTileID() < tileset.getFirstGID() + tileset.getTileCount()) {
-                                const auto* tileData = tileset.getTile(obj.getTileID() - tileset.getFirstGID());
-                                if (tileData && !tileData->imagePath.empty()) {
-                                    float depth = 1.0f;
-                                    for (const auto& prop : obj.getProperties()) {
-                                        if (prop.getName() == "depth") {
-                                            depth = prop.getFloatValue();
-                                            break;
-                                        }
-                                    }
-                                    setupParallaxCamera(camera, depth);
-                                    manager.addObject(std::make_unique<BackgroundObject>(
-                                        obj.getPosition().x, obj.getPosition().y,
-                                        depth, tileData->imagePath, camera));
-                                }
-                                break;
+            std::string groupName = objectGroup.getName();
+
+            // Check if this is a parallax layer by name
+            if (groupName.find("-parallax") == std::string::npos) {
+                continue;
+            }
+
+            float parallaxFactor = 1.0f;
+            // Get parallaxx property from the objectGroup
+            for (const auto& prop : objectGroup.getProperties()) {
+                if (prop.getName() == "parallaxx") {
+                    parallaxFactor = prop.getFloatValue();
+                    break;
+                }
+            }
+
+            for (const auto& obj : objectGroup.getObjects()) {
+                if (obj.getTileID() != 0) {  // Valid tile GID
+                    const auto& tilesets = map->getTilesets();
+                    for (const auto& tileset : tilesets) {
+                        if (obj.getTileID() >= tileset.getFirstGID() &&
+                            obj.getTileID() < tileset.getFirstGID() + tileset.getTileCount()) {
+                            const auto* tileData = tileset.getTile(obj.getTileID() - tileset.getFirstGID());
+                            if (tileData && !tileData->imagePath.empty()) {
+                                manager.addObject(std::make_unique<BackgroundObject>(
+                                    obj.getPosition().x, obj.getPosition().y,
+                                    parallaxFactor, tileData->imagePath, camera));  // Pass camera reference
                             }
+                            break;
                         }
                     }
                 }
@@ -104,18 +110,6 @@ GameObject* LevelLoader::createGameObjectFromTile(const tmx::TileLayer& layer, u
         }
     }
     return nullptr;
-}
-
-void LevelLoader::setupParallaxCamera(Camera& camera, float depth) {
-    float parallaxFactor;
-    if (depth <= 0.01f) {        // Back layer
-        parallaxFactor = 0.01f;
-    } else if (depth <= 0.94f) { // Front layer
-        parallaxFactor = 0.94f;
-    } else {                     // Mid layer
-        parallaxFactor = 0.98f;
-    }
-    camera.setParallaxFactor(parallaxFactor);
 }
 
 } // namespace game

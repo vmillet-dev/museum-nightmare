@@ -20,7 +20,7 @@ GameScreen::GameScreen(Game& game) : game(game) {
 
     // Load level using TMX loader
     LevelLoader loader("assets/maps/stage1.tmx");
-    if (!loader.loadLevel(*gameObjectManager, *camera)) {
+    if (!loader.loadLevel(*gameObjectManager, *camera)) {  // Added camera parameter
         spdlog::error("Failed to load TMX level");
     }
 }
@@ -37,8 +37,10 @@ void GameScreen::update(float deltaTime) {
     gameObjectManager->update(deltaTime);
 
     // Update camera position to follow player if exists
+    // Camera acts independently like a cinema camera
     if (playerPtr) {
-        camera->setPosition(sf::Vector2f(playerPtr->getPosition().x, playerPtr->getPosition().y));
+        sf::Vector2f targetPos(playerPtr->getPosition().x, playerPtr->getPosition().y);
+        camera->setPosition(targetPos);  // Camera follows player directly without parallax factor
     }
 }
 

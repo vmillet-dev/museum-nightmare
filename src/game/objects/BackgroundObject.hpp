@@ -1,13 +1,13 @@
 #pragma once
 #include "GameObject.hpp"
-#include "../Camera.hpp"
 #include <SFML/Graphics.hpp>
+#include "../Camera.hpp"
 
 namespace game {
 
 class BackgroundObject : public GameObject {
 public:
-    BackgroundObject(float x, float y, float depth, const std::string& texturePath, Camera& camera);
+    BackgroundObject(float x, float y, float depth, const std::string& texturePath, const Camera& camera);
 
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
@@ -17,8 +17,8 @@ private:
     sf::Sprite sprite;
     sf::Texture texture;
     float depth;
-    Camera& camera;
     sf::Vector2f initialPosition;
+    const Camera& camera;  // Store reference to camera
 };
 
 } // namespace game
