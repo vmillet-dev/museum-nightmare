@@ -5,6 +5,7 @@ set(BOX2D_VERSION "3.0.0")
 set(SFML_VERSION "2.6.2")
 set(TOMLPLUSPLUS_VERSION "3.4.0")
 set(SPDLOG_VERSION "1.15.0")
+set(TMXLITE_VERSION "master")  # Using master since no version tag is available
 
 # Define required libraries
 set(SFML_LIBRARIES
@@ -18,6 +19,7 @@ set(PROJECT_DEPENDENCIES
     tomlplusplus::tomlplusplus
     spdlog::spdlog
     box2d::box2d
+    tmxlite
 )
 
 configure_sfml_build_options()
@@ -51,5 +53,28 @@ FetchContent_Declare(
     GIT_TAG v${BOX2D_VERSION}
 )
 
-FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+# tmxlite
+FetchContent_Declare(
+    tmxlite
+    GIT_REPOSITORY https://github.com/fallahn/tmxlite.git
+    GIT_TAG        ${TMXLITE_VERSION}
+)
+
+# Configure tmxlite build options
+set(TMXLITE_STATIC_LIB TRUE CACHE BOOL "Build tmxlite as a static library" FORCE)
+set(TMXLITE_BUILD_EXAMPLES FALSE CACHE BOOL "Don't build tmxlite examples" FORCE)
+set(TMXLITE_BUILD_TESTS FALSE CACHE BOOL "Don't build tmxlite tests" FORCE)
+
+FetchContent_GetProperties(tmxlite)
+if(NOT tmxlite_POPULATED)
+    FetchContent_Populate(tmxlite)
+    add_subdirectory(${tmxlite_SOURCE_DIR}/tmxlite ${tmxlite_BINARY_DIR})
+endif()
+
+# Make sure tmxlite is available for linking
+if(NOT TARGET tmxlite)
+    message(FATAL_ERROR "tmxlite target not created!")
+endif()
+
+FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d tmxlite)
 add_library(box2d::box2d ALIAS box2d)

@@ -4,6 +4,8 @@
 #include "../game/GameObjectManager.hpp"
 #include "../game/objects/actor/Player.hpp"
 #include "../game/objects/Wall.hpp"
+#include "../game/Camera.hpp"
+#include "../game/LevelLoader.hpp"
 #include "../input/InputManager.hpp"
 #include "../core/Game.hpp"
 
@@ -24,6 +26,7 @@ private:
     Game& game;
     std::unique_ptr<GameObjectManager> gameObjectManager;
     Player* playerPtr{nullptr};  // Non-owning pointer to player
+    std::unique_ptr<Camera> camera;
 };
 
 } // namespace game
