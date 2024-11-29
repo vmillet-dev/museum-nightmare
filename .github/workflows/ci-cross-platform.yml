@@ -63,9 +63,7 @@ jobs:
       - name: Cache Dependencies
         uses: actions/cache@v3
         with:
-          path: |
-            build\_deps
-            ~\AppData\Local\ccache
+          path: build/_deps
           key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
