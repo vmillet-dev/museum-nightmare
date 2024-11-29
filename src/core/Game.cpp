@@ -6,17 +6,31 @@
 
 namespace game {
 
-Game::Game() : window(
-    sf::VideoMode(
-        ConfigManager::getInstance().getWindowWidth(),
-        ConfigManager::getInstance().getWindowHeight()
+Game::Game(const std::string& levelPath)
+    : window(
+        sf::VideoMode(
+            ConfigManager::getInstance().getWindowWidth(),
+            ConfigManager::getInstance().getWindowHeight()
+        ),
+        ConfigManager::getInstance().getWindowTitle()
     ),
-    ConfigManager::getInstance().getWindowTitle()
-) {
+    initialLevelPath(levelPath) {
     sf::err().rdbuf(nullptr);  // Disable SFML error output
-    spdlog::info("Initializing game...");
+    spdlog::info("Initializing game with level path: {}", levelPath);
+
     inputManager.init();
-    ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
+
+    // Create game screen and load level if path is provided
+    auto gameScreen = std::make_unique<GameScreen>(*this);
+    if (!initialLevelPath.empty()) {
+        if (!gameScreen->loadLevel(initialLevelPath)) {
+            spdlog::error("Failed to load level: {}", initialLevelPath);
+        } else {
+            spdlog::info("Successfully loaded level: {}", initialLevelPath);
+        }
+    }
+
+    ScreenManager::getInstance().pushScreen(std::move(gameScreen));
     spdlog::info("Game initialized successfully");
 }
 

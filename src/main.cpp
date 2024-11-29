@@ -20,17 +20,20 @@ void setup_logging() {
     spdlog::set_level(spdlog::level::debug);
 }
 
-
 int main(int argc, char* argv[]) {
     setup_logging();
 
     try {
-        bool test_mode = (argc > 1 && std::string(argv[1]) == "--test-mode");
+        std::string levelPath;
+        if (argc > 1) {
+            levelPath = argv[1];
+            spdlog::info("Starting game with level: {}", levelPath);
+        } else {
+            spdlog::info("Starting game with no level specified");
+        }
 
-        spdlog::info("Starting game application {}", test_mode ? "in test mode" : "");
-
-        game::Game game;
-        (test_mode ? game.quit() : game.run());
+        game::Game game(levelPath);
+        game.run();
 
         spdlog::info("Game closed successfully");
         return 0;

@@ -28,7 +28,17 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
 # Link required libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${PROJECT_DEPENDENCIES}
+    tmxlite
+)
+
+# Include directories for tmxlite
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${tmxlite_SOURCE_DIR}/include
+)
 
 # Copy assets to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets
+)

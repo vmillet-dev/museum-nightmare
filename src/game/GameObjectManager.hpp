@@ -4,6 +4,7 @@
 #include "objects/GameObject.hpp"
 #include "physics/PhysicsWorld.hpp"
 #include <spdlog/spdlog.h>
+#include <SFML/Graphics.hpp>
 
 namespace game {
 
@@ -11,10 +12,11 @@ class GameObjectManager {
 public:
     GameObjectManager();
     void addObject(std::unique_ptr<GameObject> object);
-    void update(float deltaTime);
+    void update(float deltaTime, const sf::Vector2f& cameraPosition = sf::Vector2f(0, 0));
     void render(sf::RenderWindow& window);
     void clear();
     PhysicsWorld& getPhysicsWorld() { return *physicsWorld; }
+    const std::vector<std::unique_ptr<GameObject>>& getObjects() const { return objects; }
 
 private:
     std::vector<std::unique_ptr<GameObject>> objects;

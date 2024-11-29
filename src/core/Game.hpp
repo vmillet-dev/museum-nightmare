@@ -7,12 +7,13 @@
 #include "../input/InputManager.hpp"
 #include "../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
+#include <string>
 
 namespace game {
 
 class Game {
 public:
-    Game();
+    Game(const std::string& levelPath = "");
     void run();
     void quit();
     sf::RenderWindow& getWindow();
@@ -26,6 +27,7 @@ private:
 
     sf::RenderWindow window;
     InputManager inputManager;
+    std::string initialLevelPath;
 };
 
 } // namespace game

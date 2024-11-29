@@ -1,4 +1,5 @@
 #include "GameObjectManager.hpp"
+#include "objects/ParallaxLayer.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -13,20 +14,33 @@ void GameObjectManager::addObject(std::unique_ptr<GameObject> object) {
     objects.push_back(std::move(object));
 }
 
-void GameObjectManager::update(float deltaTime) {
+void GameObjectManager::update(float deltaTime, const sf::Vector2f& cameraPosition) {
     // Update physics world
     physicsWorld->update(deltaTime);
 
     // Update game objects
     for (auto& object : objects) {
+        // Update parallax layers with camera position
+        if (auto* parallaxLayer = dynamic_cast<ParallaxLayer*>(object.get())) {
+            parallaxLayer->setParallaxOffset(cameraPosition);
+        }
         object->update(deltaTime);
     }
-    // Box2D now handles all collision detection and resolution
 }
 
 void GameObjectManager::render(sf::RenderWindow& window) {
+    // Render parallax layers first
     for (const auto& object : objects) {
-        object->render(window);
+        if (dynamic_cast<ParallaxLayer*>(object.get())) {
+            object->render(window);
+        }
+    }
+
+    // Then render other game objects
+    for (const auto& object : objects) {
+        if (!dynamic_cast<ParallaxLayer*>(object.get())) {
+            object->render(window);
+        }
     }
 }
 
