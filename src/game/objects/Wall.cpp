@@ -1,15 +1,26 @@
 #include "Wall.hpp"
 #include "../../core/const.hpp"
+#include "../TextureManager.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-Wall::Wall(float x, float y, float width, float height)
+Wall::Wall(float x, float y, float width, float height, const std::string& texturePath)
     : GameObject(x, y), width(width), height(height) {
-    shape.setSize(sf::Vector2f(width, height));
-    shape.setFillColor(sf::Color(128, 128, 128));  // Gray color
-    shape.setOrigin(width / 2, height / 2);
-    shape.setPosition(position);
+    try {
+        const sf::Texture& texture = TextureManager::getInstance().getTexture(texturePath);
+        sprite.setTexture(texture);
+        sprite.setOrigin(width / 2, height / 2);
+        sprite.setPosition(position);
+        // Scale sprite to match desired size
+        sf::Vector2u textureSize = texture.getSize();
+        sprite.setScale(
+            width / static_cast<float>(textureSize.x),
+            height / static_cast<float>(textureSize.y)
+        );
+    } catch (const std::runtime_error& e) {
+        spdlog::error("Failed to load wall texture: {}", e.what());
+    }
     spdlog::debug("Wall created: pos({:.1f},{:.1f}) size({:.1f},{:.1f})", x, y, width, height);
 }
 
@@ -18,12 +29,12 @@ void Wall::update(float deltaTime) {
     // Position is managed by Box2D
     if (b2Body_IsValid(bodyId)) {
         syncPositionWithPhysics();
-        shape.setPosition(position);
+        sprite.setPosition(position);
     }
 }
 
 void Wall::render(sf::RenderWindow& window) {
-    window.draw(shape);
+    window.draw(sprite);
 }
 
 void Wall::initPhysics(b2WorldId worldId) {

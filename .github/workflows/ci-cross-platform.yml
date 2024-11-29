@@ -63,9 +63,7 @@ jobs:
       - name: Cache Dependencies
         uses: actions/cache@v3
         with:
-          path: |
-            build\_deps
-            ~\AppData\Local\ccache
+          path: build/_deps
           key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
@@ -95,7 +93,7 @@ jobs:
       - name: Configure CMake
         shell: cmd
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake .. -G "Ninja"
 
@@ -121,5 +119,6 @@ jobs:
           copy _deps\sfml-build\lib\*.dll .
           copy _deps\spdlog-build\*.dll .
           copy _deps\box2d-build\src\*.dll .
+          copy _deps\tmxlite-build\*.dll .
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
           .\sfml_game.exe --test-mode
