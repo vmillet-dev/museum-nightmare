@@ -11,16 +11,21 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             /experimental:c11atomics  # Enable C11 atomics support
         )
     else()
+        # Project-specific warnings treated as errors
         target_compile_options(${PROJECT_NAME} PRIVATE
             -Wall
             -Wextra
             -Wpedantic
             -Werror
             -Wconversion
-            -Wshadow
             -Wcast-align
             -Wunused
             -Wnull-dereference
+        )
+
+        # Disable -Wshadow for external dependencies
+        target_compile_options(tmxlite PRIVATE
+            -Wno-shadow
         )
     endif()
 endif()

@@ -12,7 +12,6 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
@@ -36,6 +35,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${tmxlite_SOURCE_DIR}/include
 )
+
+# Apply compiler flags after target creation
+include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 # Copy assets to build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
