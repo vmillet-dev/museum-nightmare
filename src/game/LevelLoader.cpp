@@ -95,18 +95,8 @@ GameObject* LevelLoader::createGameObjectFromTile(const tmx::TileLayer& layer, u
             const auto* tileData = tileset.getTile(gid - tileset.getFirstGID());
             if (!tileData) continue;
 
-            bool isWall = false;
-            for (const auto& prop : tileData->properties) {
-                if (prop.getName() == "type" && prop.getStringValue() == "wall") {
-                    isWall = true;
-                    break;
-                }
-            }
-
-            if (isWall) {
-                return new Wall(x, y, tileSize.x, tileSize.y);
-            }
-            // Add more object types here as needed
+            // Create a wall for each tile and use its texture
+            return new Wall(x, y, tileSize.x, tileSize.y, tileData->imagePath);
         }
     }
     return nullptr;
