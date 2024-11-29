@@ -63,7 +63,8 @@ FetchContent_Declare(
 FetchContent_Declare(
     tmxlite
     GIT_REPOSITORY https://github.com/fallahn/tmxlite.git
-    GIT_TAG master
+    GIT_TAG v${TMXLITE_VERSION}
+    SOURCE_SUBDIR tmxlite
 )
 
 FetchContent_GetProperties(tmxlite)

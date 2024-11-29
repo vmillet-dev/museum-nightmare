@@ -30,7 +30,6 @@ add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 # Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${PROJECT_DEPENDENCIES}
-    tmxlite
 )
 
 # Include directories for tmxlite
