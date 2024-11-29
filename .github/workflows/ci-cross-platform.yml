@@ -93,7 +93,7 @@ jobs:
       - name: Configure CMake
         shell: cmd
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake .. -G "Ninja"
 
