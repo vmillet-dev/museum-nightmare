@@ -17,46 +17,18 @@ include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 # Add source files
-set(GAME_SOURCES
-    src/game/Camera.cpp
-    src/game/LevelLoader.cpp
-    src/game/TextureManager.cpp
-    src/game/objects/BackgroundObject.cpp
-)
-
-file(GLOB_RECURSE BASE_SOURCES
+file(GLOB_RECURSE SOURCES
     "src/*.cpp"
 )
 
-# Remove main.cpp and GAME_SOURCES from BASE_SOURCES
-list(FILTER BASE_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
-foreach(game_source ${GAME_SOURCES})
-    list(FILTER BASE_SOURCES EXCLUDE REGEX "${game_source}$")
-endforeach()
+# Remove main.cpp from sources
+list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Create executable
-add_executable(${PROJECT_NAME}
-    ${BASE_SOURCES}
-    ${GAME_SOURCES}
-    src/main.cpp
-)
-
-# Set include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/game
-    ${CMAKE_SOURCE_DIR}/src/game/objects
-    ${CMAKE_SOURCE_DIR}/src/game/levels
-    ${CMAKE_BINARY_DIR}/_deps/tmxlite-src/include
-    ${CMAKE_BINARY_DIR}/_deps/tmxlite-src/tmxlite/include
-)
+add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
 # Link required libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${PROJECT_DEPENDENCIES}
-    tmxlite
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
 
 # Copy assets to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
