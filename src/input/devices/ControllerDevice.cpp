@@ -1,6 +1,7 @@
 #include "ControllerDevice.hpp"
 #include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/fmt.h>
 
 namespace game {
 
@@ -35,15 +36,23 @@ void ControllerDevice::init() {
 }
 
 void ControllerDevice::update() {
+    // Update button states
     for (const auto& binding : buttonBindings) {
-        if (buttonStates[binding.first].current != buttonStates[binding.first].previous) {
-            buttonStates[binding.first].previous = buttonStates[binding.first].current;
+        auto& state = buttonStates[binding.first];
+        if (state.current != state.previous) {
+            spdlog::debug("Button state updated - Action: {}, Current: {}, Previous: {}",
+                         static_cast<int>(binding.second), state.current, state.previous);
+            state.previous = state.current;
         }
     }
 
+    // Update axis states and check for continuous input
     for (const auto& binding : axisBindings) {
-        if (axisStates[binding.first].current != axisStates[binding.first].previous) {
-            axisStates[binding.first].previous = axisStates[binding.first].current;
+        auto& state = axisStates[binding.first];
+        if (state.current != state.previous) {
+            spdlog::debug("Axis state updated - Action: {}, Current: {}, Previous: {}",
+                         static_cast<int>(binding.second), state.current, state.previous);
+            state.previous = state.current;
         }
     }
 }
@@ -132,15 +141,39 @@ void ControllerDevice::setAxisBinding(std::string axis, Action action) {
 }
 
 void ControllerDevice::setAxisState(unsigned int axisId, float position) {
-    std::string axis = std::format("{}{}", (position > 0 ? "+" : "-"), axisId);
+    // Normalize position from [-100, 100] to [-1, 1]
+    float normalizedPos = position / 100.0f;
 
-    auto absPosition = std::abs(position) > deadzone;
-    if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {
-        spdlog::debug("Controller {}: Axis {} moved to position {} ({})", controllerId, axisId, position, axis);
+    // Check both positive and negative directions
+    std::string posAxis = fmt::format("+{}", axisId);
+    std::string negAxis = fmt::format("-{}", axisId);
 
-        auto& state = axisStates[axis];
-        state.previous = state.current;
-        state.current = absPosition;
+    bool exceedsDeadzone = std::abs(normalizedPos) > deadzone;
+    float sensitivity = this->sensitivity;
+
+    spdlog::debug("Axis {}: raw={:.2f}, normalized={:.2f}, exceeds_deadzone={}, sensitivity={:.2f}",
+                 axisId, position, normalizedPos, exceedsDeadzone, sensitivity);
+
+    // Update positive direction state
+    if (axisBindings.count(posAxis)) {
+        auto& state = axisStates[posAxis];
+        bool newState = exceedsDeadzone && normalizedPos > 0;
+        if (state.current != newState) {
+            state.previous = state.current;
+            state.current = newState;
+            spdlog::debug("Axis {} positive state changed: {} -> {}", axisId, state.previous, state.current);
+        }
+    }
+
+    // Update negative direction state
+    if (axisBindings.count(negAxis)) {
+        auto& state = axisStates[negAxis];
+        bool newState = exceedsDeadzone && normalizedPos < 0;
+        if (state.current != newState) {
+            state.previous = state.current;
+            state.current = newState;
+            spdlog::debug("Axis {} negative state changed: {} -> {}", axisId, state.previous, state.current);
+        }
     }
 }
 

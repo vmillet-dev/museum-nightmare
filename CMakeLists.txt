@@ -12,7 +12,6 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
@@ -26,6 +25,9 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
+
+# Set compiler flags
+include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 # Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
