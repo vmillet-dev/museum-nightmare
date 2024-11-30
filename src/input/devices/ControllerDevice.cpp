@@ -1,6 +1,7 @@
 #include "ControllerDevice.hpp"
 #include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
+#include <format>
 
 namespace game {
 
