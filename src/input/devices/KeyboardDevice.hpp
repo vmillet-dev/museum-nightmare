@@ -15,7 +15,7 @@ public:
 
 private:
     std::unordered_map<sf::Keyboard::Key, Action> keyBindings;
-    std::unordered_map<sf::Keyboard::Key, KeyState> keyStates;
+    std::unordered_map<sf::Keyboard::Key, ActionState> keyStates;
 
     void setKeyBinding(sf::Keyboard::Key key, Action action);
     void setKeyState(sf::Keyboard::Key key, bool pressed);

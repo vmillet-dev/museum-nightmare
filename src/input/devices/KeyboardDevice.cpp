@@ -65,9 +65,11 @@ void KeyboardDevice::setKeyBinding(sf::Keyboard::Key key, Action action) {
 }
 
 void KeyboardDevice::setKeyState(sf::Keyboard::Key key, bool pressed) {
-    auto& state = keyStates[key];
-    state.previous = state.current;
-    state.current = pressed;
+    if (keyBindings.count(key) != 0) {
+        auto& state = keyStates[key];
+        state.previous = state.current;
+        state.current = pressed;
+    }
 }
 
 } // namespace game

@@ -128,4 +128,10 @@ unsigned int ConfigManager::getControllerButton(const std::string& action) const
     return button;
 }
 
+std::string ConfigManager::getControllerAxis(const std::string& action) const {
+    std::string axis = (config["controls"][action].value_or(""));
+    spdlog::debug("Controller axis for {}: {}", action, axis);
+    return axis;
+}
+
 } // namespace game

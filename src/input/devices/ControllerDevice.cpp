@@ -17,25 +17,17 @@ void ControllerDevice::init() {
             break;
         }
     }
-
+ 
     // Load button bindings from config
-    buttonBindings[Action::Confirm] = config.getControllerButton("controller_confirm");
-    buttonBindings[Action::Cancel] = config.getControllerButton("controller_cancel");
-    buttonBindings[Action::Pause] = config.getControllerButton("controller_pause");
+    setButtonBinding(config.getControllerButton("controller_confirm"), Action::Confirm);
+    setButtonBinding(config.getControllerButton("controller_cancel"), Action::Cancel);
+    setButtonBinding(config.getControllerButton("controller_pause"), Action::Pause);
 
     // Load axis bindings from config
-    axisBindings[Action::MoveUp] = sf::Joystick::Y;
-    axisBindings[Action::MoveDown] = sf::Joystick::Y;
-    axisBindings[Action::MoveLeft] = sf::Joystick::X;
-    axisBindings[Action::MoveRight] = sf::Joystick::X;
-
-    // Initialize states
-    for (const auto& [action, button] : buttonBindings) {
-        buttonStates[action] = false;
-    }
-    for (const auto& [action, axis] : axisBindings) {
-        axisStates[action] = 0.0f;
-    }
+    setAxisBinding(config.getControllerAxis("controller_move_up"), Action::MoveUp);
+    setAxisBinding(config.getControllerAxis("controller_move_down"), Action::MoveDown);
+    setAxisBinding(config.getControllerAxis("controller_move_left"), Action::MoveLeft);
+    setAxisBinding(config.getControllerAxis("controller_move_right"), Action::MoveRight);
 
     // Load controller settings
     setDeadzone(config.getControllerDeadzone());
@@ -43,86 +35,30 @@ void ControllerDevice::init() {
 }
 
 void ControllerDevice::update() {
-    if (!connected) {
-        // Check for new controller connection
-        for (int i = 0; i < sf::Joystick::Count; ++i) {
-            if (sf::Joystick::isConnected(i)) {
-                connected = true;
-                controllerId = i;
-                spdlog::info("Controller connected on port {}", i);
-                init();
-                break;
-            }
-        }
-        return;
-    }
-
-    // Store previous states
-    previousButtonStates = buttonStates;
-
-    // Convert current axis states to boolean for previous state tracking
-    for (const auto& [action, axis] : axisBindings) {
-        float position = axisStates[action];
-        switch(action) {
-            case Action::MoveUp:
-                previousAxisStates[action] = position < -0.5f;
-                break;
-            case Action::MoveDown:
-                previousAxisStates[action] = position > 0.5f;
-                break;
-            case Action::MoveLeft:
-                previousAxisStates[action] = position < -0.5f;
-                break;
-            case Action::MoveRight:
-                previousAxisStates[action] = position > 0.5f;
-                break;
-            default:
-                break;
+    for (const auto& binding : buttonBindings) {
+        if (buttonStates[binding.first].current != buttonStates[binding.first].previous) {
+            buttonStates[binding.first].previous = buttonStates[binding.first].current;
         }
     }
 
-    // Update button states
-    for (const auto& [action, button] : buttonBindings) {
-        buttonStates[action] = sf::Joystick::isButtonPressed(controllerId, button);
-        if (buttonStates[action]) {
-            spdlog::debug("Controller button {} pressed", button);
-        }
-    }
-
-    // Update axis states
-    for (const auto& [action, axis] : axisBindings) {
-        float position = sf::Joystick::getAxisPosition(controllerId, axis);
-        axisStates[action] = std::abs(position) < deadzone ? 0.0f : position / sensitivity;
-        if (std::abs(axisStates[action]) > 0.5f) {
-            spdlog::debug("Controller axis {} value: {}", static_cast<int>(axis), axisStates[action]);
+    for (const auto& binding : axisBindings) {
+        if (axisStates[binding.first].current != axisStates[binding.first].previous) {
+            axisStates[binding.first].previous = axisStates[binding.first].current;
         }
     }
 }
 
 bool ControllerDevice::isActionPressed(Action action) {
-    if (!connected) return false;
 
-    // Check button states
-    auto buttonIt = buttonBindings.find(action);
-    if (buttonIt != buttonBindings.end()) {
-        return buttonStates[action];
+    for (const auto& binding : buttonBindings) {
+        if (binding.second == action && buttonStates[binding.first].current) {
+            return true;
+        }
     }
 
-    // Check axis states
-    auto axisIt = axisBindings.find(action);
-    if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
-        switch(action) {
-            case Action::MoveUp:
-                return position < -0.5f;
-            case Action::MoveDown:
-                return position > 0.5f;
-            case Action::MoveLeft:
-                return position < -0.5f;
-            case Action::MoveRight:
-                return position > 0.5f;
-            default:
-                return false;
+    for (const auto& binding : axisBindings) {
+        if (binding.second == action && axisStates[binding.first].current) {
+            return true;
         }
     }
 
@@ -130,85 +66,82 @@ bool ControllerDevice::isActionPressed(Action action) {
 }
 
 bool ControllerDevice::isActionJustPressed(Action action) {
-    if (!connected) return false;
-
-    // Check button states
-    auto buttonIt = buttonBindings.find(action);
-    if (buttonIt != buttonBindings.end()) {
-        return buttonStates[action] && !previousButtonStates[action];
+    for (const auto& binding : buttonBindings) {
+        const auto& state = buttonStates[binding.first];
+        if (binding.second == action && state.current != state.previous && state.current) {
+            return true;
+        }
     }
 
-    // Check axis states for movement actions
-    auto axisIt = axisBindings.find(action);
-    if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
-        bool currentState = false;
-        switch(action) {
-            case Action::MoveUp:
-                currentState = position < -0.5f;
-                break;
-            case Action::MoveDown:
-                currentState = position > 0.5f;
-                break;
-            case Action::MoveLeft:
-                currentState = position < -0.5f;
-                break;
-            case Action::MoveRight:
-                currentState = position > 0.5f;
-                break;
-            default:
-                return false;
+    for (const auto& binding : axisBindings) {
+        const auto& state = axisStates[binding.first];
+        if (binding.second == action && state.current != state.previous && state.current) {
+            return true;
         }
-        // Add debug logging
-        if (currentState) {
-            spdlog::debug("Controller axis {} state: {}", static_cast<int>(axisIt->second), position);
-        }
-        return currentState && !previousAxisStates[action];
     }
 
     return false;
 }
 
 bool ControllerDevice::isActionReleased(Action action) {
-    if (!connected) return false;
-
-    auto buttonIt = buttonBindings.find(action);
-    if (buttonIt != buttonBindings.end()) {
-        return !buttonStates[action];
-    }
-
-    auto axisIt = axisBindings.find(action);
-    if (axisIt != axisBindings.end()) {
-        float position = axisStates[action];
-        switch(action) {
-            case Action::MoveUp:
-            case Action::MoveDown:
-                return std::abs(position) <= 0.5f;
-            case Action::MoveLeft:
-            case Action::MoveRight:
-                return std::abs(position) <= 0.5f;
-            default:
-                return true;
+    for (const auto& binding : buttonBindings) {
+        const auto& state = buttonStates[binding.first];
+        if (binding.second == action && state.current != state.previous && !state.current) {
+            return true;
         }
     }
 
-    return true;
+    for (const auto& binding : axisBindings) {
+        const auto& state = axisStates[binding.first];
+        if (binding.second == action && state.current != state.previous && !state.current) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void ControllerDevice::handleEvent(const sf::Event& event) {
-    if (event.type == sf::Event::JoystickDisconnected &&
-        event.joystickConnect.joystickId == controllerId) {
-        connected = false;
-        spdlog::info("Controller {} disconnected", controllerId);
+
+    if ((event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::JoystickButtonReleased) && event.joystickButton.joystickId == controllerId) {
+        setButtonState(event.joystickButton.button, event.type == sf::Event::JoystickButtonPressed);
+    }
+
+    if (event.type == sf::Event::JoystickMoved && event.joystickMove.joystickId == controllerId) {
+        setAxisState(event.joystickMove.axis, event.joystickMove.position);
     }
 }
 
-void ControllerDevice::setButtonBinding(Action action, unsigned int button) {
-    buttonBindings[action] = button;
+void ControllerDevice::setButtonBinding(unsigned int button, Action action) {
+    buttonBindings[button] = action;
 }
 
-void ControllerDevice::setAxisBinding(Action action, sf::Joystick::Axis axis) {
-    axisBindings[action] = axis;
+void ControllerDevice::setButtonState(unsigned int button, bool pressed) {
+
+    if (buttonBindings.count(button)) {
+        spdlog::debug("Controller {}: Button {} {}", controllerId, button, pressed ? "Pressed" : "Released");
+
+        auto& state = buttonStates[button];
+        state.previous = state.current;
+        state.current = pressed;
+    }
+}
+
+void ControllerDevice::setAxisBinding(std::string axis, Action action) {
+    axisBindings[axis] = action;
+}
+
+void ControllerDevice::setAxisState(unsigned int axisId, float position) {
+    std::string axis = std::format("{}{}", (position > 0 ? "+" : "-"), axisId);
+
+    auto absPosition = std::abs(position) > deadzone;
+    if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {
+        spdlog::debug("Controller {}: Axis {} moved to position {} ({})", controllerId, axisId, position, axis);
+
+        auto& state = axisStates[axis];
+        state.previous = state.current;
+        state.current = absPosition;
+    }
 }
 
 } // namespace game

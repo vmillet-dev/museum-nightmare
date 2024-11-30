@@ -25,12 +25,12 @@ public:
     float getPlayerSpeed() const;
     float getPlayerSize() const;
 
-    // New control settings methods
     sf::Keyboard::Key getKeyBinding(const std::string& action) const;
     bool isControllerEnabled() const;
     float getControllerDeadzone() const;
     float getControllerSensitivity() const;
     unsigned int getControllerButton(const std::string& action) const;
+    std::string getControllerAxis(const std::string& action) const;
 
 private:
     ConfigManager();

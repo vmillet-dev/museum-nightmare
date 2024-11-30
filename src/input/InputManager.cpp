@@ -37,9 +37,6 @@ void InputManager::update() {
 
 void InputManager::createControllerDevice() {
     auto controllerDevice = std::make_unique<ControllerDevice>();
-    auto& config = ConfigManager::getInstance();
-    controllerDevice->setDeadzone(config.getControllerDeadzone());
-    controllerDevice->setSensitivity(config.getControllerSensitivity());
     controllerDevice->init();
     devices.push_back(std::move(controllerDevice));
     spdlog::info("Controller connected and initialized");

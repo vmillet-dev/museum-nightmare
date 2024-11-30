@@ -4,7 +4,7 @@
 
 namespace game {
 
-struct KeyState {
+struct ActionState {
     bool current;
     bool previous;
 };
