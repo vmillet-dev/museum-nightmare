@@ -1,0 +1,68 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main", "feature/*", "devin/*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          build-essential \
+          g++-12 \
+          libx11-dev \
+          xorg-dev \
+          libudev-dev \
+          libopenal-dev \
+          libvorbis-dev \
+          libflac-dev \
+          libxrandr-dev \
+          libfreetype6-dev \
+          libogg-dev
+
+    - name: Set up GCC 12
+      run: |
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 100
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+
+    - name: Build
+      run: |
+        cd build
+        make
+
+    - name: Test Run with Xvfb
+      timeout-minutes: 2
+      run: |
+        cd build
+        xvfb-run --auto-servernum ./sfml_game --test-mode
+
+  build-and-test-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build .
