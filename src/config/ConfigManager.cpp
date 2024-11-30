@@ -134,4 +134,10 @@ std::string ConfigManager::getControllerAxis(const std::string& action) const {
     return axis;
 }
 
+sf::Mouse::Button ConfigManager::getMouseButton(const std::string& action) const {
+    std::string keyName = config["controls"][action].value_or("");
+    spdlog::debug("Mouse button for {}: {}", action, keyName);
+    return MouseMapper::getInstance().stringToButton(keyName);
+}
+
 } // namespace game

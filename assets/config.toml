@@ -34,3 +34,5 @@ controller_move_right = "+0"
 controller_pause = 7
 controller_confirm = 0
 controller_cancel = 5
+
+fire = "left"

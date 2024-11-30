@@ -10,6 +10,7 @@ enum class Action {
     Pause,
     Confirm,
     Cancel,
+    Fire,
     MouseLeft,
     MouseRight
 };

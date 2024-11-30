@@ -23,8 +23,8 @@ GameScreen::GameScreen(Game& game) : game(game) {
 
 void GameScreen::update(float deltaTime) {
     // TODO for testing purpose
-    game.getInputManager().isActionJustPressed(Action::MoveLeft);
-    game.getInputManager().isActionReleased(Action::MoveLeft);
+    game.getInputManager().isActionJustPressed(Action::Fire);
+    game.getInputManager().isActionReleased(Action::Fire);
 
     if (game.getInputManager().isActionPressed(Action::Pause)) {
         spdlog::info("Opening pause menu");

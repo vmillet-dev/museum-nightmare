@@ -17,6 +17,7 @@ public:
         case Action::Cancel:    return "Cancel";
         case Action::MouseLeft: return "MouseLeft";
         case Action::MouseRight:return "MouseRight";
+        case Action::Fire:      return "Fire";
         default: throw std::invalid_argument("Unknown Action value");
         }
     }

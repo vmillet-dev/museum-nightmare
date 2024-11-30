@@ -3,8 +3,10 @@
 #include <string>
 #include <spdlog/spdlog.h>
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <unordered_map>
 #include "KeyMapper.hpp"
+#include "MouseMapper.hpp"
 
 namespace game {
 
@@ -31,6 +33,7 @@ public:
     float getControllerSensitivity() const;
     unsigned int getControllerButton(const std::string& action) const;
     std::string getControllerAxis(const std::string& action) const;
+    sf::Mouse::Button getMouseButton(const std::string& action) const;
 
 private:
     ConfigManager();
