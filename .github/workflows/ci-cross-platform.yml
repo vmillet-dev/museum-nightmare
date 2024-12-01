@@ -73,10 +73,15 @@ jobs:
             ${{ runner.os }}-deps-
 
       - uses: llvm/actions/install-ninja@main
+  
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "3.25.0"
 
       - name: Build
         run: |
-          mkdir build 2>nul
+          if not exist "build" mkdir "build"
           cd build
           cmake .. -G "Visual Studio 17 2022" -A x64
           cmake --build . --config Debug
