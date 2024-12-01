@@ -62,16 +62,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Dependencies
-        uses: actions/cache@v4.1.2
-        with:
-          path: |
-            build\_deps
-            ~\AppData\Local\ccache
-          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
-          restore-keys: |
-            ${{ runner.os }}-deps-
-
       - uses: llvm/actions/install-ninja@main
   
       - name: Setup CMake
@@ -81,7 +71,7 @@ jobs:
 
       - name: Build
         run: |
-          #mkdir -p build
+          mkdir build
           cd build
           cmake .. -G "Visual Studio 17 2022" -A x64
           cmake --build . --config Debug
