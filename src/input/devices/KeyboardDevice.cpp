@@ -7,14 +7,17 @@ namespace game {
 void KeyboardDevice::init() {
     auto& config = ConfigManager::getInstance();
 
-    // Load key bindings from config
-    setKeyBinding(config.getKeyBinding("move_up"), Action::MoveUp);
-    setKeyBinding(config.getKeyBinding("move_down"), Action::MoveDown);
-    setKeyBinding(config.getKeyBinding("move_left"), Action::MoveLeft);
-    setKeyBinding(config.getKeyBinding("move_right"), Action::MoveRight);
-    setKeyBinding(config.getKeyBinding("pause"), Action::Pause);
-    setKeyBinding(config.getKeyBinding("confirm"), Action::Confirm);
-    setKeyBinding(config.getKeyBinding("cancel"), Action::Cancel);
+    // Load key bindings from config for each action
+    const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
+
+    for (const auto& actionStr : actions) {
+        Action action = config.getActionFromString(actionStr);
+        auto keys = config.getKeyboardBindingsForAction(actionStr);
+        for (const auto& key : keys) {
+            setKeyBinding(key, action);
+            spdlog::debug("Set keyboard binding: {} -> {}", static_cast<int>(key), static_cast<int>(action));
+        }
+    }
 }
 
 void KeyboardDevice::update() {

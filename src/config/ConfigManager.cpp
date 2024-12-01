@@ -13,7 +13,7 @@ ConfigManager::ConfigManager() {
 void ConfigManager::loadConfig() {
     try {
         config = toml::parse_file("assets/config.toml");
-        spdlog::info("Config loaded - Controller(enabled:{},deadzone:{:.1f},sens:{:.1f})", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
+        spdlog::info("Config loaded");
 
         // Set up logging level from config
         std::string logLevel = config["debug"]["level"].value_or("info");
@@ -34,7 +34,7 @@ void ConfigManager::loadConfig() {
 }
 
 void ConfigManager::createDefaultConfig() {
-    spdlog::info("Creating default config with controller settings");
+    spdlog::info("Creating default config");
     config = toml::table{
         {"window", toml::table{
             {"width", 800},
@@ -43,29 +43,32 @@ void ConfigManager::createDefaultConfig() {
         }},
         {"player", toml::table{
             {"speed", 200.0},
-            {"size", Constants::Physics::ACTOR_SIZE * 2}  // Full size is twice the half-size
+            {"size", Constants::Physics::ACTOR_SIZE * 2}
         }},
         {"debug", toml::table{
             {"level", "info"}
         }},
-        {"controls", toml::table{
-            {"move_up", "Z"},
-            {"move_down", "S"},
-            {"move_left", "Q"},
-            {"move_right", "D"},
-            {"pause", "Escape"},
-            {"confirm", "Return"},
-            {"cancel", "BackSpace"},
-            {"controller_enabled", true},
-            {"controller_deadzone", 20.0},
-            {"controller_sensitivity", 100.0},
-            {"controller_move_up", 0},
-            {"controller_move_down", 1},
-            {"controller_move_left", 2},
-            {"controller_move_right", 3},
-            {"controller_pause", 7},
-            {"controller_confirm", 4},
-            {"controller_cancel", 5}
+        {"actions", toml::table{
+            {"MoveUp", toml::table{
+                {"keyboard", toml::array{"Z", "Up"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickUp"}}
+            }},
+            {"MoveDown", toml::table{
+                {"keyboard", toml::array{"S", "Down"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickDown"}}
+            }},
+            {"MoveLeft", toml::table{
+                {"keyboard", toml::array{"Q", "Left"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickLeft"}}
+            }},
+            {"MoveRight", toml::table{
+                {"keyboard", toml::array{"D", "Right"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickRight"}}
+            }}
         }}
     };
     saveConfig();
@@ -74,7 +77,7 @@ void ConfigManager::createDefaultConfig() {
 void ConfigManager::saveConfig() {
     std::ofstream file("assets/config.toml");
     file << config;
-    spdlog::info("Config saved with controller settings: enabled={}, deadzone={:.1f}, sensitivity={:.1f}", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
+    spdlog::info("Config saved");
 }
 
 int ConfigManager::getWindowWidth() const {
@@ -94,50 +97,78 @@ float ConfigManager::getPlayerSpeed() const {
 }
 
 float ConfigManager::getPlayerSize() const {
-    return config["player"]["size"].value_or(Constants::Physics::ACTOR_SIZE * 2);  // Default to twice ACTOR_SIZE
+    return config["player"]["size"].value_or(Constants::Physics::ACTOR_SIZE * 2);
 }
 
-sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
-    std::string keyName = config["controls"][action].value_or("");
-    auto key = KeyMapper::getInstance().fromName(keyName);
-    spdlog::debug("Key binding: {} -> {}", action, keyName);
-    return key;
+std::vector<sf::Keyboard::Key> ConfigManager::getKeyboardBindingsForAction(const std::string& action) const {
+    std::vector<sf::Keyboard::Key> keys;
+    try {
+        const auto& keyArray = config["actions"][action]["keyboard"].as_array();
+        for (const auto& key : *keyArray) {
+            auto sfKey = KeyMapper::getInstance().fromName(key.value_or(""));
+            if (sfKey != sf::Keyboard::Unknown) {
+                keys.push_back(sfKey);
+            }
+        }
+        spdlog::debug("Keyboard bindings for {}: {} keys", action, keys.size());
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to get keyboard bindings for action {}: {}", action, e.what());
+    }
+    return keys;
 }
 
-bool ConfigManager::isControllerEnabled() const {
-    bool enabled = config["controls"]["controller_enabled"].value_or(true);
-    spdlog::debug("Controller enabled: {}", enabled);
-    return enabled;
+std::vector<sf::Mouse::Button> ConfigManager::getMouseBindingsForAction(const std::string& action) const {
+    std::vector<sf::Mouse::Button> buttons;
+    try {
+        const auto& buttonArray = config["actions"][action]["mouse"].as_array();
+        for (const auto& button : *buttonArray) {
+            auto sfButton = MouseMapper::getInstance().stringToButton(button.value_or(""));
+            if (sfButton != sf::Mouse::Button::ButtonCount) {
+                buttons.push_back(sfButton);
+            }
+        }
+        spdlog::debug("Mouse bindings for {}: {} buttons", action, buttons.size());
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to get mouse bindings for action {}: {}", action, e.what());
+    }
+    return buttons;
 }
 
-float ConfigManager::getControllerDeadzone() const {
-    float deadzone = config["controls"]["controller_deadzone"].value_or(20.0f);
-    spdlog::debug("Controller deadzone: {:.1f}", deadzone);
-    return deadzone;
+std::vector<std::string> ConfigManager::getControllerBindingsForAction(const std::string& action) const {
+    std::vector<std::string> controls;
+    try {
+        const auto& controlArray = config["actions"][action]["controller"].as_array();
+        for (const auto& control : *controlArray) {
+            std::string controlStr = control.value_or("");
+            if (!controlStr.empty()) {
+                controls.push_back(controlStr);
+            }
+        }
+        spdlog::debug("Controller bindings for {}: {} controls", action, controls.size());
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to get controller bindings for action {}: {}", action, e.what());
+    }
+    return controls;
 }
 
-float ConfigManager::getControllerSensitivity() const {
-    float sensitivity = config["controls"]["controller_sensitivity"].value_or(100.0f);
-    spdlog::debug("Controller sensitivity: {:.1f}", sensitivity);
-    return sensitivity;
-}
+Action ConfigManager::getActionFromString(const std::string& actionStr) const {
+    static const std::unordered_map<std::string, Action> actionMap = {
+        {"MoveUp", Action::MoveUp},
+        {"MoveDown", Action::MoveDown},
+        {"MoveLeft", Action::MoveLeft},
+        {"MoveRight", Action::MoveRight},
+        {"Pause", Action::Pause},
+        {"Confirm", Action::Confirm},
+        {"Cancel", Action::Cancel},
+        {"Fire", Action::Fire}
+    };
 
-unsigned int ConfigManager::getControllerButton(const std::string& action) const {
-    unsigned int button = static_cast<unsigned int>(config["controls"][action].value_or(0));
-    spdlog::debug("Controller button for {}: {}", action, button);
-    return button;
-}
-
-std::string ConfigManager::getControllerAxis(const std::string& action) const {
-    std::string axis = (config["controls"][action].value_or(""));
-    spdlog::debug("Controller axis for {}: {}", action, axis);
-    return axis;
-}
-
-sf::Mouse::Button ConfigManager::getMouseButton(const std::string& action) const {
-    std::string keyName = config["controls"][action].value_or("");
-    spdlog::debug("Mouse button for {}: {}", action, keyName);
-    return MouseMapper::getInstance().stringToButton(keyName);
+    auto it = actionMap.find(actionStr);
+    if (it != actionMap.end()) {
+        return it->second;
+    }
+    spdlog::warn("Unknown action string: {}", actionStr);
+    return Action::MoveUp; // Default action, could be changed to an Invalid action if needed
 }
 
 } // namespace game

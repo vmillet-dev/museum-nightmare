@@ -10,29 +10,44 @@ size = 32.0
 [debug]
 level = "debug"
 
-[controls]
-# Keyboard bindings (using SFML key codes)
-move_up = "Z"
-move_down = "S"
-move_left = "Q"
-move_right = "D"
-pause = "Escape"
-confirm = "Return"
-cancel = "BackSpace"
+[actions]
 
-# Controller settings
-controller_enabled = true
-controller_deadzone = 20.0  # Joystick deadzone (0-100) for analog stick movement
-controller_sensitivity = 100.0  # Joystick sensitivity for analog stick movement
-# Note: Analog stick (X/Y axes) automatically mapped for movement in addition to buttons
+[actions.MoveUp]
+keyboard = ["Z", "Up"]
+mouse = []
+controller = ["LeftStickUp"]
 
-# Controller button mappings (using SFML joystick button indices)
-controller_move_up = "-1"
-controller_move_down = "+1"
-controller_move_left = "-0"
-controller_move_right = "+0"
-controller_pause = 7
-controller_confirm = 0
-controller_cancel = 5
+[actions.MoveDown]
+keyboard = ["S", "Down"]
+mouse = []
+controller = ["LeftStickDown"]
 
-fire = "left"
+[actions.MoveLeft]
+keyboard = ["Q", "Left"]
+mouse = []
+controller = ["LeftStickLeft"]
+
+[actions.MoveRight]
+keyboard = ["D", "Right"]
+mouse = []
+controller = ["LeftStickRight"]
+
+[actions.Pause]
+keyboard = ["Escape"]
+mouse = []
+controller = ["Start"]
+
+[actions.Confirm]
+keyboard = ["Return"]
+mouse = ["LeftButton"]
+controller = ["A"]
+
+[actions.Cancel]
+keyboard = ["BackSpace"]
+mouse = ["RightButton"]
+controller = ["B"]
+
+[actions.Fire]
+keyboard = ["Space"]
+mouse = ["LeftButton"]
+controller = ["RightTrigger"]
