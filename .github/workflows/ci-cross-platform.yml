@@ -72,32 +72,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deps-
 
-      - uses: msys2/setup-msys2@v2.25.0
-        with:
-          update: true
-          msystem: CLANG64
-
-      - name: Setup CMake
-        uses: lukka/get-cmake@latest
-        with:
-          cmakeVersion: "3.25.0"
-
-      - name: Install OpenAL
-        run: |
-          choco install openal -y
-
-      - name: Configure CMake
-        shell: cmd
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G "Ninja"
+      - uses: llvm/actions/install-ninja@main
 
       - name: Build
-        shell: cmd
         run: |
+          mkdir -p build
           cd build
-          ninja
+          cmake .. -G "Visual Studio 17 2022" -A x64
+          cmake --build . --config Debug
 
       - name: Setup Virtual Display
         shell: powershell
