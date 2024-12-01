@@ -7,8 +7,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
             /MP     # Multi-processor compilation
             /EHsc   # Exception handling model
             /permissive-  # Strict C++ conformance
-            /std:c11  # Enable C11 support
-            /experimental:c11atomics  # Enable C11 atomics support
+            /std:c++latest  # Enable latest C++ features
+            /Zc:__cplusplus  # Enable correct __cplusplus macro
         )
     else()
         target_compile_options(${PROJECT_NAME} PRIVATE
