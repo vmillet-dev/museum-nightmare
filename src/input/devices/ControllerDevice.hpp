@@ -9,7 +9,7 @@ class ControllerDevice : public GenericInputDevice<unsigned int> {
 public:
     void init() override;
     void handleEvent(const sf::Event& event) override;
-    void update() override;
+    void update() override;  // Declaration only, implementation in cpp file
     bool isActionPressed(Action action) override;
     bool isActionJustPressed(Action action) override;
     bool isActionReleased(Action action) override;
@@ -21,7 +21,6 @@ public:
 private:
     std::unordered_map<std::string, Action> axisBindings;
     std::unordered_map<std::string, ActionState> axisStates;
-
     bool connected = false;
     float deadzone = 20.0f;
     float sensitivity = 100.0f;

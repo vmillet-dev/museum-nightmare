@@ -23,16 +23,34 @@ include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
-# Add source files
-file(GLOB_RECURSE SOURCES
-    "src/*.cpp"
+# Organize source files by component
+set(CONFIG_SOURCES
+    src/config/ConfigManager.cpp
+    src/config/KeyMapper.cpp
 )
 
-# Remove main.cpp from sources
-list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+set(INPUT_SOURCES
+    src/input/devices/KeyboardDevice.cpp
+    src/input/devices/MouseDevice.cpp
+    src/input/devices/ControllerDevice.cpp
+    src/input/InputManager.cpp
+    src/input/providers/PlayerInputProvider.cpp
+)
 
-# Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
+# Add all source files
+file(GLOB_RECURSE OTHER_SOURCES
+    "src/*.cpp"
+)
+list(FILTER OTHER_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+list(FILTER OTHER_SOURCES EXCLUDE REGEX ".*(ConfigManager|KeyMapper|MouseMapper|KeyboardDevice|MouseDevice|ControllerDevice|InputManager|PlayerInputProvider)\\.cpp$")
+
+# Create executable with organized sources
+add_executable(${PROJECT_NAME}
+    ${CONFIG_SOURCES}
+    ${INPUT_SOURCES}
+    ${OTHER_SOURCES}
+    src/main.cpp
+)
 
 # Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
