@@ -10,9 +10,9 @@ void KeyboardDevice::init() {
 
     for (const auto& actionStr : actions) {
         Action action = ConfigManager::getInstance().getActionFromString(actionStr);
-        const auto& keys = ConfigManager::getInstance().getKeyboardBindingsForAction(actionStr);
-        for (const auto& key : keys) {
-            setKeyBinding(static_cast<sf::Keyboard::Key>(key), action);
+        std::vector<sf::Keyboard::Key> keys = ConfigManager::getInstance().getKeyboardBindingsForAction(actionStr);  // Explicit type
+        for (const sf::Keyboard::Key& key : keys) {  // Explicit type
+            setKeyBinding(key, action);  // No need for static_cast since type is already correct
             spdlog::debug("Set keyboard binding: {} -> {}", static_cast<int>(key), static_cast<int>(action));
         }
     }
