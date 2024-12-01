@@ -1,6 +1,7 @@
 #pragma once
 #include "GenericInputDevice.hpp"
 #include <SFML/Graphics.hpp>
+#include "../../config/ConfigManager.hpp"
 
 namespace game {
 
