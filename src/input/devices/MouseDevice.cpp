@@ -37,6 +37,10 @@ sf::Vector2i MouseDevice::getMousePosition() const {
 
 void MouseDevice::setButtonBinding(sf::Mouse::Button button, Action action) {
     setBinding(button, action);
+    // Initialize state when binding is set
+    if (states.find(button) == states.end()) {
+        states[button] = ActionState{false, false};
+    }
 }
 
 void MouseDevice::setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed) {
