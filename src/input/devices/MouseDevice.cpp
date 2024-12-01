@@ -14,8 +14,8 @@ void MouseDevice::init() {
     const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
 
     for (const auto& actionStr : actions) {
-        Action action = config.getActionFromString(actionStr);
-        const auto& buttons = config.getMouseBindingsForAction(actionStr);
+        Action action = ConfigManager::getInstance().getActionFromString(actionStr);
+        const auto& buttons = ConfigManager::getInstance().getMouseBindingsForAction(actionStr);
         for (const auto& button : buttons) {
             setButtonBinding(static_cast<sf::Mouse::Button>(button), action);
             spdlog::debug("Set mouse binding: {} -> {}", static_cast<int>(button), static_cast<int>(action));

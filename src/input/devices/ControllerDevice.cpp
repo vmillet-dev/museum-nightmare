@@ -26,8 +26,8 @@ void ControllerDevice::init() {
     const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
 
     for (const auto& actionStr : actions) {
-        Action action = config.getActionFromString(actionStr);
-        auto controls = config.getControllerBindingsForAction(actionStr);
+        Action action = ConfigManager::getInstance().getActionFromString(actionStr);
+        auto controls = ConfigManager::getInstance().getControllerBindingsForAction(actionStr);
 
         for (const auto& control : controls) {
             if (control.find("Stick") != std::string::npos) {

@@ -9,8 +9,8 @@ void KeyboardDevice::init() {
     const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
 
     for (const auto& actionStr : actions) {
-        Action action = config.getActionFromString(actionStr);
-        const auto& keys = config.getKeyboardBindingsForAction(actionStr);
+        Action action = ConfigManager::getInstance().getActionFromString(actionStr);
+        const auto& keys = ConfigManager::getInstance().getKeyboardBindingsForAction(actionStr);
         for (const auto& key : keys) {
             setKeyBinding(static_cast<sf::Keyboard::Key>(key), action);
             spdlog::debug("Set keyboard binding: {} -> {}", static_cast<int>(key), static_cast<int>(action));
