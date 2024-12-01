@@ -75,7 +75,7 @@ jobs:
       - uses: msys2/setup-msys2@v2.25.0
         with:
           update: true
-          msystem: UCRT64
+          msystem: CLANG64
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
