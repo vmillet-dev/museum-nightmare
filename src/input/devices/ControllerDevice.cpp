@@ -27,9 +27,9 @@ void ControllerDevice::init() {
 
     for (const auto& actionStr : actions) {
         Action action = ConfigManager::getInstance().getActionFromString(actionStr);
-        auto controls = ConfigManager::getInstance().getControllerBindingsForAction(actionStr);
+        std::vector<std::string> controls = ConfigManager::getInstance().getControllerBindingsForAction(actionStr);  // Explicit type
 
-        for (const auto& control : controls) {
+        for (const std::string& control : controls) {  // Explicit type
             if (control.find("Stick") != std::string::npos) {
                 setAxisBinding(control, action);
                 spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
