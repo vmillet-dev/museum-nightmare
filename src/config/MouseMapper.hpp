@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Window.hpp>
 #include <unordered_map>
 #include <string>
@@ -51,8 +52,8 @@ private:
         };
 
         // Build reverse mapping
-        for (const auto& [name, key] : buttonToStringMap) {
-            stringToButtonMap[key] = name;
+        for (const auto& [button, name] : buttonToStringMap) {
+            stringToButtonMap[name] = button;
         }
     }
 };
