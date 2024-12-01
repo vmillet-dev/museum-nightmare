@@ -7,17 +7,25 @@ namespace game {
 template <typename InputType>
 class GenericInputDevice : public InputDevice {
 public:
+    using ActionMap = std::unordered_map<InputType, Action>;
+    using StateMap = std::unordered_map<InputType, ActionState>;
+    using ActionIterator = typename ActionMap::const_iterator;
+    using StateIterator = typename StateMap::iterator;
+    using ConstStateIterator = typename StateMap::const_iterator;
+
     void update() override {
-        for (const typename std::unordered_map<InputType, Action>::const_iterator& it = bindings.begin(); it != bindings.end(); ++it) {
-            if (states[it->first].current != states[it->first].previous) {
-                states[it->first].previous = states[it->first].current;
+        for (ActionIterator it = bindings.cbegin(); it != bindings.cend(); ++it) {
+            StateIterator stateIt = states.find(it->first);
+            if (stateIt != states.end() && stateIt->second.current != stateIt->second.previous) {
+                stateIt->second.previous = stateIt->second.current;
             }
         }
     }
 
     bool isActionPressed(Action action) override {
-        for (const typename std::unordered_map<InputType, Action>::const_iterator& it = bindings.begin(); it != bindings.end(); ++it) {
-            if (it->second == action && states[it->first].current) {
+        for (ActionIterator it = bindings.cbegin(); it != bindings.cend(); ++it) {
+            ConstStateIterator stateIt = states.find(it->first);
+            if (it->second == action && stateIt != states.end() && stateIt->second.current) {
                 return true;
             }
         }
@@ -25,9 +33,10 @@ public:
     }
 
     bool isActionJustPressed(Action action) override {
-        for (const typename std::unordered_map<InputType, Action>::const_iterator& it = bindings.begin(); it != bindings.end(); ++it) {
-            const auto& state = states[it->first];
-            if (it->second == action && state.current != state.previous && state.current) {
+        for (ActionIterator it = bindings.cbegin(); it != bindings.cend(); ++it) {
+            ConstStateIterator stateIt = states.find(it->first);
+            if (stateIt != states.end() && it->second == action &&
+                stateIt->second.current != stateIt->second.previous && stateIt->second.current) {
                 return true;
             }
         }
@@ -35,9 +44,10 @@ public:
     }
 
     bool isActionReleased(Action action) override {
-        for (const typename std::unordered_map<InputType, Action>::const_iterator& it = bindings.begin(); it != bindings.end(); ++it) {
-            const auto& state = states[it->first];
-            if (it->second == action && state.current != state.previous && !state.current) {
+        for (ActionIterator it = bindings.cbegin(); it != bindings.cend(); ++it) {
+            ConstStateIterator stateIt = states.find(it->first);
+            if (stateIt != states.end() && it->second == action &&
+                stateIt->second.current != stateIt->second.previous && !stateIt->second.current) {
                 return true;
             }
         }
@@ -45,8 +55,8 @@ public:
     }
 
 protected:
-    std::unordered_map<InputType, Action> bindings;
-    std::unordered_map<InputType, ActionState> states;
+    ActionMap bindings;
+    StateMap states;
 
     void setBinding(InputType input, Action action) {
         bindings[input] = action;
@@ -57,10 +67,10 @@ protected:
     }
 
     void setState(InputType input, bool pressed) {
-        if (bindings.count(input)) {
-            auto& state = states[input];
-            state.previous = state.current;
-            state.current = pressed;
+        StateIterator stateIt = states.find(input);
+        if (bindings.count(input) > 0 && stateIt != states.end()) {
+            stateIt->second.previous = stateIt->second.current;
+            stateIt->second.current = pressed;
         }
     }
 };
