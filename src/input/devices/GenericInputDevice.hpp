@@ -50,6 +50,10 @@ protected:
 
     void setBinding(InputType input, Action action) {
         bindings[input] = action;
+        // Initialize state when binding is set
+        if (states.find(input) == states.end()) {
+            states[input] = ActionState{false, false};
+        }
     }
 
     void setState(InputType input, bool pressed) {
