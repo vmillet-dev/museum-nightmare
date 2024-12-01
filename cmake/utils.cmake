@@ -28,10 +28,11 @@ endfunction()
 function(configure_box2d_build_options)
     set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
     set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-    set(BOX2D_BUILD_SHARED ON CACHE BOOL "" FORCE)
+    set(BOX2D_BUILD_SHARED OFF CACHE BOOL "" FORCE)  # Changed to OFF for static linking
 
     if(MSVC)
         # Ensure Box2D uses static runtime for MSVC
         set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+        add_compile_definitions(_CRT_SECURE_NO_WARNINGS)  # Disable MSVC warnings about secure CRT functions
     endif()
 endfunction()
