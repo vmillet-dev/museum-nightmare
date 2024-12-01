@@ -77,9 +77,9 @@ jobs:
           choco install ninja -y
 
       - name: Setup Visual Studio Environment
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
         with:
-          vs-version: '17.0'
+          vs-prerelease: true
 
       - name: Install Visual Studio Components
         run: |
