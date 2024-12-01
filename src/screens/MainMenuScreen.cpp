@@ -20,11 +20,13 @@ void MainMenuScreen::update(float deltaTime) {
         buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
         buttons[selectedButtonIndex]->setSelected(true);
+        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
     if (inputManager.isActionJustPressed(Action::MoveUp)) {
         buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
         buttons[selectedButtonIndex]->setSelected(true);
+        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
 
     // Update all buttons with input manager
@@ -32,17 +34,17 @@ void MainMenuScreen::update(float deltaTime) {
         button->update(inputManager);
     }
 
-    //// Play button clicked
-    //if (buttons[0]->isClicked()) {
-    //    spdlog::info("Starting game");
-    //    game.getScreenManager().setState(GameState::Playing);
-    //}
+    // Play button clicked
+    if (buttons[0]->isClicked()) {
+        spdlog::info("Starting game");
+        game.getScreenManager().setState(GameState::Playing);
+    }
 
-    //// Quit button clicked
-    //if (buttons[1]->isClicked()) {
-    //    spdlog::info("Quitting game");
-    //    game.getScreenManager().setState(GameState::Quit);
-    //}
+    // Quit button clicked
+    if (buttons[1]->isClicked()) {
+        spdlog::info("Quitting game");
+        game.getScreenManager().setState(GameState::Quit);
+    }
 }
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
