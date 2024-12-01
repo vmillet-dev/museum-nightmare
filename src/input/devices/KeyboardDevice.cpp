@@ -12,9 +12,9 @@ void KeyboardDevice::init() {
 
     for (const auto& actionStr : actions) {
         Action action = config.getActionFromString(actionStr);
-        auto keys = config.getKeyboardBindingsForAction(actionStr);
+        const auto& keys = config.getKeyboardBindingsForAction(actionStr);
         for (const auto& key : keys) {
-            setKeyBinding(key, action);
+            setKeyBinding(static_cast<sf::Keyboard::Key>(key), action);
             spdlog::debug("Set keyboard binding: {} -> {}", static_cast<int>(key), static_cast<int>(action));
         }
     }

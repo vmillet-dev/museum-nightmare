@@ -17,9 +17,9 @@ void MouseDevice::init() {
 
     for (const auto& actionStr : actions) {
         Action action = config.getActionFromString(actionStr);
-        auto buttons = config.getMouseBindingsForAction(actionStr);
+        const auto& buttons = config.getMouseBindingsForAction(actionStr);
         for (const auto& button : buttons) {
-            setButtonBinding(button, action);
+            setButtonBinding(static_cast<sf::Mouse::Button>(button), action);
             spdlog::debug("Set mouse binding: {} -> {}", static_cast<int>(button), static_cast<int>(action));
         }
     }
