@@ -83,7 +83,7 @@ jobs:
 
       - name: Install Visual Studio Components
         run: |
-          choco install choco install visualstudio2022buildtools -y --package-parameters "--includeOptional"
+          choco install visualstudio2022buildtools --params "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended" -y
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
