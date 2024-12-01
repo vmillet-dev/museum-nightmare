@@ -128,6 +128,10 @@ void ControllerDevice::setButtonState(unsigned int button, bool pressed) {
 
 void ControllerDevice::setAxisBinding(std::string axis, Action action) {
     axisBindings[axis] = action;
+    // Initialize axis state when binding is set
+    if (axisStates.find(axis) == axisStates.end()) {
+        axisStates[axis] = ActionState{false, false};
+    }
 }
 
 void ControllerDevice::setAxisState(unsigned int axisId, float position) {
