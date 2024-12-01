@@ -19,7 +19,6 @@ public:
     int getControllerId() const { return controllerId; }
 
 private:
-    ConfigManager& config = ConfigManager::getInstance();
     std::unordered_map<std::string, Action> axisBindings;
     std::unordered_map<std::string, ActionState> axisStates;
 

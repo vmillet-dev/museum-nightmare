@@ -20,7 +20,6 @@ private:
 
     sf::RenderWindow& window;
     sf::Vector2i lastMousePos;
-    ConfigManager& config = ConfigManager::getInstance();
 };
 
 } // namespace game
