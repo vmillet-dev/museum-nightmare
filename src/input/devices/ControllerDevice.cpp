@@ -6,8 +6,6 @@
 namespace game {
 
 void ControllerDevice::init() {
-    auto& config = ConfigManager::getInstance();
-
     // Check for any available controller
     connected = false;
     for (int i = 0; i < sf::Joystick::Count; ++i) {

@@ -10,8 +10,6 @@ MouseDevice::MouseDevice(sf::RenderWindow& window)
 {}
 
 void MouseDevice::init() {
-    auto& config = ConfigManager::getInstance();
-
     // Load mouse bindings from config for each action
     const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
 

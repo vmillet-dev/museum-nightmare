@@ -5,8 +5,6 @@
 namespace game {
 
 void KeyboardDevice::init() {
-    auto& config = ConfigManager::getInstance();
-
     // Load key bindings from config for each action
     const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
 
