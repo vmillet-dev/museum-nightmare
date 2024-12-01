@@ -1,7 +1,7 @@
 #include "ControllerDevice.hpp"
 #include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
-#include <format>
+#include <string>
 
 namespace game {
 
@@ -18,29 +18,40 @@ void ControllerDevice::init() {
             break;
         }
     }
- 
-    // Load button bindings from config
-    setButtonBinding(config.getControllerButton("controller_confirm"), Action::Confirm);
-    setButtonBinding(config.getControllerButton("controller_cancel"), Action::Cancel);
-    setButtonBinding(config.getControllerButton("controller_pause"), Action::Pause);
 
-    // Load axis bindings from config
-    setAxisBinding(config.getControllerAxis("controller_move_up"), Action::MoveUp);
-    setAxisBinding(config.getControllerAxis("controller_move_down"), Action::MoveDown);
-    setAxisBinding(config.getControllerAxis("controller_move_left"), Action::MoveLeft);
-    setAxisBinding(config.getControllerAxis("controller_move_right"), Action::MoveRight);
+    if (!connected) {
+        spdlog::warn("No controller connected");
+        return;
+    }
 
-    // Load controller settings
-    setDeadzone(config.getControllerDeadzone());
-    setSensitivity(config.getControllerSensitivity());
+    // Load controller bindings from config for each action
+    const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
+
+    for (const auto& actionStr : actions) {
+        Action action = config.getActionFromString(actionStr);
+        auto controls = config.getControllerBindingsForAction(actionStr);
+
+        for (const auto& control : controls) {
+            if (control.find("Stick") != std::string::npos) {
+                setAxisBinding(control, action);
+                spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
+            } else if (control.find("Trigger") != std::string::npos) {
+                // Handle triggers as buttons
+                setButtonBinding(7, action); // Right trigger is usually button 7
+                spdlog::debug("Set controller trigger binding: {} -> {}", 7, static_cast<int>(action));
+            } else if (control == "A") {
+                setButtonBinding(0, action);
+            } else if (control == "B") {
+                setButtonBinding(1, action);
+            } else if (control == "Start") {
+                setButtonBinding(7, action);
+            }
+        }
+    }
 }
 
 void ControllerDevice::update() {
-    for (const auto& binding : buttonBindings) {
-        if (buttonStates[binding.first].current != buttonStates[binding.first].previous) {
-            buttonStates[binding.first].previous = buttonStates[binding.first].current;
-        }
-    }
+    GenericInputDevice<unsigned int>::update();  // Update button states
 
     for (const auto& binding : axisBindings) {
         if (axisStates[binding.first].current != axisStates[binding.first].previous) {
@@ -50,11 +61,8 @@ void ControllerDevice::update() {
 }
 
 bool ControllerDevice::isActionPressed(Action action) {
-
-    for (const auto& binding : buttonBindings) {
-        if (binding.second == action && buttonStates[binding.first].current) {
-            return true;
-        }
+    if (GenericInputDevice<unsigned int>::isActionPressed(action)) {
+        return true;
     }
 
     for (const auto& binding : axisBindings) {
@@ -67,11 +75,8 @@ bool ControllerDevice::isActionPressed(Action action) {
 }
 
 bool ControllerDevice::isActionJustPressed(Action action) {
-    for (const auto& binding : buttonBindings) {
-        const auto& state = buttonStates[binding.first];
-        if (binding.second == action && state.current != state.previous && state.current) {
-            return true;
-        }
+    if (GenericInputDevice<unsigned int>::isActionJustPressed(action)) {
+        return true;
     }
 
     for (const auto& binding : axisBindings) {
@@ -85,11 +90,8 @@ bool ControllerDevice::isActionJustPressed(Action action) {
 }
 
 bool ControllerDevice::isActionReleased(Action action) {
-    for (const auto& binding : buttonBindings) {
-        const auto& state = buttonStates[binding.first];
-        if (binding.second == action && state.current != state.previous && !state.current) {
-            return true;
-        }
+    if (GenericInputDevice<unsigned int>::isActionReleased(action)) {
+        return true;
     }
 
     for (const auto& binding : axisBindings) {
@@ -103,8 +105,8 @@ bool ControllerDevice::isActionReleased(Action action) {
 }
 
 void ControllerDevice::handleEvent(const sf::Event& event) {
-
-    if ((event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::JoystickButtonReleased) && event.joystickButton.joystickId == controllerId) {
+    if ((event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::JoystickButtonReleased) &&
+        event.joystickButton.joystickId == controllerId) {
         setButtonState(event.joystickButton.button, event.type == sf::Event::JoystickButtonPressed);
     }
 
@@ -114,17 +116,13 @@ void ControllerDevice::handleEvent(const sf::Event& event) {
 }
 
 void ControllerDevice::setButtonBinding(unsigned int button, Action action) {
-    buttonBindings[button] = action;
+    setBinding(button, action);
 }
 
 void ControllerDevice::setButtonState(unsigned int button, bool pressed) {
-
-    if (buttonBindings.count(button)) {
+    if (bindings.count(button)) {
         spdlog::debug("Controller {}: Button {} {}", controllerId, button, pressed ? "Pressed" : "Released");
-
-        auto& state = buttonStates[button];
-        state.previous = state.current;
-        state.current = pressed;
+        setState(button, pressed);
     }
 }
 
@@ -133,7 +131,7 @@ void ControllerDevice::setAxisBinding(std::string axis, Action action) {
 }
 
 void ControllerDevice::setAxisState(unsigned int axisId, float position) {
-    std::string axis = std::format("{}{}", (position > 0 ? "+" : "-"), axisId);
+    std::string axis = (position > 0 ? "+" : "-") + std::to_string(axisId);
 
     auto absPosition = std::abs(position) > deadzone;
     if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {

@@ -7,51 +7,17 @@ namespace game {
 void KeyboardDevice::init() {
     auto& config = ConfigManager::getInstance();
 
-    // Load key bindings from config
-    setKeyBinding(config.getKeyBinding("move_up"), Action::MoveUp);
-    setKeyBinding(config.getKeyBinding("move_down"), Action::MoveDown);
-    setKeyBinding(config.getKeyBinding("move_left"), Action::MoveLeft);
-    setKeyBinding(config.getKeyBinding("move_right"), Action::MoveRight);
-    setKeyBinding(config.getKeyBinding("pause"), Action::Pause);
-    setKeyBinding(config.getKeyBinding("confirm"), Action::Confirm);
-    setKeyBinding(config.getKeyBinding("cancel"), Action::Cancel);
-}
+    // Load key bindings from config for each action
+    const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
 
-void KeyboardDevice::update() {
-    for (const auto& binding : keyBindings) {
-        if (keyStates[binding.first].current != keyStates[binding.first].previous) {
-            keyStates[binding.first].previous = keyStates[binding.first].current;
+    for (const auto& actionStr : actions) {
+        Action action = config.getActionFromString(actionStr);
+        auto keys = config.getKeyboardBindingsForAction(actionStr);
+        for (const auto& key : keys) {
+            setKeyBinding(key, action);
+            spdlog::debug("Set keyboard binding: {} -> {}", static_cast<int>(key), static_cast<int>(action));
         }
     }
-}
-
-bool KeyboardDevice::isActionPressed(Action action) {
-    for (const auto& binding : keyBindings) {
-        if (binding.second == action && keyStates[binding.first].current) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool KeyboardDevice::isActionJustPressed(Action action) {
-    for (const auto& binding : keyBindings) {
-        const auto& state = keyStates[binding.first];
-        if (binding.second == action && state.current != state.previous && state.current) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool KeyboardDevice::isActionReleased(Action action) {
-    for (const auto& binding : keyBindings) {
-        const auto& state = keyStates[binding.first];
-        if (binding.second == action && state.current != state.previous && !state.current) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void KeyboardDevice::handleEvent(const sf::Event& event) {
@@ -61,15 +27,11 @@ void KeyboardDevice::handleEvent(const sf::Event& event) {
 }
 
 void KeyboardDevice::setKeyBinding(sf::Keyboard::Key key, Action action) {
-    keyBindings[key] = action;
+    setBinding(key, action);
 }
 
 void KeyboardDevice::setKeyState(sf::Keyboard::Key key, bool pressed) {
-    if (keyBindings.count(key) != 0) {
-        auto& state = keyStates[key];
-        state.previous = state.current;
-        state.current = pressed;
-    }
+    setState(key, pressed);
 }
 
 } // namespace game

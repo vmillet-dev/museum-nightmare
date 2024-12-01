@@ -1,28 +1,24 @@
 #pragma once
-#include "InputDevice.hpp"
-#include <unordered_map>
+#include "GenericInputDevice.hpp"
+#include <SFML/Window.hpp>
 #include "../../config/ConfigManager.hpp"
 
 namespace game {
 
-class ControllerDevice : public InputDevice {
+class ControllerDevice : public GenericInputDevice<unsigned int> {
 public:
     void init() override;
+    void handleEvent(const sf::Event& event) override;
     void update() override;
     bool isActionPressed(Action action) override;
     bool isActionJustPressed(Action action) override;
     bool isActionReleased(Action action) override;
-    void handleEvent(const sf::Event& event) override;
-
 
     // Add methods to check controller status
     bool isConnected() const { return connected; }
     int getControllerId() const { return controllerId; }
 
 private:
-    std::unordered_map<unsigned int, Action> buttonBindings;
-    std::unordered_map<unsigned int, ActionState> buttonStates;
-
     std::unordered_map<std::string, Action> axisBindings;
     std::unordered_map<std::string, ActionState> axisStates;
 

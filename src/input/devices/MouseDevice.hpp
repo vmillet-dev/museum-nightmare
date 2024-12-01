@@ -1,35 +1,23 @@
 #pragma once
+#include "GenericInputDevice.hpp"
 #include <SFML/Graphics.hpp>
-#include "InputDevice.hpp"
-#include <unordered_map>
 
 namespace game {
 
-class MouseDevice : public InputDevice {
+class MouseDevice : public GenericInputDevice<sf::Mouse::Button> {
 public:
     explicit MouseDevice(sf::RenderWindow& window);
 
     void init() override;  // No initialization needed for mouse
-    void update() override;
-    bool isActionPressed(Action action) override;
-    bool isActionJustPressed(Action action) override;
-    bool isActionReleased(Action action) override;
     void handleEvent(const sf::Event& event) override;
 
     sf::Vector2i getMousePosition() const;
 
 private:
-    std::unordered_map<sf::Mouse::Button, Action> buttonBindings;
-    std::unordered_map<sf::Mouse::Button, ActionState> buttonStates;
-
-    void setButtonBinding(sf::Mouse::Button, Action action);
-    void setButtonState(sf::Event::MouseButtonEvent, bool pressed);
+    void setButtonBinding(sf::Mouse::Button button, Action action);
+    void setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed);
 
     sf::RenderWindow& window;
-    bool leftButtonPressed;
-    bool rightButtonPressed;
-    bool leftButtonJustPressed;
-    bool rightButtonJustPressed;
     sf::Vector2i lastMousePos;
 };
 
