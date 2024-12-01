@@ -27,21 +27,21 @@ void ControllerDevice::init() {
 
     for (const auto& actionStr : actions) {
         Action action = ConfigManager::getInstance().getActionFromString(actionStr);
-        std::vector<std::string> controls = ConfigManager::getInstance().getControllerBindingsForAction(actionStr);  // Explicit type
+        const std::vector<std::string>& controls = ConfigManager::getInstance().getControllerBindingsForAction(actionStr);
 
-        for (const std::string& control : controls) {  // Explicit type
-            if (control.find("Stick") != std::string::npos) {
-                setAxisBinding(control, action);
-                spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
-            } else if (control.find("Trigger") != std::string::npos) {
+        for (std::vector<std::string>::const_iterator it = controls.begin(); it != controls.end(); ++it) {
+            if (it->find("Stick") != std::string::npos) {
+                setAxisBinding(*it, action);
+                spdlog::debug("Set controller axis binding: {} -> {}", *it, static_cast<int>(action));
+            } else if (it->find("Trigger") != std::string::npos) {
                 // Handle triggers as buttons
                 setButtonBinding(7, action); // Right trigger is usually button 7
                 spdlog::debug("Set controller trigger binding: {} -> {}", 7, static_cast<int>(action));
-            } else if (control == "A") {
+            } else if (*it == "A") {
                 setButtonBinding(0, action);
-            } else if (control == "B") {
+            } else if (*it == "B") {
                 setButtonBinding(1, action);
-            } else if (control == "Start") {
+            } else if (*it == "Start") {
                 setButtonBinding(7, action);
             }
         }
