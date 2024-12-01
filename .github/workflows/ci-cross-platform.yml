@@ -76,14 +76,12 @@ jobs:
         run: |
           choco install ninja -y
 
-      - name: Setup Visual Studio Environment
-        uses: microsoft/setup-msbuild@v2
+      - uses: msys2/setup-msys2@v2
         with:
-          vs-version: '17.0'
-
-      - name: Install Visual Studio Components
-        run: |
-          choco install visualstudio2022buildtools --params "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended" -y
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-ninja
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
