@@ -79,11 +79,11 @@ jobs:
       - name: Setup Visual Studio Environment
         uses: microsoft/setup-msbuild@v2
         with:
-          vs-prerelease: true
+          vs-version: '17.0'
 
       - name: Install Visual Studio Components
         run: |
-          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional"
+          choco install choco install visualstudio2022buildtools -y --package-parameters "--includeOptional"
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
