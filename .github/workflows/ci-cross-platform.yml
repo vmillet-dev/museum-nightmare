@@ -10,10 +10,10 @@ jobs:
   build-and-test-linux:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Cache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4.1.2
         with:
           path: |
             build/_deps
@@ -60,10 +60,10 @@ jobs:
   build-and-test-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Cache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4.1.2
         with:
           path: |
             build\_deps
@@ -72,16 +72,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deps-
 
-      - name: Install Ninja
-        run: |
-          choco install ninja -y
-
-      - uses: msys2/setup-msys2@v2
+      - uses: msys2/setup-msys2@v2.25.0
         with:
           update: true
-          install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-ninja
+          msystem: UCRT64
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
