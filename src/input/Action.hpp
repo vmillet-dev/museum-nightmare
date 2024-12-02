@@ -18,60 +18,65 @@ enum class Action {
     MouseRight
 };
 
-// Convert Action enum to string
-inline std::string toString(Action action) {
-    switch (action) {
-        case Action::MoveUp:     return "MoveUp";
-        case Action::MoveDown:   return "MoveDown";
-        case Action::MoveLeft:   return "MoveLeft";
-        case Action::MoveRight:  return "MoveRight";
-        case Action::Pause:      return "Pause";
-        case Action::Confirm:    return "Confirm";
-        case Action::Cancel:     return "Cancel";
-        case Action::Fire:       return "Fire";
-        case Action::MouseLeft:  return "MouseLeft";
-        case Action::MouseRight: return "MouseRight";
-        default: throw std::invalid_argument("Unknown Action value");
+class ActionUtil {
+public:
+    // Convert Action enum to string
+    static std::string toString(Action action) {
+        auto it = actionToStringMap().find(action);
+        if (it != actionToStringMap().end()) {
+            return it->second;
+        }
+        throw std::invalid_argument("Unknown Action value");
     }
-}
 
-// Convert string to Action enum
-inline Action fromString(const std::string& actionStr) {
-    static const std::unordered_map<std::string, Action> actionMap = {
-        {"MoveUp", Action::MoveUp},
-        {"MoveDown", Action::MoveDown},
-        {"MoveLeft", Action::MoveLeft},
-        {"MoveRight", Action::MoveRight},
-        {"Pause", Action::Pause},
-        {"Confirm", Action::Confirm},
-        {"Cancel", Action::Cancel},
-        {"Fire", Action::Fire},
-        {"MouseLeft", Action::MouseLeft},
-        {"MouseRight", Action::MouseRight}
-    };
-
-    auto it = actionMap.find(actionStr);
-    if (it != actionMap.end()) {
-        return it->second;
+    // Convert string to Action enum
+    static Action fromString(const std::string& actionStr) {
+        auto it = stringToActionMap().find(actionStr);
+        if (it != stringToActionMap().end()) {
+            return it->second;
+        }
+        throw std::invalid_argument("Unknown action string: " + actionStr);
     }
-    throw std::invalid_argument("Unknown action string: " + actionStr);
-}
 
-// Get all available actions and their string representations
-inline const std::unordered_map<std::string, Action>& getActionMap() {
-    static const std::unordered_map<std::string, Action> actionMap = {
-        {"MoveUp", Action::MoveUp},
-        {"MoveDown", Action::MoveDown},
-        {"MoveLeft", Action::MoveLeft},
-        {"MoveRight", Action::MoveRight},
-        {"Pause", Action::Pause},
-        {"Confirm", Action::Confirm},
-        {"Cancel", Action::Cancel},
-        {"Fire", Action::Fire},
-        {"MouseLeft", Action::MouseLeft},
-        {"MouseRight", Action::MouseRight}
-    };
-    return actionMap;
-}
+    // Get all available actions and their string representations
+    static const std::unordered_map<std::string, Action>& getActionMap() {
+        return stringToActionMap();
+    }
+
+private:
+    // Lazy initialization for string to Action map
+    static const std::unordered_map<std::string, Action>& stringToActionMap() {
+        static const std::unordered_map<std::string, Action> map = {
+            {"MoveUp", Action::MoveUp},
+            {"MoveDown", Action::MoveDown},
+            {"MoveLeft", Action::MoveLeft},
+            {"MoveRight", Action::MoveRight},
+            {"Pause", Action::Pause},
+            {"Confirm", Action::Confirm},
+            {"Cancel", Action::Cancel},
+            {"Fire", Action::Fire}
+            //{"MouseLeft", Action::MouseLeft},
+            //{"MouseRight", Action::MouseRight}
+        };
+        return map;
+    }
+
+    // Lazy initialization for Action to string map
+    static const std::unordered_map<Action, std::string>& actionToStringMap() {
+        static const std::unordered_map<Action, std::string> map = {
+            {Action::MoveUp, "MoveUp"},
+            {Action::MoveDown, "MoveDown"},
+            {Action::MoveLeft, "MoveLeft"},
+            {Action::MoveRight, "MoveRight"},
+            {Action::Pause, "Pause"},
+            {Action::Confirm, "Confirm"},
+            {Action::Cancel, "Cancel"},
+            {Action::Fire, "Fire"}
+            //{Action::MouseLeft, "MouseLeft"},
+            //{Action::MouseRight, "MouseRight"}
+        };
+        return map;
+    }
+};
 
 } // namespace game

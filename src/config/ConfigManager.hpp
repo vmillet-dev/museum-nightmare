@@ -6,8 +6,6 @@
 #include <SFML/Window/Mouse.hpp>
 #include <unordered_map>
 #include <vector>
-#include "KeyMapper.hpp"
-#include "MouseMapper.hpp"
 #include "../input/Action.hpp"
 
 namespace game {
@@ -30,9 +28,9 @@ public:
     float getPlayerSize() const;
 
     // Input binding methods
-    std::vector<sf::Keyboard::Key> getKeyboardBindingsForAction(const std::string& action) const;
-    std::vector<sf::Mouse::Button> getMouseBindingsForAction(const std::string& action) const;
-    std::vector<std::string> getControllerBindingsForAction(const std::string& action) const;
+    toml::v3::array* getKeyboardBindingsForAction(const std::string& action);
+    toml::v3::array* getMouseBindingsForAction(const std::string& action);
+    toml::v3::array* getControllerBindingsForAction(const std::string& action);
 
     // Controller settings
     bool isControllerEnabled() const { return config["controller"]["enabled"].value_or(false); }

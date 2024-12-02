@@ -78,7 +78,7 @@ bool InputManager::isActionPressed(Action action) {
 bool InputManager::isActionJustPressed(Action action) {
     for (auto& device : devices) {
         if (device->isActionJustPressed(action)) {
-            spdlog::debug("Action {} just pressed on {}", toString(action), typeid(*device).name());
+            spdlog::debug("Action {} just pressed on {}", ActionUtil::toString(action), typeid(*device).name());
             return true;
         }
     }
@@ -88,7 +88,7 @@ bool InputManager::isActionJustPressed(Action action) {
 bool InputManager::isActionReleased(Action action) {
     for (auto& device : devices) {
         if (device->isActionReleased(action)) {
-            spdlog::debug("Action {} released on {}", toString(action), typeid(*device).name());
+            spdlog::debug("Action {} released on {}", ActionUtil::toString(action), typeid(*device).name());
             return true;
         }
     }

@@ -1,5 +1,7 @@
 #include "ControllerMapper.hpp"
 #include <stdexcept>
+#include <string>
+#include <regex>
 
 namespace game {
 
@@ -13,9 +15,7 @@ const std::unordered_map<std::string, unsigned int> ControllerMapper::buttonMap 
     {"Back", 6},
     {"Start", 7},
     {"LeftStick", 8},
-    {"RightStick", 9},
-    {"LT", 6},    // Left Trigger as button
-    {"RT", 7}     // Right Trigger as button
+    {"RightStick", 9}
 };
 
 const std::unordered_map<std::string, unsigned int> ControllerMapper::axisMap = {
@@ -37,27 +37,28 @@ unsigned int ControllerMapper::mapButtonName(const std::string& name) {
     throw std::runtime_error("Unknown controller button: " + name);
 }
 
-unsigned int ControllerMapper::mapAxisId(const std::string& name) {
-    std::string baseName = name;
-    if (name.find("Up") != std::string::npos || name.find("Down") != std::string::npos) {
-        baseName = name.substr(0, name.find("Up"));
-        if (baseName.empty()) {
-            baseName = name.substr(0, name.find("Down"));
-        }
-        baseName += "Y";
-    } else if (name.find("Left") != std::string::npos || name.find("Right") != std::string::npos) {
-        baseName = name.substr(0, name.find("Left"));
-        if (baseName.empty()) {
-            baseName = name.substr(0, name.find("Right"));
-        }
-        baseName += "X";
+unsigned int ControllerMapper::mapAxisId(const std::string& input) {
+    std::string result = input;
+
+    // Check and replace the suffixes directly
+    if (input.size() > 2 && input.compare(input.size() - 2, 2, "Up") == 0) {
+        result.replace(input.size() - 2, 2, "Y");
+    }
+    else if (input.size() > 4 && input.compare(input.size() - 4, 4, "Down") == 0) {
+        result.replace(input.size() - 4, 4, "Y");
+    }
+    else if (input.size() > 4 && input.compare(input.size() - 4, 4, "Left") == 0) {
+        result.replace(input.size() - 4, 4, "X");
+    }
+    else if (input.size() > 5 && input.compare(input.size() - 5, 5, "Right") == 0) {
+        result.replace(input.size() - 5, 5, "X");
     }
 
-    auto it = axisMap.find(baseName);
+    auto it = axisMap.find(result);
     if (it != axisMap.end()) {
         return it->second;
     }
-    throw std::runtime_error("Unknown controller axis: " + name);
+    throw std::runtime_error("Unknown controller axis: " + input);
 }
 
 bool ControllerMapper::isAxisPositive(const std::string& name) {

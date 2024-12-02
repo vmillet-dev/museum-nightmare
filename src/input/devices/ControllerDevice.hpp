@@ -1,8 +1,6 @@
 #pragma once
 #include "InputDevice.hpp"
-#include "../mappers/ControllerMapper.hpp"
 #include <unordered_map>
-#include "../../config/ConfigManager.hpp"
 
 namespace game {
 

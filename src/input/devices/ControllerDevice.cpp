@@ -1,8 +1,9 @@
 #include "ControllerDevice.hpp"
-#include "../../config/ConfigManager.hpp"
-#include "../mappers/ControllerMapper.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
+
+#include "../../config/ConfigManager.hpp"
+#include "../mappers/ControllerMapper.hpp"
 
 namespace game {
 
@@ -30,23 +31,21 @@ void ControllerDevice::init() {
     }
 
     // Load controller bindings from config
-    for (const auto& [actionStr, action] : game::getActionMap()) {
+    for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
         auto controls = config.getControllerBindingsForAction(actionStr);
 
-        for (const auto& control : controls) {
-            try {
-                if (ControllerMapper::isAxis(control)) {
-                    unsigned int axisId = ControllerMapper::mapAxisId(control);
-                    std::string axisKey = (ControllerMapper::isAxisPositive(control) ? "+" : "-") + std::to_string(axisId);
-                    setAxisBinding(axisKey, action);
-                    spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
-                } else if (ControllerMapper::isButton(control)) {
-                    unsigned int buttonId = ControllerMapper::mapButtonName(control);
-                    setButtonBinding(buttonId, action);
-                    spdlog::debug("Set controller button binding: {} -> {}", control, static_cast<int>(action));
-                }
-            } catch (const std::runtime_error& e) {
-                spdlog::warn("Invalid controller binding '{}': {}", control, e.what());
+        for (const auto& control : *controls) {
+            std::string controlStr = control.value_or("");
+            if (ControllerMapper::isAxis(controlStr)) {
+                unsigned int axisId = ControllerMapper::mapAxisId(controlStr);
+                std::string axisKey = (ControllerMapper::isAxisPositive(controlStr) ? "+" : "-") + std::to_string(axisId);
+                setAxisBinding(axisKey, action);
+                spdlog::debug("Set controller axis binding: {} -> {}", controlStr, ActionUtil::toString(action));
+            }
+            else if (ControllerMapper::isButton(controlStr)) {
+                unsigned int buttonId = ControllerMapper::mapButtonName(controlStr);
+                setButtonBinding(buttonId, action);
+                spdlog::debug("Set controller button binding: {} -> {}", controlStr, ActionUtil::toString(action));
             }
         }
     }
