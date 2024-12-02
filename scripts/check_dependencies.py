@@ -89,16 +89,31 @@ def get_latest_version(repo_url):
         response = requests.get(api_url, headers=headers)
         response.raise_for_status()
 
-        tags = [
-            tag["name"] for tag in response.json()
-            if re.match(r'^v?\d+\.\d+\.\d+$', tag["name"])
-        ]
+        # Get all tags and filter for valid semantic versions
+        tags = response.json()
+        valid_tags = []
+        for tag in tags:
+            tag_name = tag["name"]
+            if re.match(r'^v?\d+\.\d+\.\d+$', tag_name):
+                # Verify the tag actually exists by checking its commit
+                commit_url = f"https://api.github.com/repos/{owner}/{repo}/git/refs/tags/{tag_name}"
+                try:
+                    commit_response = requests.get(commit_url, headers=headers)
+                    commit_response.raise_for_status()
+                    valid_tags.append(tag_name)
+                except requests.RequestException:
+                    print(f"  Warning: Tag {tag_name} exists but may be invalid")
+                    continue
 
-        if tags:
-            return sorted(tags, key=version_to_tuple)[-1]
+        if valid_tags:
+            return sorted(valid_tags, key=version_to_tuple)[-1]
+        print(f"  Warning: No valid semantic version tags found for {owner}/{repo}")
+        return None
+    except requests.RequestException as e:
+        print(f"  Error fetching tags: {str(e)}")
         return None
     except Exception as e:
-        print(f"  Error fetching tags: {str(e)}")
+        print(f"  Unexpected error: {str(e)}")
         return None
 
 def update_file(content, dependencies, file_path):
