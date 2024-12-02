@@ -150,7 +150,7 @@ void ControllerDevice::setAxisBinding(std::string axis, Action action) {
 }
 
 void ControllerDevice::setAxisState(unsigned int axisId, float position) {
-    std::string axis = (position > 0 ? "+" : "-") + std::to_string(axisId);
+    std::string axis = std::string(position > 0 ? "+" : "-") + std::to_string(axisId);
 
     auto absPosition = std::abs(position) > (deadzone / 100.0f * 100.0f); // Convert from percentage to SFML's -100 to 100 range
     if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {
