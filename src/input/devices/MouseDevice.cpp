@@ -17,7 +17,7 @@ void MouseDevice::init() {
     auto& config = ConfigManager::getInstance();
 
     // Load mouse bindings from config
-    for (const auto& [actionStr, action] : config.getActionMap()) {
+    for (const auto& [actionStr, action] : game::getActionMap()) {
         auto buttons = config.getMouseBindingsForAction(actionStr);
         for (const auto& button : buttons) {
             setButtonBinding(button, action);

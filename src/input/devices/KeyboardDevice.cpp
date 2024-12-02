@@ -8,7 +8,7 @@ void KeyboardDevice::init() {
     auto& config = ConfigManager::getInstance();
 
     // Load key bindings from config
-    for (const auto& [actionStr, action] : config.getActionMap()) {
+    for (const auto& [actionStr, action] : game::getActionMap()) {
         auto keys = config.getKeyboardBindingsForAction(actionStr);
         for (const auto& key : keys) {
             setKeyBinding(key, action);

@@ -30,7 +30,7 @@ void ControllerDevice::init() {
     }
 
     // Load controller bindings from config
-    for (const auto& [actionStr, action] : config.getActionMap()) {
+    for (const auto& [actionStr, action] : game::getActionMap()) {
         auto controls = config.getControllerBindingsForAction(actionStr);
 
         for (const auto& control : controls) {

@@ -151,40 +151,6 @@ std::vector<std::string> ConfigManager::getControllerBindingsForAction(const std
     return controls;
 }
 
-Action ConfigManager::getActionFromString(const std::string& actionStr) const {
-    static const std::unordered_map<std::string, Action> actionMap = {
-        {"MoveUp", Action::MoveUp},
-        {"MoveDown", Action::MoveDown},
-        {"MoveLeft", Action::MoveLeft},
-        {"MoveRight", Action::MoveRight},
-        {"Pause", Action::Pause},
-        {"Confirm", Action::Confirm},
-        {"Cancel", Action::Cancel},
-        {"Fire", Action::Fire}
-    };
-
-    auto it = actionMap.find(actionStr);
-    if (it != actionMap.end()) {
-        return it->second;
-    }
-    spdlog::warn("Unknown action string: {}", actionStr);
-    return Action::MoveUp; // Default action, could be changed to an Invalid action if needed
-}
-
-std::unordered_map<std::string, Action> ConfigManager::getActionMap() const {
-    static const std::unordered_map<std::string, Action> actionMap = {
-        {"MoveUp", Action::MoveUp},
-        {"MoveDown", Action::MoveDown},
-        {"MoveLeft", Action::MoveLeft},
-        {"MoveRight", Action::MoveRight},
-        {"Pause", Action::Pause},
-        {"Confirm", Action::Confirm},
-        {"Cancel", Action::Cancel},
-        {"Fire", Action::Fire}
-    };
-    return actionMap;
-}
-
 float ConfigManager::getControllerDeadzone() const {
     return config["controller"]["deadzone"].value_or(20.0f);
 }

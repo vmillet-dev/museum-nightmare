@@ -9,7 +9,6 @@
 #include "KeyMapper.hpp"
 #include "MouseMapper.hpp"
 #include "../input/Action.hpp"
-#include "../input/mappers/ControllerMapper.hpp"
 
 namespace game {
 
@@ -34,10 +33,6 @@ public:
     std::vector<sf::Keyboard::Key> getKeyboardBindingsForAction(const std::string& action) const;
     std::vector<sf::Mouse::Button> getMouseBindingsForAction(const std::string& action) const;
     std::vector<std::string> getControllerBindingsForAction(const std::string& action) const;
-    Action getActionFromString(const std::string& actionStr) const;
-
-    // Get all actions and their enum values
-    std::unordered_map<std::string, Action> getActionMap() const;
 
     // Legacy methods for backward compatibility
     sf::Keyboard::Key getKeyBinding(const std::string& action) const;
