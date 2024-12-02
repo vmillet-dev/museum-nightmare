@@ -29,11 +29,8 @@ void ControllerDevice::init() {
         return;
     }
 
-    // Load controller bindings from config for each action
-    const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
-
-    for (const auto& actionStr : actions) {
-        Action action = config.getActionFromString(actionStr);
+    // Load controller bindings from config
+    for (const auto& [actionStr, action] : config.getActionMap()) {
         auto controls = config.getControllerBindingsForAction(actionStr);
 
         for (const auto& control : controls) {
