@@ -1,5 +1,6 @@
 #pragma once
 #include "InputDevice.hpp"
+#include "../mappers/ControllerMapper.hpp"
 #include <unordered_map>
 #include "../../config/ConfigManager.hpp"
 
@@ -13,7 +14,6 @@ public:
     bool isActionJustPressed(Action action) override;
     bool isActionReleased(Action action) override;
     void handleEvent(const sf::Event& event) override;
-
 
     // Add methods to check controller status
     bool isConnected() const { return connected; }

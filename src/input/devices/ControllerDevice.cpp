@@ -1,5 +1,6 @@
 #include "ControllerDevice.hpp"
 #include "../../config/ConfigManager.hpp"
+#include "../mappers/ControllerMapper.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -36,19 +37,19 @@ void ControllerDevice::init() {
         auto controls = config.getControllerBindingsForAction(actionStr);
 
         for (const auto& control : controls) {
-            if (control.find("Stick") != std::string::npos) {
-                setAxisBinding(control, action);
-                spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
-            } else if (control.find("Trigger") != std::string::npos) {
-                // Handle triggers as buttons
-                setButtonBinding(7, action); // Right trigger is usually button 7
-                spdlog::debug("Set controller trigger binding: {} -> {}", 7, static_cast<int>(action));
-            } else if (control == "A") {
-                setButtonBinding(0, action);
-            } else if (control == "B") {
-                setButtonBinding(1, action);
-            } else if (control == "Start") {
-                setButtonBinding(7, action);
+            try {
+                if (ControllerMapper::isAxis(control)) {
+                    unsigned int axisId = ControllerMapper::mapAxisId(control);
+                    std::string axisKey = (ControllerMapper::isAxisPositive(control) ? "+" : "-") + std::to_string(axisId);
+                    setAxisBinding(axisKey, action);
+                    spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
+                } else if (ControllerMapper::isButton(control)) {
+                    unsigned int buttonId = ControllerMapper::mapButtonName(control);
+                    setButtonBinding(buttonId, action);
+                    spdlog::debug("Set controller button binding: {} -> {}", control, static_cast<int>(action));
+                }
+            } catch (const std::runtime_error& e) {
+                spdlog::warn("Invalid controller binding '{}': {}", control, e.what());
             }
         }
     }
