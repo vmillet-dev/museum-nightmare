@@ -171,12 +171,52 @@ Action ConfigManager::getActionFromString(const std::string& actionStr) const {
     return Action::MoveUp; // Default action, could be changed to an Invalid action if needed
 }
 
+std::unordered_map<std::string, Action> ConfigManager::getActionMap() const {
+    static const std::unordered_map<std::string, Action> actionMap = {
+        {"MoveUp", Action::MoveUp},
+        {"MoveDown", Action::MoveDown},
+        {"MoveLeft", Action::MoveLeft},
+        {"MoveRight", Action::MoveRight},
+        {"Pause", Action::Pause},
+        {"Confirm", Action::Confirm},
+        {"Cancel", Action::Cancel},
+        {"Fire", Action::Fire}
+    };
+    return actionMap;
+}
+
 float ConfigManager::getControllerDeadzone() const {
     return config["controller"]["deadzone"].value_or(20.0f);
 }
 
 float ConfigManager::getControllerSensitivity() const {
     return config["controller"]["sensitivity"].value_or(100.0f);
+}
+
+sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
+    auto keys = getKeyboardBindingsForAction(action);
+    return keys.empty() ? sf::Keyboard::Unknown : keys[0];
+}
+
+sf::Mouse::Button ConfigManager::getMouseButton(const std::string& action) const {
+    auto buttons = getMouseBindingsForAction(action);
+    return buttons.empty() ? sf::Mouse::ButtonCount : buttons[0];
+}
+
+unsigned int ConfigManager::getControllerButton(const std::string& action) const {
+    auto controls = getControllerBindingsForAction(action);
+    if (controls.empty()) return 0;
+    try {
+        return ControllerMapper::mapButtonName(controls[0]);
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to map controller button for action {}: {}", action, e.what());
+        return 0;
+    }
+}
+
+std::string ConfigManager::getControllerAxis(const std::string& action) const {
+    auto controls = getControllerBindingsForAction(action);
+    return controls.empty() ? "" : controls[0];
 }
 
 } // namespace game
