@@ -171,4 +171,12 @@ Action ConfigManager::getActionFromString(const std::string& actionStr) const {
     return Action::MoveUp; // Default action, could be changed to an Invalid action if needed
 }
 
+float ConfigManager::getControllerDeadzone() const {
+    return config["controller"]["deadzone"].value_or(20.0f);
+}
+
+float ConfigManager::getControllerSensitivity() const {
+    return config["controller"]["sensitivity"].value_or(100.0f);
+}
+
 } // namespace game
