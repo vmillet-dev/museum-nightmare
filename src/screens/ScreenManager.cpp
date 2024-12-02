@@ -1,55 +1,49 @@
 #include "ScreenManager.hpp"
+#include "MainMenuScreen.hpp"
+#include "GameScreen.hpp"
+#include "PauseScreen.hpp"
+#include "../core/Game.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-ScreenManager& ScreenManager::getInstance() {
-    static ScreenManager instance;
-    return instance;
+ScreenManager::ScreenManager(Game& game) : game(game) {
+    registerScreen<MainMenuScreen>(GameState::MainMenu);
+    registerScreen<GameScreen>(GameState::Playing);
+    registerScreen<PauseScreen>(GameState::Paused);
+
+    currentScreen = screens[GameState::MainMenu].get(); //TODO 
+    spdlog::info("ScreenManager initialized with MainMenu screen");
 }
 
-void ScreenManager::pushScreen(std::unique_ptr<Screen> screen) {
-    if (!screens.empty()) {
-        screens.top()->pause();
+void ScreenManager::setState(GameState newState) {
+    if (currentState == newState) return;
+
+    if (newState == GameState::Quit) {
+        game.quit();
+        return;
     }
-    screens.push(std::move(screen));
-    spdlog::info("Pushed new screen. Total screens: {}", screens.size());
-}
 
-void ScreenManager::popScreen() {
-    if (!screens.empty()) {
-        screens.pop();
-        spdlog::info("Popped screen. Remaining screens: {}", screens.size());
-        if (!screens.empty()) {
-            screens.top()->resume();
-        }
-    }
-}
-
-void ScreenManager::handleInput(const sf::Event& event) {
-    if (!screens.empty()) {
-        screens.top()->handleInput(event);
+    auto it = screens.find(newState);
+    if (it != screens.end()) {
+        currentScreen = it->second.get();
+        currentState = newState;
+        spdlog::info("Screen state changed to: {}", static_cast<int>(newState));
+    } else {
+        spdlog::error("Attempted to switch to invalid screen state: {}", static_cast<int>(newState));
     }
 }
 
 void ScreenManager::update(float deltaTime) {
-    if (!screens.empty()) {
-        screens.top()->update(deltaTime);
+    if (currentScreen) {
+        currentScreen->update(deltaTime);
     }
 }
 
 void ScreenManager::render(sf::RenderWindow& window) {
-    if (!screens.empty()) {
-        screens.top()->render(window);
+    if (currentScreen) {
+        currentScreen->render(window);
     }
-}
-
-Screen* ScreenManager::getCurrentScreen() {
-    return screens.empty() ? nullptr : screens.top().get();
-}
-
-bool ScreenManager::isEmpty() const {
-    return screens.empty();
 }
 
 } // namespace game
