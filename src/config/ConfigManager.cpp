@@ -159,30 +159,4 @@ float ConfigManager::getControllerSensitivity() const {
     return config["controller"]["sensitivity"].value_or(100.0f);
 }
 
-sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
-    auto keys = getKeyboardBindingsForAction(action);
-    return keys.empty() ? sf::Keyboard::Unknown : keys[0];
-}
-
-sf::Mouse::Button ConfigManager::getMouseButton(const std::string& action) const {
-    auto buttons = getMouseBindingsForAction(action);
-    return buttons.empty() ? sf::Mouse::ButtonCount : buttons[0];
-}
-
-unsigned int ConfigManager::getControllerButton(const std::string& action) const {
-    auto controls = getControllerBindingsForAction(action);
-    if (controls.empty()) return 0;
-    try {
-        return ControllerMapper::mapButtonName(controls[0]);
-    } catch (const std::exception& e) {
-        spdlog::warn("Failed to map controller button for action {}: {}", action, e.what());
-        return 0;
-    }
-}
-
-std::string ConfigManager::getControllerAxis(const std::string& action) const {
-    auto controls = getControllerBindingsForAction(action);
-    return controls.empty() ? "" : controls[0];
-}
-
 } // namespace game

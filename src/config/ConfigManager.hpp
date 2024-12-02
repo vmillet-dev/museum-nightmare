@@ -34,12 +34,6 @@ public:
     std::vector<sf::Mouse::Button> getMouseBindingsForAction(const std::string& action) const;
     std::vector<std::string> getControllerBindingsForAction(const std::string& action) const;
 
-    // Legacy methods for backward compatibility
-    sf::Keyboard::Key getKeyBinding(const std::string& action) const;
-    sf::Mouse::Button getMouseButton(const std::string& action) const;
-    unsigned int getControllerButton(const std::string& action) const;
-    std::string getControllerAxis(const std::string& action) const;
-
     // Controller settings
     bool isControllerEnabled() const { return config["controller"]["enabled"].value_or(false); }
     float getControllerDeadzone() const;
