@@ -1,12 +1,18 @@
 #include "ControllerDevice.hpp"
-#include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
+
+#include "../../config/ConfigManager.hpp"
+#include "../mappers/ControllerMapper.hpp"
 
 namespace game {
 
 void ControllerDevice::init() {
     auto& config = ConfigManager::getInstance();
+
+    // Load controller settings
+    deadzone = config.getControllerDeadzone();
+    sensitivity = config.getControllerSensitivity();
 
     // Check for any available controller
     connected = false;
@@ -24,26 +30,23 @@ void ControllerDevice::init() {
         return;
     }
 
-    // Load controller bindings from config for each action
-    const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
-
-    for (const auto& actionStr : actions) {
-        Action action = config.getActionFromString(actionStr);
+    // Load controller bindings from config
+    for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
         auto controls = config.getControllerBindingsForAction(actionStr);
 
-        for (const auto& control : controls) {
-            if (control.find("Stick") != std::string::npos) {
-                setAxisBinding(control, action);
-                spdlog::debug("Set controller axis binding: {} -> {}", control, static_cast<int>(action));
-            } else if (control.find("Trigger") != std::string::npos) {
-                setButtonBinding(7, action);
-                spdlog::debug("Set controller trigger binding: {} -> {}", 7, static_cast<int>(action));
-            } else if (control == "A") {
-                setButtonBinding(0, action);
-            } else if (control == "B") {
-                setButtonBinding(1, action);
-            } else if (control == "Start") {
-                setButtonBinding(7, action);
+        for (const auto& control : *controls) {
+            std::string controlStr = control.value_or("");
+            if (ControllerMapper::isAxis(controlStr)) {
+                unsigned int axisId = ControllerMapper::mapAxisId(controlStr);
+                std::string axisKey = (ControllerMapper::isAxisPositive(controlStr) ? "+" : "-") + std::to_string(axisId);
+                setAxisBinding(axisKey, action);
+                spdlog::debug("Set controller axis binding: {} -> {}", controlStr, ActionUtil::toString(action));
+            }
+            else if (ControllerMapper::isButton(controlStr)) {
+                unsigned int buttonId = ControllerMapper::mapButtonName(controlStr);
+                setButtonBinding(buttonId, action);
+                spdlog::debug("Set controller button binding: {} -> {}", controlStr, ActionUtil::toString(action));
+
             }
         }
     }
@@ -127,9 +130,9 @@ void ControllerDevice::setAxisBinding(std::string axis, Action action) {
 }
 
 void ControllerDevice::setAxisState(unsigned int axisId, float position) {
-    std::string axis = (position > 0 ? "+" : "-") + std::to_string(axisId);
+    std::string axis = std::string(position > 0 ? "+" : "-") + std::to_string(axisId);
 
-    auto absPosition = std::abs(position) > deadzone;
+    auto absPosition = std::abs(position) > (deadzone / 100.0f * 100.0f); // Convert from percentage to SFML's -100 to 100 range
     if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {
         spdlog::debug("Controller {}: Axis {} moved to position {} ({})", controllerId, axisId, position, axis);
 

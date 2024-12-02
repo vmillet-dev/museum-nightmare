@@ -100,75 +100,39 @@ float ConfigManager::getPlayerSize() const {
     return config["player"]["size"].value_or(Constants::Physics::ACTOR_SIZE * 2);
 }
 
-std::vector<sf::Keyboard::Key> ConfigManager::getKeyboardBindingsForAction(const std::string& action) const {
-    std::vector<sf::Keyboard::Key> keys;
+toml::v3::array* ConfigManager::getKeyboardBindingsForAction(const std::string& action) {
     try {
-        const auto& keyArray = config["actions"][action]["keyboard"].as_array();
-        for (const auto& key : *keyArray) {
-            auto sfKey = KeyMapper::getInstance().fromName(key.value_or(""));
-            if (sfKey != sf::Keyboard::Unknown) {
-                keys.push_back(sfKey);
-            }
-        }
-        spdlog::debug("Keyboard bindings for {}: {} keys", action, keys.size());
+        return config["actions"][action]["keyboard"].as_array();
     } catch (const std::exception& e) {
         spdlog::warn("Failed to get keyboard bindings for action {}: {}", action, e.what());
     }
-    return keys;
 }
 
-std::vector<sf::Mouse::Button> ConfigManager::getMouseBindingsForAction(const std::string& action) const {
+toml::v3::array* ConfigManager::getMouseBindingsForAction(const std::string& action) {
     std::vector<sf::Mouse::Button> buttons;
     try {
-        const auto& buttonArray = config["actions"][action]["mouse"].as_array();
-        for (const auto& button : *buttonArray) {
-            auto sfButton = MouseMapper::getInstance().stringToButton(button.value_or(""));
-            if (sfButton != sf::Mouse::Button::ButtonCount) {
-                buttons.push_back(sfButton);
-            }
-        }
-        spdlog::debug("Mouse bindings for {}: {} buttons", action, buttons.size());
+        return config["actions"][action]["mouse"].as_array();
     } catch (const std::exception& e) {
         spdlog::warn("Failed to get mouse bindings for action {}: {}", action, e.what());
     }
-    return buttons;
 }
 
-std::vector<std::string> ConfigManager::getControllerBindingsForAction(const std::string& action) const {
+toml::v3::array* ConfigManager::getControllerBindingsForAction(const std::string& action) {
     std::vector<std::string> controls;
     try {
-        const auto& controlArray = config["actions"][action]["controller"].as_array();
-        for (const auto& control : *controlArray) {
-            std::string controlStr = control.value_or("");
-            if (!controlStr.empty()) {
-                controls.push_back(controlStr);
-            }
-        }
-        spdlog::debug("Controller bindings for {}: {} controls", action, controls.size());
+        return config["actions"][action]["controller"].as_array();
     } catch (const std::exception& e) {
         spdlog::warn("Failed to get controller bindings for action {}: {}", action, e.what());
     }
-    return controls;
+
 }
 
-Action ConfigManager::getActionFromString(const std::string& actionStr) const {
-    static const std::unordered_map<std::string, Action> actionMap = {
-        {"MoveUp", Action::MoveUp},
-        {"MoveDown", Action::MoveDown},
-        {"MoveLeft", Action::MoveLeft},
-        {"MoveRight", Action::MoveRight},
-        {"Pause", Action::Pause},
-        {"Confirm", Action::Confirm},
-        {"Cancel", Action::Cancel},
-        {"Fire", Action::Fire}
-    };
+float ConfigManager::getControllerDeadzone() const {
+    return config["controller"]["deadzone"].value_or(20.0f);
+}
 
-    auto it = actionMap.find(actionStr);
-    if (it != actionMap.end()) {
-        return it->second;
-    }
-    spdlog::warn("Unknown action string: {}", actionStr);
-    return Action::MoveUp; // Default action, could be changed to an Invalid action if needed
+float ConfigManager::getControllerSensitivity() const {
+    return config["controller"]["sensitivity"].value_or(100.0f);
 }
 
 } // namespace game

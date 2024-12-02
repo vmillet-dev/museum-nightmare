@@ -2,7 +2,6 @@
 #include "InputDevice.hpp"
 #include "GenericInputDevice.hpp"
 #include <unordered_map>
-#include "../../config/ConfigManager.hpp"
 
 namespace game {
 

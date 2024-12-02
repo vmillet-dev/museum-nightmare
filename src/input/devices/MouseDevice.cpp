@@ -1,6 +1,7 @@
 #include "MouseDevice.hpp"
 #include <spdlog/spdlog.h>
 #include "../../config/ConfigManager.hpp"
+#include "../mappers/MouseMapper.hpp"
 
 namespace game {
 
@@ -12,15 +13,18 @@ MouseDevice::MouseDevice(sf::RenderWindow& window)
 void MouseDevice::init() {
     auto& config = ConfigManager::getInstance();
 
-    // Load mouse bindings from config for each action
-    const std::vector<std::string> actions = {"MoveUp", "MoveDown", "MoveLeft", "MoveRight", "Pause", "Confirm", "Cancel", "Fire"};
-
-    for (const auto& actionStr : actions) {
-        Action action = config.getActionFromString(actionStr);
+    // Load mouse bindings from config
+    for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
         auto buttons = config.getMouseBindingsForAction(actionStr);
-        for (const auto& button : buttons) {
-            setButtonBinding(button, action);
-            spdlog::debug("Set mouse binding: {} -> {}", static_cast<int>(button), static_cast<int>(action));
+
+        for (const auto& button : *buttons) {
+            std::string buttonName = button.value_or("");
+            auto sfButton = MouseMapper::getInstance().stringToButton(buttonName);
+            if (sfButton != sf::Mouse::Button::ButtonCount) {
+
+                setButtonBinding(sfButton, action);
+                spdlog::debug("Set mouse binding: {} -> {}", buttonName, ActionUtil::toString(action));
+            }
         }
     }
 }

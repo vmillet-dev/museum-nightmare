@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
+#include "../mappers/ControllerMapper.hpp"
 
 namespace game {
 
@@ -43,9 +44,9 @@ private:
     MouseMapper() {
         // Initialize the mapping between strings and sf::Mouse::Button values
         buttonToStringMap = {
-            {sf::Mouse::Left, "left"},
-            {sf::Mouse::Right, "right"},
-            {sf::Mouse::Middle, "middle"},
+            {sf::Mouse::Left, "LeftButton"},
+            {sf::Mouse::Right, "RightButton"},
+            {sf::Mouse::Middle, "MiddleButton"},
             {sf::Mouse::XButton1, "x1"},
             {sf::Mouse::XButton2, "x2"}
         };
