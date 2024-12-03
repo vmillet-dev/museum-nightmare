@@ -11,27 +11,29 @@ MainMenuScreen::MainMenuScreen(Game& game) : Screen(game) {
     float centerX = windowSize.x / 2.f;
     float startY = windowSize.y * 0.3f;
 
-    // Create buttons with consistent spacing
+    // Create buttons with consistent sizing
     const float buttonWidth = 200.f;
     const float buttonHeight = 50.f;
-    const float spacing = 20.f;
 
     // Create menu buttons
     playButton_ = menuBuilder_.addButton("Play",
-        sf::Vector2f(centerX, startY),
+        sf::Vector2f(centerX - buttonWidth/2, startY),
         sf::Vector2f(buttonWidth, buttonHeight));
 
     settingsButton_ = menuBuilder_.addButton("Settings",
-        sf::Vector2f(centerX, startY + buttonHeight + spacing),
+        sf::Vector2f(centerX - buttonWidth/2, startY),
         sf::Vector2f(buttonWidth, buttonHeight));
 
     testButton_ = menuBuilder_.addButton("Test Widgets",
-        sf::Vector2f(centerX, startY + (buttonHeight + spacing) * 2),
+        sf::Vector2f(centerX - buttonWidth/2, startY),
         sf::Vector2f(buttonWidth, buttonHeight));
 
     quitButton_ = menuBuilder_.addButton("Quit",
-        sf::Vector2f(centerX, startY + (buttonHeight + spacing) * 3),
+        sf::Vector2f(centerX - buttonWidth/2, startY),
         sf::Vector2f(buttonWidth, buttonHeight));
+
+    // Use layout helper to align buttons vertically with spacing
+    menuBuilder_.alignVertically(centerX - buttonWidth/2, 20.f);
 }
 
 void MainMenuScreen::update(float deltaTime) {

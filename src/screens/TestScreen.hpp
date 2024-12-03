@@ -10,13 +10,14 @@ namespace game {
 class TestScreen : public Screen {
 public:
     explicit TestScreen(Game& game);
-    ~TestScreen();  // Add destructor
+    ~TestScreen();
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
 
 private:
     MenuBuilder menuBuilder_;
     Button* backButton_;
+    Button* applyButton_;     // Add apply button
     Dropdown* resolutionDropdown_;
 
     std::vector<std::string> getAvailableResolutions() {

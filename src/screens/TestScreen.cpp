@@ -10,40 +10,42 @@ TestScreen::TestScreen(Game& game) : Screen(game) {
     float centerX = windowSize.x / 2.f;
     float startY = windowSize.y * 0.3f;
 
-    // Create resolution dropdown
-    const float dropdownWidth = 300.f;
-    const float dropdownHeight = 40.f;
-    resolutionDropdown_ = new Dropdown("Resolution",
-        sf::Vector2f(centerX - dropdownWidth / 2, startY),
-        sf::Vector2f(dropdownWidth, dropdownHeight),
+    // Create widgets
+    resolutionDropdown_ = menuBuilder_.addDropdown("Resolution",
+        sf::Vector2f(centerX - 150.f, startY),
+        sf::Vector2f(300.f, 40.f),
         getAvailableResolutions());
 
-    // Create back button
-    const float buttonWidth = 200.f;
-    const float buttonHeight = 50.f;
-    const float spacing = 20.f;
+    applyButton_ = menuBuilder_.addButton("Apply",
+        sf::Vector2f(centerX - 100.f, startY + 60.f),
+        sf::Vector2f(200.f, 50.f));
+
     backButton_ = menuBuilder_.addButton("Back",
-        sf::Vector2f(centerX, startY + dropdownHeight + spacing * 2),
-        sf::Vector2f(buttonWidth, buttonHeight));
+        sf::Vector2f(centerX - 100.f, startY + 120.f),
+        sf::Vector2f(200.f, 50.f));
+
+    // Center all widgets horizontally
+    menuBuilder_.centerHorizontally(startY, 20.f);
 }
 
 TestScreen::~TestScreen() {
-    delete resolutionDropdown_;
-    // Note: backButton_ is managed by menuBuilder_
+    // Widgets are managed by MenuBuilder
 }
 
 void TestScreen::update(float deltaTime) {
     menuBuilder_.update(game.getInputManager());
-    resolutionDropdown_->update(game.getInputManager());
 
-    if (backButton_->isClicked()) {
+    if (applyButton_->isClicked()) {
+        spdlog::info("Applying resolution change");
+        // TODO: Implement resolution change
+    }
+    else if (backButton_->isClicked()) {
         game.getScreenManager().setState(GameState::MainMenu);
     }
 }
 
 void TestScreen::render(sf::RenderWindow& window) {
     menuBuilder_.render(window);
-    resolutionDropdown_->render(window);
 }
 
 } // namespace game

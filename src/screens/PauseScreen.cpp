@@ -13,19 +13,21 @@ PauseScreen::PauseScreen(Game& game) : Screen(game) {
     float centerX = windowSize.x / 2.f;
     float startY = windowSize.y * 0.3f;
 
-    // Create buttons with consistent spacing
+    // Create buttons with consistent sizing
     const float buttonWidth = 200.f;
     const float buttonHeight = 50.f;
-    const float spacing = 20.f;
 
     // Create menu buttons using MenuBuilder
     resumeButton = menuBuilder_.addButton("Resume",
-        sf::Vector2f(centerX, startY),
+        sf::Vector2f(centerX - buttonWidth/2, startY),
         sf::Vector2f(buttonWidth, buttonHeight));
 
     mainMenuButton = menuBuilder_.addButton("Main Menu",
-        sf::Vector2f(centerX, startY + buttonHeight + spacing),
+        sf::Vector2f(centerX - buttonWidth/2, startY),
         sf::Vector2f(buttonWidth, buttonHeight));
+
+    // Use layout helper to align buttons vertically with spacing
+    menuBuilder_.alignVertically(centerX - buttonWidth/2, 20.f);
 
     // Load font for pause text
     if (!font.loadFromFile("assets/arial.ttf")) {
@@ -41,7 +43,7 @@ PauseScreen::PauseScreen(Game& game) : Screen(game) {
     // Center the pause text
     sf::FloatRect textBounds = pauseText.getLocalBounds();
     pauseText.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    pauseText.setPosition(centerX, startY - spacing * 2);
+    pauseText.setPosition(centerX, startY - 40.f);  // Position above buttons
 }
 
 void PauseScreen::update(float deltaTime) {

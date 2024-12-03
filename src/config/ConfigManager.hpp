@@ -25,6 +25,11 @@ public:
     int getWindowHeight() const;
     std::string getWindowTitle() const;
 
+    // Window settings
+    void setWindowWidth(int width);
+    void setWindowHeight(int height);
+    void setWindowResolution(int width, int height);
+
     // Input binding methods
     toml::v3::array* getKeyboardBindingsForAction(const std::string& action);
     toml::v3::array* getMouseBindingsForAction(const std::string& action);
