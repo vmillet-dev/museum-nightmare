@@ -13,14 +13,13 @@ class Game;  // Forward declaration
 
 class GameScreen : public Screen {
 public:
-    GameScreen(Game& game);
+    explicit GameScreen(Game& game);
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
     void pause() override;
     void resume() override;
 
 private:
-    Game& game;
     std::unique_ptr<GameObjectManager> gameObjectManager;
     Player* playerPtr{nullptr};  // Non-owning pointer to player
 };

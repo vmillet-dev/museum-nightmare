@@ -1,9 +1,9 @@
 #pragma once
 #include "Screen.hpp"
 #include "../ui/Button.hpp"
+#include "../ui/MenuBuilder.hpp"
 #include "ScreenManager.hpp"
 #include <memory>
-#include <vector>
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -15,18 +15,16 @@ class MainMenuScreen;  // Forward declaration
 
 class PauseScreen : public Screen {
 public:
-    PauseScreen(Game& game);
+    explicit PauseScreen(Game& game);
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
 
 private:
-    std::vector<std::unique_ptr<Button>> buttons;
-    std::unique_ptr<Button> resumeButton;
-    std::unique_ptr<Button> mainMenuButton;
+    MenuBuilder menuBuilder_;
+    Button* resumeButton;
+    Button* mainMenuButton;
     sf::Font font;
     sf::Text pauseText;
-    Game& game;
-    size_t selectedButtonIndex{0};  // Track currently selected button
 };
 
 } // namespace game
