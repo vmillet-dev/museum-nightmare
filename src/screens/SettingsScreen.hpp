@@ -1,6 +1,6 @@
 #pragma once
 #include "../ui/MenuBuilder.hpp"
-#include "../core/Screen.hpp"
+#include "Screen.hpp"
 #include <vector>
 
 namespace game {
