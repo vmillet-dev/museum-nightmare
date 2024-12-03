@@ -1,10 +1,11 @@
 #pragma once
 #include "InputDevice.hpp"
+#include "GenericInputDevice.hpp"
 #include <unordered_map>
 
 namespace game {
 
-class ControllerDevice : public InputDevice {
+class ControllerDevice : public GenericInputDevice<unsigned int> {
 public:
     void init() override;
     void update() override;
@@ -18,9 +19,6 @@ public:
     int getControllerId() const { return controllerId; }
 
 private:
-    std::unordered_map<unsigned int, Action> buttonBindings;
-    std::unordered_map<unsigned int, ActionState> buttonStates;
-
     std::unordered_map<std::string, Action> axisBindings;
     std::unordered_map<std::string, ActionState> axisStates;
 
