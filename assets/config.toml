@@ -3,10 +3,6 @@ width = 800
 height = 600
 title = "SFML Game"
 
-[player]
-speed = 200.0
-size = 32.0
-
 [debug]
 level = "debug"
 

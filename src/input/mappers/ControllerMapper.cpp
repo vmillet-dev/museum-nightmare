@@ -37,28 +37,28 @@ unsigned int ControllerMapper::mapButtonName(const std::string& name) {
     throw std::runtime_error("Unknown controller button: " + name);
 }
 
-unsigned int ControllerMapper::mapAxisId(const std::string& input) {
-    std::string result = input;
+unsigned int ControllerMapper::mapAxisId(const std::string& name) {
+    std::string result;
 
-    // Check and replace the suffixes directly
-    if (input.size() > 2 && input.compare(input.size() - 2, 2, "Up") == 0) {
-        result.replace(input.size() - 2, 2, "Y");
-    }
-    else if (input.size() > 4 && input.compare(input.size() - 4, 4, "Down") == 0) {
-        result.replace(input.size() - 4, 4, "Y");
-    }
-    else if (input.size() > 4 && input.compare(input.size() - 4, 4, "Left") == 0) {
-        result.replace(input.size() - 4, 4, "X");
-    }
-    else if (input.size() > 5 && input.compare(input.size() - 5, 5, "Right") == 0) {
-        result.replace(input.size() - 5, 5, "X");
+    static const std::unordered_map<std::string, std::string> suffixMap = {
+        {"Up", "Y"},
+        {"Down", "Y"},
+        {"Left", "X"},
+        {"Right", "X"}
+    };
+
+    for (const auto& [suffix, replacement] : suffixMap) {
+        if (name.size() >= suffix.size() && name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0) {
+            result = name.substr(0, name.size() - suffix.size()) + replacement;
+            break;
+        }
     }
 
     auto it = axisMap.find(result);
     if (it != axisMap.end()) {
         return it->second;
     }
-    throw std::runtime_error("Unknown controller axis: " + input);
+    throw std::runtime_error("Unknown controller axis: " + name);
 }
 
 bool ControllerMapper::isAxisPositive(const std::string& name) {

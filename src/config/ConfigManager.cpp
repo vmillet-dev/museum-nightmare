@@ -92,14 +92,6 @@ std::string ConfigManager::getWindowTitle() const {
     return config["window"]["title"].value_or("SFML Game");
 }
 
-float ConfigManager::getPlayerSpeed() const {
-    return config["player"]["speed"].value_or(200.0f);
-}
-
-float ConfigManager::getPlayerSize() const {
-    return config["player"]["size"].value_or(Constants::Physics::ACTOR_SIZE * 2);
-}
-
 toml::v3::array* ConfigManager::getKeyboardBindingsForAction(const std::string& action) {
     try {
         return config["actions"][action]["keyboard"].as_array();

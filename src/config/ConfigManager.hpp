@@ -24,8 +24,6 @@ public:
     int getWindowWidth() const;
     int getWindowHeight() const;
     std::string getWindowTitle() const;
-    float getPlayerSpeed() const;
-    float getPlayerSize() const;
 
     // Input binding methods
     toml::v3::array* getKeyboardBindingsForAction(const std::string& action);
