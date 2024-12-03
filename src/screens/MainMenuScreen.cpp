@@ -9,7 +9,7 @@ namespace game {
 MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
     MenuBuilder builder(game);
 
-    // Add Play button with automatic vertical spacing
+    // Add buttons with automatic vertical spacing
     builder.setSpacing(100)
            .addButton("Play", 300, 200,
                 [this, &game]() {
@@ -18,7 +18,12 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) 
                     game.getScreenManager().setState(GameState::Playing);
                     spdlog::debug("State transition completed");
                 })
-           .addButton("Quit", 300, 300,
+           .addButton("Settings", 300, 300,
+                [this, &game]() {
+                    spdlog::info("Settings button clicked - Transitioning to Settings screen");
+                    game.getScreenManager().setState(GameState::Settings);
+                })
+           .addButton("Quit", 300, 400,
                 [this, &game]() {
                     spdlog::info("Quit button clicked - Attempting to transition to GameState::Quit");
                     game.getScreenManager().setState(GameState::Quit);

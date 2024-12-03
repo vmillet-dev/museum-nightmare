@@ -6,6 +6,7 @@ enum class GameState {
     MainMenu,
     Playing,
     Paused,
+    Settings,  // Add Settings state
     Quit
 };
 
