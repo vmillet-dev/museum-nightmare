@@ -12,29 +12,31 @@ MenuBuilder& MenuBuilder::addButton(const std::string& text, float centerX, floa
         currentY += buttonSpacing;
     }
 
-    buttons.push_back(std::make_unique<Button>(text, sf::Vector2f(centerX, currentY), size));
-    clickHandlers.push_back(std::move(onClick));
+    auto button = std::make_unique<Button>(text, sf::Vector2f(centerX, currentY), size);
+    button->setOnClick(onClick);  // Set the onClick handler directly on the button
 
     // Set initial selection for first button
-    if (buttons.size() == 1) {
-        buttons[0]->setSelected(true);
+    if (buttons.empty()) {
+        button->setSelected(true);
     }
 
     spdlog::debug("Added button '{}' at position ({}, {})", text, centerX, currentY);
+    buttons.push_back(std::move(button));
     return *this;
 }
 
 MenuBuilder& MenuBuilder::addButtonAt(const std::string& text, const sf::Vector2f& position,
                                     std::function<void()> onClick, const sf::Vector2f& size) {
-    buttons.push_back(std::make_unique<Button>(text, position, size));
-    clickHandlers.push_back(std::move(onClick));
+    auto button = std::make_unique<Button>(text, position, size);
+    button->setOnClick(onClick);  // Set the onClick handler directly on the button
 
     // Set initial selection for first button
-    if (buttons.size() == 1) {
-        buttons[0]->setSelected(true);
+    if (buttons.empty()) {
+        button->setSelected(true);
     }
 
     spdlog::debug("Added button '{}' at specific position ({}, {})", text, position.x, position.y);
+    buttons.push_back(std::move(button));
     return *this;
 }
 
@@ -51,12 +53,9 @@ void MenuBuilder::update(InputManager& inputManager) {
         buttons[selectedButtonIndex]->setSelected(true);
     }
 
-    // Update all buttons and handle clicks
-    for (size_t i = 0; i < buttons.size(); ++i) {
-        buttons[i]->update(inputManager);
-        if (buttons[i]->isClicked() && i < clickHandlers.size()) {
-            clickHandlers[i]();
-        }
+    // Update all buttons
+    for (auto& button : buttons) {
+        button->update(inputManager);
     }
 }
 

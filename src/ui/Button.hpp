@@ -5,6 +5,7 @@
 #endif
 #include <cmath>
 #include <string>
+#include <functional>
 #include <spdlog/spdlog.h>
 #include "../input/InputManager.hpp"
 
@@ -18,6 +19,7 @@ public:
     void render(sf::RenderWindow& window);
     void setSelected(bool selected) { isSelected = selected; updateVisualState(); }
     bool getSelected() const { return isSelected; }
+    void setOnClick(std::function<void()> callback) { onClick = callback; }
 
     // Add getters for position to help with navigation
     sf::Vector2f getPosition() const { return shape.getPosition(); }
@@ -35,6 +37,7 @@ private:
     bool clicked;
     bool wasPressed;
     bool isSelected{false};
+    std::function<void()> onClick;
 
     // Enhanced visual states
     float pulseEffect{0.0f};

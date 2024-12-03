@@ -38,7 +38,6 @@ public:
 private:
     Game& game;
     std::vector<std::unique_ptr<Button>> buttons;
-    std::vector<std::function<void()>> clickHandlers;
     float buttonSpacing{70.0f};
     float currentY{0.0f};
     size_t selectedButtonIndex{0};

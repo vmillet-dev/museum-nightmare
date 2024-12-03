@@ -1,5 +1,8 @@
 #include "Button.hpp"
 #include <spdlog/spdlog.h>
+#ifdef _WIN32
+#include <corecrt_math_defines.h>
+#endif
 #include <cmath>
 
 namespace game {
@@ -47,7 +50,25 @@ void Button::update(InputManager& inputManager) {
     // Handle input state
     bool isPressed = inputManager.isActionPressed(Action::Fire) ||
                     inputManager.isActionPressed(Action::Confirm);
-    clicked = (isSelected || isHovered) && isPressed && !wasPressed;
+    bool justPressed = inputManager.isActionJustPressed(Action::Fire) ||
+                      inputManager.isActionJustPressed(Action::Confirm);
+
+    if (justPressed) {
+        spdlog::debug("Button '{}' just pressed - Selected: {}, Hovered: {}, WasPressed: {}",
+            text.getString().toAnsiString(), isSelected, isHovered, wasPressed);
+    }
+
+    clicked = (isSelected || isHovered) && justPressed;
+
+    if (clicked) {
+        spdlog::info("Button '{}' clicked - Triggering callback", text.getString().toAnsiString());
+        if (onClick) {
+            onClick();
+        } else {
+            spdlog::error("Button '{}' clicked but no callback registered!", text.getString().toAnsiString());
+        }
+    }
+
     wasPressed = isPressed;
 
     // Update visual effects

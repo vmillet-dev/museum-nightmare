@@ -12,14 +12,21 @@ ScreenManager::ScreenManager(Game& game) : game(game) {
     registerScreen<GameScreen>(GameState::Playing);
     registerScreen<PauseScreen>(GameState::Paused);
 
-    currentScreen = screens[GameState::MainMenu].get(); //TODO 
+    currentScreen = screens[GameState::MainMenu].get(); //TODO
     spdlog::info("ScreenManager initialized with MainMenu screen");
 }
 
 void ScreenManager::setState(GameState newState) {
-    if (currentState == newState) return;
+    spdlog::debug("Attempting to set state from {} to {}",
+        static_cast<int>(currentState), static_cast<int>(newState));
+
+    if (currentState == newState) {
+        spdlog::debug("State unchanged, already in state {}", static_cast<int>(currentState));
+        return;
+    }
 
     if (newState == GameState::Quit) {
+        spdlog::info("Quitting game from state {}", static_cast<int>(currentState));
         game.quit();
         return;
     }
@@ -28,9 +35,11 @@ void ScreenManager::setState(GameState newState) {
     if (it != screens.end()) {
         currentScreen = it->second.get();
         currentState = newState;
-        spdlog::info("Screen state changed to: {}", static_cast<int>(newState));
+        spdlog::info("Screen transition successful: {} -> {}",
+            static_cast<int>(currentState), static_cast<int>(newState));
     } else {
-        spdlog::error("Attempted to switch to invalid screen state: {}", static_cast<int>(newState));
+        spdlog::error("Screen transition failed: Invalid state {} requested from state {}",
+            static_cast<int>(newState), static_cast<int>(currentState));
     }
 }
 

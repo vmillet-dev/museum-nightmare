@@ -13,13 +13,16 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) 
     builder.setSpacing(100)
            .addButton("Play", 300, 200,
                 [this, &game]() {
-                    spdlog::info("Starting game");
+                    spdlog::debug("Play button clicked - Button state validation");
+                    spdlog::info("Play button clicked - Attempting to transition to GameState::Playing");
                     game.getScreenManager().setState(GameState::Playing);
+                    spdlog::debug("State transition completed");
                 })
            .addButton("Quit", 300, 300,
                 [this, &game]() {
-                    spdlog::info("Quitting game");
+                    spdlog::info("Quit button clicked - Attempting to transition to GameState::Quit");
                     game.getScreenManager().setState(GameState::Quit);
+                    spdlog::info("Screen transition completed");
                 });
 
     buttons = builder.build();
@@ -41,7 +44,7 @@ void MainMenuScreen::update(float deltaTime) {
         buttons[selectedButtonIndex]->setSelected(true);
     }
 
-    // Update all buttons and handle clicks
+    // Update all buttons - callbacks will be triggered inside Button::update
     for (auto& button : buttons) {
         button->update(inputManager);
     }
