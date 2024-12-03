@@ -1,15 +1,29 @@
 #include "MainMenuScreen.hpp"
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
+#include "../ui/MenuBuilder.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
 MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
-    buttons.push_back(std::make_unique<Button>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50)));
-    buttons.push_back(std::make_unique<Button>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50)));
-    // Set initial button selection
-    buttons[selectedButtonIndex]->setSelected(true);
+    MenuBuilder builder(game);
+
+    // Add Play button with automatic vertical spacing
+    builder.setSpacing(100)
+           .addButton("Play", 300, 200,
+                [this, &game]() {
+                    spdlog::info("Starting game");
+                    game.getScreenManager().setState(GameState::Playing);
+                })
+           .addButton("Quit", 300, 300,
+                [this, &game]() {
+                    spdlog::info("Quitting game");
+                    game.getScreenManager().setState(GameState::Quit);
+                });
+
+    buttons = builder.build();
+    selectedButtonIndex = builder.getSelectedIndex();
 }
 
 void MainMenuScreen::update(float deltaTime) {
@@ -20,30 +34,16 @@ void MainMenuScreen::update(float deltaTime) {
         buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
         buttons[selectedButtonIndex]->setSelected(true);
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
     if (inputManager.isActionJustPressed(Action::MoveUp)) {
         buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
         buttons[selectedButtonIndex]->setSelected(true);
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
 
-    // Update all buttons with input manager
+    // Update all buttons
     for (auto& button : buttons) {
         button->update(inputManager);
-    }
-
-    // Play button clicked
-    if (buttons[0]->isClicked()) {
-        spdlog::info("Starting game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
-
-    // Quit button clicked
-    if (buttons[1]->isClicked()) {
-        spdlog::info("Quitting game");
-        game.getScreenManager().setState(GameState::Quit);
     }
 }
 
