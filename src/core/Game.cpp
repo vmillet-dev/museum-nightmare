@@ -12,9 +12,10 @@ Game::Game() : window(
         ConfigManager::getInstance().getWindowHeight()
     ),
     ConfigManager::getInstance().getWindowTitle()
-) {
+), soundManager(resourceManager) {  // Initialize soundManager with resourceManager
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Initializing game...");
+
     inputManager.init();
     ScreenManager::getInstance().pushScreen(std::make_unique<GameScreen>(*this));
     spdlog::info("Game initialized successfully");

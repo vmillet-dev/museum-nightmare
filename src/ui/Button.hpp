@@ -3,12 +3,13 @@
 #include <functional>
 #include <string>
 #include <spdlog/spdlog.h>
+#include "../core/ResourceManager.hpp"
 
 namespace game {
 
 class Button {
 public:
-    Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size);
+    Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size, const core::ResourceManager& resourceManager);
     void handleInput(const sf::Vector2f& mousePos);
     void setCallback(std::function<void()> callback);
     void render(sf::RenderWindow& window);
@@ -21,7 +22,6 @@ private:
 
     sf::RectangleShape shape;
     sf::Text text;
-    sf::Font font;
     std::function<void()> callback;
     bool isHovered;
     sf::Color defaultColor{sf::Color(100, 100, 100)};
