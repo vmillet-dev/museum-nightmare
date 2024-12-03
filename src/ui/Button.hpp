@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <corecrt_math_defines.h>
+#include <cmath>
 #include <string>
 #include <spdlog/spdlog.h>
 #include "../input/InputManager.hpp"
