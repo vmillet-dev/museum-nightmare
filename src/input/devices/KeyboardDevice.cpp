@@ -1,6 +1,8 @@
 #include "KeyboardDevice.hpp"
-#include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
+
+#include "../../config/ConfigManager.hpp"
+#include "../mappers/KeyMapper.hpp"
 
 namespace game {
 
@@ -8,29 +10,16 @@ void KeyboardDevice::init() {
     auto& config = ConfigManager::getInstance();
 
     // Load key bindings from config
-    keyBindings[config.getKeyBinding("move_up")] = Action::MoveUp;
-    keyBindings[config.getKeyBinding("move_down")] = Action::MoveDown;
-    keyBindings[config.getKeyBinding("move_left")] = Action::MoveLeft;
-    keyBindings[config.getKeyBinding("move_right")] = Action::MoveRight;
-    keyBindings[config.getKeyBinding("pause")] = Action::Pause;
-    keyBindings[config.getKeyBinding("confirm")] = Action::Confirm;
-    keyBindings[config.getKeyBinding("cancel")] = Action::Cancel;
-}
+    for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
+        auto keys = config.getKeyboardBindingsForAction(actionStr);
+        for (const auto& key : *keys) {
+            std::string keyName = key.value_or("");
+            sf::Keyboard::Key sfKey = KeyMapper::getInstance().fromName(keyName);
 
-void KeyboardDevice::update() {
-    // Update key states for continuous input
-    for (const auto& binding : keyBindings) {
-        keyStates[binding.first] = sf::Keyboard::isKeyPressed(binding.first);
-    }
-}
-
-bool KeyboardDevice::isActionPressed(Action action) {
-    for (const auto& binding : keyBindings) {
-        if (binding.second == action && keyStates[binding.first]) {
-            return true;
+            setKeyBinding(sfKey, action);
+            spdlog::debug("Set keyboard binding: {} -> {}", keyName, ActionUtil::toString(action));
         }
     }
-    return false;
 }
 
 void KeyboardDevice::handleEvent(const sf::Event& event) {
@@ -39,12 +28,12 @@ void KeyboardDevice::handleEvent(const sf::Event& event) {
     }
 }
 
-void KeyboardDevice::setKeyBinding(Action action, sf::Keyboard::Key key) {
-    keyBindings[key] = action;
+void KeyboardDevice::setKeyBinding(sf::Keyboard::Key key, Action action) {
+    setBinding(key, action);
 }
 
 void KeyboardDevice::setKeyState(sf::Keyboard::Key key, bool pressed) {
-    keyStates[key] = pressed;
+    setState(key, pressed);
 }
 
 } // namespace game

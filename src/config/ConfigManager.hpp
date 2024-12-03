@@ -3,8 +3,10 @@
 #include <string>
 #include <spdlog/spdlog.h>
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <unordered_map>
-#include "KeyMapper.hpp"
+#include <vector>
+#include "../input/Action.hpp"
 
 namespace game {
 
@@ -22,15 +24,16 @@ public:
     int getWindowWidth() const;
     int getWindowHeight() const;
     std::string getWindowTitle() const;
-    float getPlayerSpeed() const;
-    float getPlayerSize() const;
 
-    // New control settings methods
-    sf::Keyboard::Key getKeyBinding(const std::string& action) const;
-    bool isControllerEnabled() const;
+    // Input binding methods
+    toml::v3::array* getKeyboardBindingsForAction(const std::string& action);
+    toml::v3::array* getMouseBindingsForAction(const std::string& action);
+    toml::v3::array* getControllerBindingsForAction(const std::string& action);
+
+    // Controller settings
+    bool isControllerEnabled() const { return config["controller"]["enabled"].value_or(false); }
     float getControllerDeadzone() const;
     float getControllerSensitivity() const;
-    unsigned int getControllerButton(const std::string& action) const;
 
 private:
     ConfigManager();
