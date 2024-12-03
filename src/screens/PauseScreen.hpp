@@ -16,7 +16,6 @@ class MainMenuScreen;  // Forward declaration
 class PauseScreen : public Screen {
 public:
     PauseScreen(Game& game);
-    void handleInput(const sf::Event& event) override;
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
 
@@ -27,6 +26,7 @@ private:
     sf::Font font;
     sf::Text pauseText;
     Game& game;
+    size_t selectedButtonIndex{0};  // Track currently selected button
 };
 
 } // namespace game

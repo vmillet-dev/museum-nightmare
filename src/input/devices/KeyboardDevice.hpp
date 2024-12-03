@@ -1,21 +1,16 @@
 #pragma once
-#include "InputDevice.hpp"
-#include <unordered_map>
+#include "GenericInputDevice.hpp"
 
 namespace game {
 
-class KeyboardDevice : public InputDevice {
+class KeyboardDevice : public GenericInputDevice<sf::Keyboard::Key> {
 public:
     void init() override;
-    void update() override;
-    bool isActionPressed(Action action) override;
     void handleEvent(const sf::Event& event) override;
-    void setKeyBinding(Action action, sf::Keyboard::Key key);
-    void setKeyState(sf::Keyboard::Key key, bool pressed);
 
 private:
-    std::unordered_map<sf::Keyboard::Key, Action> keyBindings;
-    std::unordered_map<sf::Keyboard::Key, bool> keyStates;
+    void setKeyBinding(sf::Keyboard::Key key, Action action);
+    void setKeyState(sf::Keyboard::Key key, bool pressed);
 };
 
 } // namespace game

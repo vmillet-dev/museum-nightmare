@@ -1,31 +1,33 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <functional>
 #include <string>
 #include <spdlog/spdlog.h>
+#include "../input/InputManager.hpp"
 
 namespace game {
 
 class Button {
 public:
     Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size);
-    void handleInput(const sf::Vector2f& mousePos);
-    void setCallback(std::function<void()> callback);
+    void update(InputManager& inputManager);
+    bool isClicked() const { return clicked; }
     void render(sf::RenderWindow& window);
+    void setSelected(bool selected) { isSelected = selected; }
+    bool getSelected() const { return isSelected; }
 
 private:
-    void handleClick(const sf::Vector2f& mousePos);
-    void handleHover(const sf::Vector2f& mousePos);
     bool isMouseOver(const sf::Vector2f& mousePos) const;
-    void update(float deltaTime);
 
     sf::RectangleShape shape;
     sf::Text text;
     sf::Font font;
-    std::function<void()> callback;
     bool isHovered;
+    bool clicked;
+    bool wasPressed;  // Track previous frame's press state
+    bool isSelected{false};  // Track if button is selected via keyboard/controller
     sf::Color defaultColor{sf::Color(100, 100, 100)};
     sf::Color hoverColor{sf::Color(150, 150, 150)};
+    sf::Color selectedColor{sf::Color(200, 200, 200)};
 };
 
 } // namespace game

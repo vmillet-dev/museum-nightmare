@@ -1,19 +1,19 @@
 name: CI Cross-Platform Build
 
-on:
-  push:
-    branches: [ "main", "feature/*" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push, pull_request, workflow_dispatch]
+
+concurrency:
+  group: environment-${{github.ref}}
+  cancel-in-progress: true
 
 jobs:
   build-and-test-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Cache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4.1.2
         with:
           path: |
             build/_deps
@@ -58,50 +58,28 @@ jobs:
   build-and-test-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
+  
       - name: Cache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4.1.2
         with:
-          path: build/_deps
+          path: build\_deps
           key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
-
-      - name: Install Ninja
-        run: |
-          choco install ninja -y
-
-      - name: Setup Visual Studio Environment
-        uses: microsoft/setup-msbuild@v1.1
-        with:
-          vs-version: '17.0'
-
-      - name: Install Visual Studio Components
-        run: |
-          choco install visualstudio2022-workload-nativedesktop -y --package-parameters "--includeOptional"
 
       - name: Setup CMake
         uses: lukka/get-cmake@latest
         with:
           cmakeVersion: "3.25.0"
-
-      - name: Install OpenAL
-        run: |
-          choco install openal -y
-
-      - name: Configure CMake
-        shell: cmd
+          
+      - name: Build
+        shell: powershell
         run: |
           mkdir -p build
           cd build
-          cmake .. -G "Ninja"
-
-      - name: Build
-        shell: cmd
-        run: |
-          cd build
-          ninja
+          cmake .. -G "Visual Studio 17 2022" -A x64
+          cmake --build . --config Debug
 
       - name: Setup Virtual Display
         shell: powershell
@@ -115,10 +93,10 @@ jobs:
       - name: Run Tests
         shell: cmd
         run: |
-          cd build
-          copy _deps\sfml-build\lib\*.dll .
-          copy _deps\spdlog-build\*.dll .
-          copy _deps\box2d-build\src\*.dll .
-          copy _deps\tmxlite-build\*.dll .
+          copy ..\_deps\sfml-build\lib\Debug\*.dll .
+          copy ..\_deps\spdlog-build\Debug\*.dll .
+          copy ..\_deps\box2d-build\src\Debug\*.dll .
+          copy ..\_deps\tmxlite-build\Debug\*.dll .
+
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
           .\sfml_game.exe --test-mode
