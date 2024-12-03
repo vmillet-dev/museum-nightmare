@@ -48,10 +48,8 @@ void Button::update(InputManager& inputManager) {
     isHovered = isMouseOver(mousePos);
 
     // Handle input state
-    bool isPressed = inputManager.isActionPressed(Action::Fire) ||
-                    inputManager.isActionPressed(Action::Confirm);
-    bool justPressed = inputManager.isActionJustPressed(Action::Fire) ||
-                      inputManager.isActionJustPressed(Action::Confirm);
+    bool isPressed = inputManager.isActionPressed(Action::Confirm);
+    bool justPressed = inputManager.isActionJustPressed(Action::Confirm);
 
     if (justPressed) {
         spdlog::debug("Button '{}' just pressed - Selected: {}, Hovered: {}, WasPressed: {}",
