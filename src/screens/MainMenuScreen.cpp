@@ -12,12 +12,12 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) 
     // Add Play button with automatic vertical spacing
     builder.setSpacing(100)
            .addButton("Play", 300, 200,
-                [this]() {
+                [this, &game]() {
                     spdlog::info("Starting game");
                     game.getScreenManager().setState(GameState::Playing);
                 })
            .addButton("Quit", 300, 300,
-                [this]() {
+                [this, &game]() {
                     spdlog::info("Quitting game");
                     game.getScreenManager().setState(GameState::Quit);
                 });
@@ -41,19 +41,9 @@ void MainMenuScreen::update(float deltaTime) {
         buttons[selectedButtonIndex]->setSelected(true);
     }
 
-    // Update all buttons
+    // Update all buttons and handle clicks
     for (auto& button : buttons) {
         button->update(inputManager);
-    }
-
-    // Check for button clicks
-    if (buttons[selectedButtonIndex]->isClicked()) {
-        spdlog::info("Button clicked: {}", selectedButtonIndex);
-        if (selectedButtonIndex == 0) { // Play button
-            game.getScreenManager().setState(GameState::Playing);
-        } else if (selectedButtonIndex == 1) { // Quit button
-            game.getScreenManager().setState(GameState::Quit);
-        }
     }
 }
 
