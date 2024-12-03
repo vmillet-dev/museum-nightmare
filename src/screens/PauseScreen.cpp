@@ -1,33 +1,20 @@
 #include "PauseScreen.hpp"
 #include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
+#include "../ui/MenuBuilder.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game) {
+PauseScreen::PauseScreen(Game& game) : game(game), selectedButtonIndex(0) {
     spdlog::info("Initializing pause screen");
 
-    // Create resume button
-    resumeButton = std::make_unique<Button>(
-        "Resume",
-        sf::Vector2f(400, 250),
-        sf::Vector2f(200, 50)
-    );
-
-    // Create main menu button
-    mainMenuButton = std::make_unique<Button>(
-        "Main Menu",
-        sf::Vector2f(400, 350),
-        sf::Vector2f(200, 50)
-    );
-
-    // Load font
+    // Load font for pause text
     if (!font.loadFromFile("assets/arial.ttf")) {
         spdlog::error("Failed to load font!");
     }
 
-    // Create pause text
+    // Setup pause text
     pauseText.setFont(font);
     pauseText.setString("Paused");
     pauseText.setCharacterSize(50);
@@ -38,10 +25,22 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     pauseText.setOrigin(textBounds.width / 2, textBounds.height / 2);
     pauseText.setPosition(400, 150);
 
-    // Add buttons to vector and set initial selection
-    buttons.push_back(std::move(resumeButton));
-    buttons.push_back(std::move(mainMenuButton));
-    buttons[selectedButtonIndex]->setSelected(true);
+    // Create menu using MenuBuilder
+    MenuBuilder builder(game);
+    builder.setSpacing(100)
+           .addButton("Resume", 400, 250,
+                [this, &game]() {
+                    spdlog::info("Resuming game");
+                    game.getScreenManager().setState(GameState::Playing);
+                })
+           .addButton("Main Menu", 400, 350,
+                [this, &game]() {
+                    spdlog::info("Returning to main menu");
+                    game.getScreenManager().setState(GameState::MainMenu);
+                });
+
+    buttons = builder.build();
+    selectedButtonIndex = builder.getSelectedIndex();
 }
 
 void PauseScreen::update(float deltaTime) {
@@ -59,20 +58,9 @@ void PauseScreen::update(float deltaTime) {
         buttons[selectedButtonIndex]->setSelected(true);
     }
 
-    // Update all buttons with input manager
+    // Update all buttons
     for (auto& button : buttons) {
         button->update(inputManager);
-    }
-
-    // Handle button clicks
-    if (buttons[0]->isClicked()) {  // Resume button
-        spdlog::info("Resuming game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
-
-    if (buttons[1]->isClicked()) {  // Main Menu button
-        spdlog::info("Returning to main menu");
-        game.getScreenManager().setState(GameState::MainMenu);
     }
 }
 
