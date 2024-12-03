@@ -5,52 +5,59 @@
 
 namespace game {
 
-MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
-    buttons.push_back(std::make_unique<Button>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50)));
-    buttons.push_back(std::make_unique<Button>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50)));
-    // Set initial button selection
-    buttons[selectedButtonIndex]->setSelected(true);
+MainMenuScreen::MainMenuScreen(Game& game) : Screen(game) {
+    // Get window size for centering
+    sf::Vector2u windowSize = game.getWindow().getSize();
+    float centerX = windowSize.x / 2.f;
+    float startY = windowSize.y * 0.3f;
+
+    // Create buttons with consistent spacing
+    const float buttonWidth = 200.f;
+    const float buttonHeight = 50.f;
+    const float spacing = 20.f;
+
+    // Create menu buttons
+    playButton_ = menuBuilder_.addButton("Play",
+        sf::Vector2f(centerX, startY),
+        sf::Vector2f(buttonWidth, buttonHeight));
+
+    settingsButton_ = menuBuilder_.addButton("Settings",
+        sf::Vector2f(centerX, startY + buttonHeight + spacing),
+        sf::Vector2f(buttonWidth, buttonHeight));
+
+    testButton_ = menuBuilder_.addButton("Test Widgets",
+        sf::Vector2f(centerX, startY + (buttonHeight + spacing) * 2),
+        sf::Vector2f(buttonWidth, buttonHeight));
+
+    quitButton_ = menuBuilder_.addButton("Quit",
+        sf::Vector2f(centerX, startY + (buttonHeight + spacing) * 3),
+        sf::Vector2f(buttonWidth, buttonHeight));
 }
 
 void MainMenuScreen::update(float deltaTime) {
-    auto& inputManager = game.getInputManager();
+    menuBuilder_.update(game.getInputManager());
 
-    // Handle button navigation
-    if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
-    }
-    if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
-    }
-
-    // Update all buttons with input manager
-    for (auto& button : buttons) {
-        button->update(inputManager);
-    }
-
-    // Play button clicked
-    if (buttons[0]->isClicked()) {
+    // Handle button clicks
+    if (playButton_->isClicked()) {
         spdlog::info("Starting game");
         game.getScreenManager().setState(GameState::Playing);
     }
-
-    // Quit button clicked
-    if (buttons[1]->isClicked()) {
+    else if (settingsButton_->isClicked()) {
+        spdlog::info("Opening settings");
+        game.getScreenManager().setState(GameState::Settings);
+    }
+    else if (testButton_->isClicked()) {
+        spdlog::info("Opening test screen");
+        game.getScreenManager().setState(GameState::Test);
+    }
+    else if (quitButton_->isClicked()) {
         spdlog::info("Quitting game");
         game.getScreenManager().setState(GameState::Quit);
     }
 }
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
-    for (auto& button : buttons) {
-        button->render(window);
-    }
+    menuBuilder_.render(window);
 }
 
 } // namespace game
