@@ -1,5 +1,6 @@
 #include "Button.hpp"
 #include <spdlog/spdlog.h>
+#include <cmath>
 
 namespace game {
 
@@ -9,13 +10,13 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
         spdlog::error("Failed to load font in Button!");
     }
 
-    // Setup shape
+    // Setup shape with enhanced visuals
     shape.setSize(size);
     shape.setPosition(position);
     shape.setOrigin(size.x / 2, size.y / 2);
     shape.setFillColor(defaultColor);
     shape.setOutlineThickness(2);
-    shape.setOutlineColor(sf::Color::White);
+    shape.setOutlineColor(outlineDefaultColor);
 
     // Setup text
     text.setFont(font);
@@ -31,25 +32,82 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
     isHovered = false;
     clicked = false;
     wasPressed = false;
+    effectClock.restart();
 }
 
 void Button::update(InputManager& inputManager) {
+    float deltaTime = effectClock.restart().asSeconds();
+
     // Get mouse position from window
     sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(inputManager.getWindow()));
 
     bool wasHovered = isHovered;
     isHovered = isMouseOver(mousePos);
 
-    // Handle hover state change
-    shape.setFillColor(isHovered || isSelected ? selectedColor : defaultColor);
-
-    // Update color based on selection state
-    //shape.setFillColor(isSelected || isHovered ? selectedColor : defaultColor);
-
-    // Handle click using InputManager (mouse or confirm action)
-    bool isPressed = inputManager.isActionPressed(Action::Fire) || inputManager.isActionPressed(Action::Confirm);
+    // Handle input state
+    bool isPressed = inputManager.isActionPressed(Action::Fire) ||
+                    inputManager.isActionPressed(Action::Confirm);
     clicked = (isSelected || isHovered) && isPressed && !wasPressed;
     wasPressed = isPressed;
+
+    // Update visual effects
+    updateEffects(deltaTime);
+    updateVisualState();
+}
+
+void Button::updateEffects(float deltaTime) {
+    // Pulse effect for selected state
+    if (isSelected) {
+        pulseEffect += deltaTime * 4.0f;
+        if (pulseEffect > 2 * M_PI) pulseEffect -= 2 * M_PI;
+    } else {
+        pulseEffect = 0.0f;
+    }
+
+    // Smooth transition effect
+    float targetTransition = (isHovered || isSelected) ? 1.0f : 0.0f;
+    float transitionSpeed = 5.0f;
+
+    if (transitionEffect < targetTransition) {
+        transitionEffect = std::min(transitionEffect + deltaTime * transitionSpeed, targetTransition);
+    } else if (transitionEffect > targetTransition) {
+        transitionEffect = std::max(transitionEffect - deltaTime * transitionSpeed, targetTransition);
+    }
+}
+
+void Button::updateVisualState() {
+    sf::Color currentColor = defaultColor;
+    sf::Color currentOutline = outlineDefaultColor;
+
+    // Determine base color based on state
+    if (wasPressed && (isHovered || isSelected)) {
+        currentColor = pressedColor;
+    } else if (isSelected) {
+        currentColor = selectedColor;
+        currentOutline = outlineSelectedColor;
+    } else if (isHovered) {
+        currentColor = hoverColor;
+    }
+
+    // Apply pulse effect when selected
+    if (isSelected) {
+        float pulse = (std::sin(pulseEffect) + 1.0f) * 0.5f;
+        currentOutline.a = static_cast<sf::Uint8>(155 + 100 * pulse);
+        shape.setOutlineThickness(2.0f + pulse * 2.0f);
+    } else {
+        shape.setOutlineThickness(2.0f);
+    }
+
+    // Apply transition effect
+    sf::Color finalColor = sf::Color(
+        currentColor.r,
+        currentColor.g,
+        currentColor.b,
+        currentColor.a
+    );
+
+    shape.setFillColor(finalColor);
+    shape.setOutlineColor(currentOutline);
 }
 
 void Button::render(sf::RenderWindow& window) {
