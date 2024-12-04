@@ -59,7 +59,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-  
+
       - name: Cache Dependencies
         uses: actions/cache@v4.1.2
         with:
@@ -97,5 +97,6 @@ jobs:
           copy ..\_deps\sfml-build\lib\Debug\*.dll .
           copy ..\_deps\spdlog-build\Debug\*.dll .
           copy ..\_deps\box2d-build\src\Debug\*.dll .
+          copy ..\_deps\tmxlite-build\Debug\*.dll .
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
           .\sfml_game.exe --test-mode
