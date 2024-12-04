@@ -1,4 +1,4 @@
-#include "game/levels/ParallaxLayer.hpp"
+#include "levels/ParallaxLayer.hpp"
 #include <spdlog/spdlog.h>
 #include <cmath>
 
