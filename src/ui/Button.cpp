@@ -1,64 +1,61 @@
 #include "Button.hpp"
-#include <spdlog/spdlog.h>
 
 namespace game {
 
-Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size) {
+Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size, const WidgetStyle& style)
+    : style_(style) {
     // Load font
-    if (!font.loadFromFile("assets/arial.ttf")) {
+    if (!font_.loadFromFile(style_.fontPath)) {
         spdlog::error("Failed to load font in Button!");
     }
 
     // Setup shape
-    shape.setSize(size);
-    shape.setPosition(position);
-    shape.setOrigin(size.x / 2, size.y / 2);
-    shape.setFillColor(defaultColor);
-    shape.setOutlineThickness(2);
-    shape.setOutlineColor(sf::Color::White);
+    shape_.setSize(size);
+    shape_.setPosition(position);
+    shape_.setOrigin(size.x / 2, size.y / 2);
+    shape_.setFillColor(style_.defaultColor);
+    shape_.setOutlineThickness(style_.outlineThickness);
+    shape_.setOutlineColor(style_.outlineColor);
+
+    // Store widget properties
+    position_ = position;
+    size_ = size;
 
     // Setup text
-    text.setFont(font);
-    text.setString(buttonText);
-    text.setCharacterSize(24);
-    text.setFillColor(sf::Color::White);
-
-    // Center text in button
-    sf::FloatRect textBounds = text.getLocalBounds();
-    text.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    text.setPosition(position.x, position.y);
-
-    isHovered = false;
-    clicked = false;
-    wasPressed = false;
+    text_.setFont(font_);
+    setText(buttonText);
 }
 
 void Button::update(InputManager& inputManager) {
-    // Get mouse position from window
     sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(inputManager.getWindow()));
 
-    bool wasHovered = isHovered;
-    isHovered = isMouseOver(mousePos);
+    isHovered_ = isMouseOver(mousePos);
 
-    // Handle hover state change
-    shape.setFillColor(isHovered || isSelected ? selectedColor : defaultColor);
-
-    // Update color based on selection state
-    //shape.setFillColor(isSelected || isHovered ? selectedColor : defaultColor);
+    // Update visual state
+    shape_.setFillColor(isHovered_ || isSelected_ ? style_.selectedColor : style_.defaultColor);
 
     // Handle click using InputManager (mouse or confirm action)
     bool isPressed = inputManager.isActionPressed(Action::Fire) || inputManager.isActionPressed(Action::Confirm);
-    clicked = (isSelected || isHovered) && isPressed && !wasPressed;
-    wasPressed = isPressed;
+    clicked_ = (isSelected_ || isHovered_) && isPressed && !wasPressed_;
+    wasPressed_ = isPressed;
 }
 
 void Button::render(sf::RenderWindow& window) {
-    window.draw(shape);
-    window.draw(text);
+    window.draw(shape_);
+    window.draw(text_);
 }
 
-bool Button::isMouseOver(const sf::Vector2f& mousePos) const {
-    return shape.getGlobalBounds().contains(mousePos);
+void Button::setText(const std::string& text) {
+    text_.setString(text);
+    text_.setCharacterSize(style_.characterSize);
+    text_.setFillColor(style_.textColor);
+    updateTextPosition();
+}
+
+void Button::updateTextPosition() {
+    sf::FloatRect textBounds = text_.getLocalBounds();
+    text_.setOrigin(textBounds.width / 2, textBounds.height / 2);
+    text_.setPosition(position_);
 }
 
 } // namespace game

@@ -77,7 +77,9 @@ void ConfigManager::createDefaultConfig() {
 void ConfigManager::saveConfig() {
     std::ofstream file("assets/config.toml");
     file << config;
-    spdlog::info("Config saved");
+    spdlog::info("Config saved with window dimensions: {}x{}",
+        config["window"]["width"].value_or(800),
+        config["window"]["height"].value_or(600));
 }
 
 int ConfigManager::getWindowWidth() const {
@@ -90,6 +92,31 @@ int ConfigManager::getWindowHeight() const {
 
 std::string ConfigManager::getWindowTitle() const {
     return config["window"]["title"].value_or("SFML Game");
+}
+
+void ConfigManager::setWindowWidth(int width) {
+    if (!config.contains("window")) {
+        config.insert_or_assign("window", toml::table{});
+    }
+    auto& window_table = *config.get("window")->as_table();
+    window_table.insert_or_assign("width", width);
+    spdlog::debug("Window width updated in config: {}", width);
+}
+
+void ConfigManager::setWindowHeight(int height) {
+    if (!config.contains("window")) {
+        config.insert_or_assign("window", toml::table{});
+    }
+    auto& window_table = *config.get("window")->as_table();
+    window_table.insert_or_assign("height", height);
+    spdlog::debug("Window height updated in config: {}", height);
+}
+
+void ConfigManager::setWindowResolution(int width, int height) {
+    setWindowWidth(width);
+    setWindowHeight(height);
+    saveConfig();
+    spdlog::info("Window resolution set to: {}x{}", width, height);
 }
 
 toml::v3::array* ConfigManager::getKeyboardBindingsForAction(const std::string& action) {

@@ -6,7 +6,7 @@
 
 namespace game {
 
-GameScreen::GameScreen(Game& game) : game(game) {
+GameScreen::GameScreen(Game& game) : Screen(game) {
     spdlog::info("Initializing game screen");
 
     // Initialize game objects
