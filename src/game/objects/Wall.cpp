@@ -5,23 +5,25 @@
 
 namespace game {
 
-Wall::Wall(float x, float y, float width, float height, const std::string& texturePath)
+Wall::Wall(float x, float y, float width, float height,
+           const std::string& texturePath, const sf::IntRect& textureRect)
     : GameObject(x, y), width(width), height(height) {
     try {
         const sf::Texture& texture = TextureManager::getInstance().getTexture(texturePath);
         sprite.setTexture(texture);
+        sprite.setTextureRect(textureRect);
         sprite.setOrigin(width / 2, height / 2);
         sprite.setPosition(position);
-        // Scale sprite to match desired size
-        sf::Vector2u textureSize = texture.getSize();
-        sprite.setScale(
-            width / static_cast<float>(textureSize.x),
-            height / static_cast<float>(textureSize.y)
-        );
+        // Set scale to match the desired tile size while preserving texture rect proportions
+        float scaleX = width / static_cast<float>(textureRect.width);
+        float scaleY = height / static_cast<float>(textureRect.height);
+        sprite.setScale(scaleX, scaleY);
     } catch (const std::runtime_error& e) {
         spdlog::error("Failed to load wall texture: {}", e.what());
     }
-    spdlog::debug("Wall created: pos({:.1f},{:.1f}) size({:.1f},{:.1f})", x, y, width, height);
+    spdlog::debug("Wall created: pos({:.1f},{:.1f}) size({:.1f},{:.1f}) texRect({},{},{},{})",
+                  x, y, width, height, textureRect.left, textureRect.top,
+                  textureRect.width, textureRect.height);
 }
 
 void Wall::update(float deltaTime) {

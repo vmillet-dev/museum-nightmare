@@ -5,7 +5,8 @@
 
 namespace game {
 
-BackgroundObject::BackgroundObject(float x, float y, float depth, const std::string& texturePath, const Camera& camera)
+BackgroundObject::BackgroundObject(float x, float y, float depth, const std::string& texturePath,
+                                 const Camera& camera, const sf::IntRect& textureRect)
     : GameObject(x, y)
     , depth(depth)
     , initialPosition(x, y)
@@ -14,10 +15,10 @@ BackgroundObject::BackgroundObject(float x, float y, float depth, const std::str
     try {
         const sf::Texture& loadedTexture = TextureManager::getInstance().getTexture(texturePath);
         sprite.setTexture(loadedTexture);
+        sprite.setTextureRect(textureRect);
 
         // Set the origin to the center of the sprite for proper positioning
-        sf::Vector2u textureSize = loadedTexture.getSize();
-        sprite.setOrigin(textureSize.x / 2.0f, textureSize.y / 2.0f);
+        sprite.setOrigin(textureRect.width / 2.0f, textureRect.height / 2.0f);
 
         // Initial position setup
         sprite.setPosition(initialPosition);

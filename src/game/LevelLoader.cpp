@@ -48,9 +48,22 @@ void LevelLoader::loadParallaxLayers(GameObjectManager& manager, const Camera& c
                             obj.getTileID() < tileset.getFirstGID() + tileset.getTileCount()) {
                             const auto* tileData = tileset.getTile(obj.getTileID() - tileset.getFirstGID());
                             if (tileData && !tileData->imagePath.empty()) {
+                                // Calculate texture rectangle for background object
+                                uint32_t localId = obj.getTileID() - tileset.getFirstGID();
+                                uint32_t tilesetColumns = tileset.getColumnCount();
+                                const auto& tileSize = tileset.getTileSize();
+                                uint32_t tileX = (localId % tilesetColumns) * tileSize.x;
+                                uint32_t tileY = (localId / tilesetColumns) * tileSize.y;
+
+                                sf::IntRect textureRect(tileX, tileY, tileSize.x, tileSize.y);
+                                spdlog::debug("Creating background object with texture rect: ({}, {}, {}, {})",
+                                            textureRect.left, textureRect.top,
+                                            textureRect.width, textureRect.height);
+
                                 manager.addObject(std::make_unique<BackgroundObject>(
                                     obj.getPosition().x, obj.getPosition().y,
-                                    parallaxFactor, tileData->imagePath, camera));  // Pass camera reference
+                                    parallaxFactor, tileData->imagePath,
+                                    camera, textureRect));
                             }
                             break;
                         }
@@ -95,8 +108,19 @@ GameObject* LevelLoader::createGameObjectFromTile(const tmx::TileLayer& layer, u
             const auto* tileData = tileset.getTile(gid - tileset.getFirstGID());
             if (!tileData) continue;
 
-            // Create a wall for each tile and use its texture
-            return new Wall(x, y, tileSize.x, tileSize.y, tileData->imagePath);
+            // Calculate texture rectangle based on GID
+            uint32_t localId = gid - tileset.getFirstGID();
+            uint32_t tilesetColumns = tileset.getColumnCount();
+            uint32_t tileX = (localId % tilesetColumns) * tileSize.x;
+            uint32_t tileY = (localId / tilesetColumns) * tileSize.y;
+
+            sf::IntRect textureRect(tileX, tileY, tileSize.x, tileSize.y);
+            spdlog::debug("Creating wall with texture rect: ({}, {}, {}, {})",
+                         textureRect.left, textureRect.top,
+                         textureRect.width, textureRect.height);
+
+            // Create wall with texture rectangle
+            return new Wall(x, y, tileSize.x, tileSize.y, tileData->imagePath, textureRect);
         }
     }
     return nullptr;
