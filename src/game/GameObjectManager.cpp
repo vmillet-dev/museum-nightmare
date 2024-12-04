@@ -58,7 +58,7 @@ void GameObjectManager::createWall(float x, float y, float width, float height) 
     b2CreatePolygonShape(bodyId, &shapeDef, &boxShape);
 
     // Create a wall game object
-    auto wall = std::make_unique<StaticWall>(bodyId, width, height);
+    auto wall = std::make_unique<Wall>(bodyId, width, height);
     wall->initPhysics(physicsWorld->getWorld());
 
     // Add wall to objects list
