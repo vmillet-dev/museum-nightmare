@@ -53,6 +53,7 @@ jobs:
       - name: Run Tests with Virtual Display
         run: |
           cd build
+          cp -r ../assets .
           xvfb-run --auto-servernum ./sfml_game --test-mode
 
   build-and-test-windows:
@@ -94,6 +95,7 @@ jobs:
         shell: cmd
         run: |
           cd build\Debug
+          xcopy /E /I /Y ..\..\assets assets
           copy ..\_deps\sfml-build\lib\Debug\*.dll .
           copy ..\_deps\spdlog-build\Debug\*.dll .
           copy ..\_deps\box2d-build\src\Debug\*.dll .
