@@ -2,7 +2,6 @@
 #include <vector>
 #include <memory>
 #include "objects/GameObject.hpp"
-#include "objects/StaticWall.hpp"
 #include "objects/Wall.hpp"
 #include "physics/PhysicsWorld.hpp"
 #include <spdlog/spdlog.h>
