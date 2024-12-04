@@ -5,7 +5,7 @@
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : Screen(game) {
+PauseScreen::PauseScreen(Game& game) : Screen(game), menuBuilder_(game) {
     spdlog::info("Initializing pause screen");
 
     // Get window size for centering
@@ -13,21 +13,22 @@ PauseScreen::PauseScreen(Game& game) : Screen(game) {
     float centerX = windowSize.x / 2.f;
     float startY = windowSize.y * 0.3f;
 
-    // Create buttons with consistent sizing
-    const float buttonWidth = 200.f;
-    const float buttonHeight = 50.f;
+    // Create menu buttons using MenuBuilder with method chaining
+    menuBuilder_.setSpacing(100)
+        .addButton("Resume", 300, startY,
+            [this, &game]() {
+                spdlog::info("Resuming game");
+                game.getScreenManager().setState(GameState::Playing);
+            })
+        .addButton("Main Menu", 300, startY + 100,
+            [this, &game]() {
+                spdlog::info("Returning to main menu");
+                game.getScreenManager().setState(GameState::MainMenu);
+            });
 
-    // Create menu buttons using MenuBuilder
-    resumeButton = menuBuilder_.addButton("Resume",
-        sf::Vector2f(centerX - buttonWidth/2, startY),
-        sf::Vector2f(buttonWidth, buttonHeight));
-
-    mainMenuButton = menuBuilder_.addButton("Main Menu",
-        sf::Vector2f(centerX - buttonWidth/2, startY),
-        sf::Vector2f(buttonWidth, buttonHeight));
-
-    // Use layout helper to align buttons vertically with spacing
-    menuBuilder_.alignVertically(centerX - buttonWidth/2, 20.f);
+    // Store buttons and selected index
+    buttons_ = menuBuilder_.build();
+    selectedButtonIndex_ = menuBuilder_.getSelectedIndex();
 
     // Load font for pause text
     if (!font.loadFromFile("assets/arial.ttf")) {
@@ -48,17 +49,6 @@ PauseScreen::PauseScreen(Game& game) : Screen(game) {
 
 void PauseScreen::update(float deltaTime) {
     menuBuilder_.update(game.getInputManager());
-
-    // Handle button clicks
-    if (resumeButton->isClicked()) {
-        spdlog::info("Resuming game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
-
-    if (mainMenuButton->isClicked()) {
-        spdlog::info("Returning to main menu");
-        game.getScreenManager().setState(GameState::MainMenu);
-    }
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {

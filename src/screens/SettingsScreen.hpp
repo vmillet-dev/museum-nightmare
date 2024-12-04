@@ -13,12 +13,11 @@ public:
 
 private:
     MenuBuilder menuBuilder_;
-    Button* backButton_;
-    Button* applyButton_;
+    std::vector<Button*> buttons_;
+    size_t selectedButtonIndex_;
     Dropdown* resolutionDropdown_;
 
     std::vector<std::string> getAvailableResolutions();
-    void applySettings();
 };
 
 } // namespace game

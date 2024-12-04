@@ -21,8 +21,8 @@ public:
 
 private:
     MenuBuilder menuBuilder_;
-    Button* resumeButton;
-    Button* mainMenuButton;
+    std::vector<Button*> buttons_;
+    size_t selectedButtonIndex_;
     sf::Font font;
     sf::Text pauseText;
 };

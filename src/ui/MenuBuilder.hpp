@@ -8,18 +8,28 @@
 
 namespace game {
 
+class Game;  // Forward declaration
+
 class MenuBuilder {
 public:
-    MenuBuilder() = default;
+    using ButtonCallback = std::function<void()>;
 
-    // Button creation with method chaining and direct access
-    Button* addButton(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size,
-                      const WidgetStyle& style = WidgetStyle::createDefault());
+    explicit MenuBuilder(Game& game);
 
-    // Dropdown creation with method chaining and direct access
+    // Method chaining interface
+    MenuBuilder& setSpacing(float spacing) {
+        spacing_ = spacing;
+        return *this;
+    }
+
+    MenuBuilder& addButton(const std::string& text, float x, float y, ButtonCallback callback);
     Dropdown* addDropdown(const std::string& label, const sf::Vector2f& position, const sf::Vector2f& size,
-                          const std::vector<std::string>& options,
-                          const WidgetStyle& style = WidgetStyle::createDefault());
+                         const std::vector<std::string>& options,
+                         const WidgetStyle& style = WidgetStyle::createDefault());
+
+    // Build and get results
+    std::vector<Button*> build();
+    size_t getSelectedIndex() const { return selectedIndex_; }
 
     // Widget management
     void update(InputManager& inputManager);
@@ -29,26 +39,18 @@ public:
     void selectNext();
     void selectPrevious();
     Widget* getSelectedWidget();
-    const std::vector<std::unique_ptr<Widget>>& getWidgets() const { return widgets_; }
-
-    // Widget access
-    template<typename T>
-    T* getWidget(size_t index) {
-        if (index < widgets_.size()) {
-            return dynamic_cast<T*>(widgets_[index].get());
-        }
-        return nullptr;
-    }
-
-    // Layout helpers
-    void centerHorizontally(float y, float spacing = 20.f);
-    void alignVertically(float x, float spacing = 20.f);
 
 private:
+    Game& game_;
     std::vector<std::unique_ptr<Widget>> widgets_;
+    std::vector<ButtonCallback> callbacks_;
     size_t selectedIndex_ = 0;
+    float spacing_ = 20.f;
+    float nextY_ = 0.f;
+    float startX_ = 0.f;
 
     void updateSelection();
+    void executeCallback(size_t index);
 };
 
 } // namespace game

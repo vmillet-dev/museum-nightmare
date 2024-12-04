@@ -6,17 +6,11 @@
 
 namespace game {
 
-SettingsScreen::SettingsScreen(Game& game) : Screen(game) {
+SettingsScreen::SettingsScreen(Game& game) : Screen(game), menuBuilder_(game) {
     // Get window size for centering
     sf::Vector2u windowSize = game.getWindow().getSize();
     float centerX = windowSize.x / 2.f;
     float startY = windowSize.y * 0.3f;
-
-    // Create widgets with consistent sizing
-    const float buttonWidth = 200.f;
-    const float buttonHeight = 50.f;
-    const float dropdownWidth = 300.f;
-    const float spacing = 20.f;
 
     // Get available resolutions and current resolution
     auto resolutions = getAvailableResolutions();
@@ -25,8 +19,8 @@ SettingsScreen::SettingsScreen(Game& game) : Screen(game) {
     // Create resolution dropdown
     resolutionDropdown_ = menuBuilder_.addDropdown(
         "Resolution",
-        sf::Vector2f(centerX - dropdownWidth/2, startY),
-        sf::Vector2f(dropdownWidth, buttonHeight),
+        sf::Vector2f(300, startY),
+        sf::Vector2f(200.f, 50.f),
         resolutions
     );
 
@@ -36,58 +30,46 @@ SettingsScreen::SettingsScreen(Game& game) : Screen(game) {
         resolutionDropdown_->setSelectedIndex(std::distance(resolutions.begin(), it));
     }
 
-    // Create Apply button
-    applyButton_ = menuBuilder_.addButton(
-        "Apply",
-        sf::Vector2f(centerX - buttonWidth/2, startY + buttonHeight + spacing),
-        sf::Vector2f(buttonWidth, buttonHeight)
-    );
+    // Create menu with automatic spacing
+    menuBuilder_.setSpacing(100)
+        .addButton("Apply", 300, startY + 100,
+            [this, &game]() {
+                const std::string& selectedRes = resolutionDropdown_->getSelectedOption();
+                size_t xPos = selectedRes.find('x');
+                if (xPos != std::string::npos) {
+                    try {
+                        unsigned int width = std::stoul(selectedRes.substr(0, xPos));
+                        unsigned int height = std::stoul(selectedRes.substr(xPos + 1));
 
-    // Create Back button
-    backButton_ = menuBuilder_.addButton(
-        "Back",
-        sf::Vector2f(centerX - buttonWidth/2, startY + (buttonHeight + spacing) * 2),
-        sf::Vector2f(buttonWidth, buttonHeight)
-    );
+                        // Update config and window
+                        ConfigManager::getInstance().setWindowResolution(width, height);
+                        game.getWindow().setSize(sf::Vector2u(width, height));
+
+                        // Center window on screen
+                        sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+                        game.getWindow().setPosition(sf::Vector2i(
+                            (desktop.width - width) / 2,
+                            (desktop.height - height) / 2
+                        ));
+
+                        spdlog::info("Resolution changed to {}x{}", width, height);
+                    } catch (const std::exception& e) {
+                        spdlog::error("Failed to parse resolution: {}", e.what());
+                    }
+                }
+            })
+        .addButton("Back", 300, startY + 200,
+            [this, &game]() {
+                game.getScreenManager().setState(GameState::MainMenu);
+            });
+
+    // Store buttons and selected index
+    buttons_ = menuBuilder_.build();
+    selectedButtonIndex_ = menuBuilder_.getSelectedIndex();
 }
 
 void SettingsScreen::update(float deltaTime) {
     menuBuilder_.update(game.getInputManager());
-
-    if (applyButton_->isClicked()) {
-        const std::string& selectedRes = resolutionDropdown_->getSelectedOption();
-        size_t xPos = selectedRes.find('x');
-        if (xPos != std::string::npos) {
-            try {
-                unsigned int width = std::stoul(selectedRes.substr(0, xPos));
-                unsigned int height = std::stoul(selectedRes.substr(xPos + 1));
-
-                // Update config
-                ConfigManager::getInstance().setWindowResolution(width, height);
-
-                // Update window size
-                game.getWindow().setSize(sf::Vector2u(width, height));
-
-                // Center window on screen
-                sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-                game.getWindow().setPosition(sf::Vector2i(
-                    (desktop.width - width) / 2,
-                    (desktop.height - height) / 2
-                ));
-
-                // Recenter UI elements after resolution change
-                float centerX = width / 2.f;
-                float startY = height * 0.3f;
-                menuBuilder_.alignVertically(centerX, 20.f);
-            } catch (const std::exception& e) {
-                spdlog::error("Failed to parse resolution: {}", e.what());
-            }
-        }
-    }
-
-    if (backButton_->isClicked()) {
-        game.getScreenManager().setState(GameState::MainMenu);
-    }
 }
 
 void SettingsScreen::render(sf::RenderWindow& window) {
