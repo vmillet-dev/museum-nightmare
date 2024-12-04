@@ -16,7 +16,7 @@ Wall::Wall(b2BodyId bodyId, float width, float height)
     position = sf::Vector2f(pos.x, pos.y);
     shape.setPosition(position);
 
-    spdlog::debug("Wall created with bodyId: {} size({:.1f},{:.1f})", (void*)bodyId, width, height);
+    spdlog::debug("Wall created with size({:.1f},{:.1f})", width, height);
 }
 
 void Wall::update(float deltaTime) {
