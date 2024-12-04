@@ -1,5 +1,6 @@
 #include "ParallaxLayer.hpp"
 #include <spdlog/spdlog.h>
+#include <cmath>
 
 namespace game {
 
