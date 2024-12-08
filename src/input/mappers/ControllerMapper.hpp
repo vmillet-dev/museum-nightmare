@@ -20,21 +20,17 @@ public:
     bool isButton(const std::string& name);
 
 private:
-    ControllerMapper() {}  // initializeMap will be called by getButtonMap/getAxisMap
+    ControllerMapper() { initializeMap(); }
     ControllerMapper(const ControllerMapper&) = delete;
     ControllerMapper& operator=(const ControllerMapper&) = delete;
 
     static Bimap<unsigned int, std::string>& getButtonMap() {
-        static std::once_flag buttonInitFlag;
         static Bimap<unsigned int, std::string> buttonMap;
-        std::call_once(buttonInitFlag, [&]() { getInstance().initializeMap(); });
         return buttonMap;
     }
 
     static Bimap<unsigned int, std::string>& getAxisMap() {
-        static std::once_flag axisInitFlag;
         static Bimap<unsigned int, std::string> axisMap;
-        std::call_once(axisInitFlag, [&]() { getInstance().initializeMap(); });
         return axisMap;
     }
 

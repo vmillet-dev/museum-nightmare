@@ -17,14 +17,12 @@ public:
     std::string toName(sf::Keyboard::Key key);
 
 private:
-    KeyMapper() {}  // initializeMap will be called by getKeyMap
+    KeyMapper() { initializeMap(); }
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
     static Bimap<sf::Keyboard::Key, std::string>& getKeyMap() {
-        static std::once_flag initFlag;
         static Bimap<sf::Keyboard::Key, std::string> keyMap;
-        std::call_once(initFlag, [&]() { getInstance().initializeMap(); });
         return keyMap;
     }
 

@@ -17,14 +17,12 @@ public:
     std::string buttonToString(sf::Mouse::Button button);
 
 private:
-    MouseMapper() {}  // initializeMap will be called by getButtonMap
+    MouseMapper() { initializeMap(); }
     MouseMapper(const MouseMapper&) = delete;
     MouseMapper& operator=(const MouseMapper&) = delete;
 
     static Bimap<sf::Mouse::Button, std::string>& getButtonMap() {
-        static std::once_flag initFlag;
         static Bimap<sf::Mouse::Button, std::string> buttonMap;
-        std::call_once(initFlag, [&]() { getInstance().initializeMap(); });
         return buttonMap;
     }
 
