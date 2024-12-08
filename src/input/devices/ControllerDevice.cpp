@@ -36,14 +36,14 @@ void ControllerDevice::init() {
 
         for (const auto& control : *controls) {
             std::string controlStr = control.value_or("");
-            if (ControllerMapper::isAxis(controlStr)) {
-                unsigned int axisId = ControllerMapper::mapAxisId(controlStr);
-                std::string axisKey = (ControllerMapper::isAxisPositive(controlStr) ? "+" : "-") + std::to_string(axisId);
+            if (ControllerMapper::getInstance().isAxis(controlStr)) {
+                unsigned int axisId = ControllerMapper::getInstance().mapAxisId(controlStr);
+                std::string axisKey = (ControllerMapper::getInstance().isAxisPositive(controlStr) ? "+" : "-") + std::to_string(axisId);
                 setAxisBinding(axisKey, action);
                 spdlog::debug("Set controller axis binding: {} -> {}", controlStr, ActionUtil::toString(action));
             }
-            else if (ControllerMapper::isButton(controlStr)) {
-                unsigned int buttonId = ControllerMapper::mapButtonName(controlStr);
+            else if (ControllerMapper::getInstance().isButton(controlStr)) {
+                unsigned int buttonId = ControllerMapper::getInstance().mapButtonName(controlStr);
                 setButtonBinding(buttonId, action);
                 spdlog::debug("Set controller button binding: {} -> {}", controlStr, ActionUtil::toString(action));
 

@@ -3,11 +3,19 @@
 #include <spdlog/spdlog.h>
 #include <algorithm>
 #include <typeinfo>
+#include "mappers/KeyMapper.hpp"
+#include "mappers/MouseMapper.hpp"
+#include "mappers/ControllerMapper.hpp"
 
 namespace game {
 
 InputManager::InputManager(sf::RenderWindow& window) : window(window) {
     spdlog::info("Initializing InputManager");
+
+    // Initialize mappers before creating devices
+    KeyMapper::getInstance();
+    MouseMapper::getInstance();
+    ControllerMapper::getInstance();
 
     // Add keyboard device by default
     auto keyboardDevice = std::make_unique<KeyboardDevice>();

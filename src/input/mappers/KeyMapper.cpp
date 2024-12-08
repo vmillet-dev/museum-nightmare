@@ -43,7 +43,7 @@ void KeyMapper::initializeMap() {
 
 sf::Keyboard::Key KeyMapper::fromName(const std::string& keyName) {
     try {
-        return getInstance().getKeyMap().get_right(keyName);
+        return getKeyMap().get_right(keyName);
     } catch (const std::out_of_range&) {
         return sf::Keyboard::Unknown;
     }
@@ -51,7 +51,7 @@ sf::Keyboard::Key KeyMapper::fromName(const std::string& keyName) {
 
 std::string KeyMapper::toName(sf::Keyboard::Key key) {
     try {
-        return getInstance().getKeyMap().get_left(key);
+        return getKeyMap().get_left(key);
     } catch (const std::out_of_range&) {
         return "Unknown";
     }

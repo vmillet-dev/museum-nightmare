@@ -13,7 +13,7 @@ void MouseMapper::initializeMap() {
 
 sf::Mouse::Button MouseMapper::stringToButton(const std::string& buttonStr) {
     try {
-        return getInstance().getButtonMap().get_right(buttonStr);
+        return getButtonMap().get_right(buttonStr);
     } catch (const std::out_of_range&) {
         return sf::Mouse::ButtonCount;  // Return an invalid button if not found
     }
@@ -21,7 +21,7 @@ sf::Mouse::Button MouseMapper::stringToButton(const std::string& buttonStr) {
 
 std::string MouseMapper::buttonToString(sf::Mouse::Button button) {
     try {
-        return getInstance().getButtonMap().get_left(button);
+        return getButtonMap().get_left(button);
     } catch (const std::out_of_range&) {
         return "unknown";  // Return "unknown" if button is not found
     }

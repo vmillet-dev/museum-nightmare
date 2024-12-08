@@ -14,7 +14,7 @@ void KeyboardDevice::init() {
         auto keys = config.getKeyboardBindingsForAction(actionStr);
         for (const auto& key : *keys) {
             std::string keyName = key.value_or("");
-            sf::Keyboard::Key sfKey = KeyMapper::fromName(keyName);
+            sf::Keyboard::Key sfKey = KeyMapper::getInstance().fromName(keyName);
 
             setKeyBinding(sfKey, action);
             spdlog::debug("Set keyboard binding: {} -> {}", keyName, ActionUtil::toString(action));
