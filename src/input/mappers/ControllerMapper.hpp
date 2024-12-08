@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Window/Joystick.hpp>
 #include <string>
-#include "../../../core/containers/bimap.hpp"
+#include "../../core/containers/bimap.hpp"
 
 namespace game {
 
