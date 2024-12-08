@@ -56,8 +56,8 @@ private:
             m.insert(Action::Confirm, "Confirm");
             m.insert(Action::Cancel, "Cancel");
             m.insert(Action::Fire, "Fire");
-            //m.insert(Action::MouseLeft, "MouseLeft");
-            //m.insert(Action::MouseRight, "MouseRight");
+            m.insert(Action::MouseLeft, "MouseLeft");
+            m.insert(Action::MouseRight, "MouseRight");
             return m;
         }();
         return map;

@@ -5,19 +5,19 @@
 #include <concepts>
 #include <stdexcept>
 
-namespace cpp23 {
+namespace game {
 
 template<typename Left, typename Right>
     requires std::movable<Left> && std::movable<Right> &&
              std::equality_comparable<Left> && std::equality_comparable<Right> &&
              std::default_initializable<Left> && std::default_initializable<Right>
-class bimap {
+class Bimap {
 private:
     std::unordered_map<Left, Right> left_to_right;
     std::unordered_map<Right, Left> right_to_left;
 
 public:
-    bimap() = default;
+    Bimap() = default;
 
     bool insert(const Left& left, const Right& right) {
         if (left_to_right.contains(left) || right_to_left.contains(right)) {
@@ -41,34 +41,28 @@ public:
         return l_inserted;
     }
 
-    [[nodiscard]] const Right* get_right(const Left& left) const noexcept {
-        auto it = left_to_right.find(left);
-        return it != left_to_right.end() ? &it->second : nullptr;
-    }
-
-    [[nodiscard]] const Left* get_left(const Right& right) const noexcept {
-        auto it = right_to_left.find(right);
-        return it != right_to_left.end() ? &it->second : nullptr;
-    }
-
-    bool remove(const Left& left) {
+    const Right& get_left(const Left& left) const {
         auto it = left_to_right.find(left);
         if (it == left_to_right.end()) {
-            return false;
+            throw std::out_of_range("Key not found in left map");
         }
-        right_to_left.erase(it->second);
-        left_to_right.erase(it);
-        return true;
+        return it->second;
     }
 
-    bool remove_by_right(const Right& right) {
+    const Left& get_right(const Right& right) const {
         auto it = right_to_left.find(right);
         if (it == right_to_left.end()) {
-            return false;
+            throw std::out_of_range("Key not found in right map");
         }
-        left_to_right.erase(it->second);
-        right_to_left.erase(it);
-        return true;
+        return it->second;
+    }
+
+    bool contains_left(const Left& left) const noexcept {
+        return left_to_right.contains(left);
+    }
+
+    bool contains_right(const Right& right) const noexcept {
+        return right_to_left.contains(right);
     }
 
     void clear() noexcept {
@@ -85,6 +79,6 @@ public:
     }
 };
 
-} // namespace cpp23
+} // namespace game
 
 #endif // BIMAP_HPP
