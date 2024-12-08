@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML/Window/Joystick.hpp>
 #include <string>
-#include <mutex>
 #include "../../core/containers/bimap.hpp"
 
 namespace game {
@@ -15,15 +14,26 @@ public:
     static bool isButton(const std::string& name);
 
 private:
-    ControllerMapper() = default;
+    static ControllerMapper& getInstance() {
+        static ControllerMapper instance;
+        return instance;
+    }
+
+    ControllerMapper() { initializeMap(); }
     ControllerMapper(const ControllerMapper&) = delete;
     ControllerMapper& operator=(const ControllerMapper&) = delete;
 
-    static void ensureInitialized();
-    static void initializeMap();
-    static std::once_flag initFlag_;
-    static Bimap<unsigned int, std::string> buttonMap;
-    static Bimap<unsigned int, std::string> axisMap;
+    static Bimap<unsigned int, std::string>& getButtonMap() {
+        static Bimap<unsigned int, std::string> buttonMap;
+        return buttonMap;
+    }
+
+    static Bimap<unsigned int, std::string>& getAxisMap() {
+        static Bimap<unsigned int, std::string> axisMap;
+        return axisMap;
+    }
+
+    void initializeMap();
 };
 
 } // namespace game

@@ -1,18 +1,9 @@
 #include "KeyMapper.hpp"
-#include <mutex>
 
 namespace game {
 
-std::once_flag KeyMapper::initFlag_;
-Bimap<sf::Keyboard::Key, std::string> KeyMapper::keyMap;
-
-void KeyMapper::ensureInitialized() {
-    std::call_once(initFlag_, []() {
-        initializeMap();
-    });
-}
-
 void KeyMapper::initializeMap() {
+    auto& keyMap = getKeyMap();
     keyMap.insert(sf::Keyboard::A, "A"); keyMap.insert(sf::Keyboard::B, "B");
     keyMap.insert(sf::Keyboard::C, "C"); keyMap.insert(sf::Keyboard::D, "D");
     keyMap.insert(sf::Keyboard::E, "E"); keyMap.insert(sf::Keyboard::F, "F");
@@ -51,18 +42,16 @@ void KeyMapper::initializeMap() {
 }
 
 sf::Keyboard::Key KeyMapper::fromName(const std::string& keyName) {
-    ensureInitialized();
     try {
-        return keyMap.get_right(keyName);
+        return getInstance().getKeyMap().get_right(keyName);
     } catch (const std::out_of_range&) {
         return sf::Keyboard::Unknown;
     }
 }
 
 std::string KeyMapper::toName(sf::Keyboard::Key key) {
-    ensureInitialized();
     try {
-        return keyMap.get_left(key);
+        return getInstance().getKeyMap().get_left(key);
     } catch (const std::out_of_range&) {
         return "Unknown";
     }

@@ -2,21 +2,13 @@
 #include <stdexcept>
 #include <string>
 #include <regex>
-#include <mutex>
 
 namespace game {
 
-std::once_flag ControllerMapper::initFlag_;
-Bimap<unsigned int, std::string> ControllerMapper::buttonMap;
-Bimap<unsigned int, std::string> ControllerMapper::axisMap;
-
-void ControllerMapper::ensureInitialized() {
-    std::call_once(initFlag_, []() {
-        initializeMap();
-    });
-}
-
 void ControllerMapper::initializeMap() {
+    auto& buttonMap = getButtonMap();
+    auto& axisMap = getAxisMap();
+
     // Initialize button mappings
     buttonMap.insert(0, "A");
     buttonMap.insert(1, "B");
@@ -41,9 +33,8 @@ void ControllerMapper::initializeMap() {
 }
 
 unsigned int ControllerMapper::mapButtonName(const std::string& name) {
-    ensureInitialized();
     try {
-        return buttonMap.get_right(name);
+        return getInstance().getButtonMap().get_right(name);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller button: " + name);
     }
@@ -66,9 +57,8 @@ unsigned int ControllerMapper::mapAxisId(const std::string& name) {
         }
     }
 
-    ensureInitialized();
     try {
-        return axisMap.get_right(result);
+        return getInstance().getAxisMap().get_right(result);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller axis: " + name);
     }
@@ -80,15 +70,13 @@ bool ControllerMapper::isAxisPositive(const std::string& name) {
 }
 
 bool ControllerMapper::isAxis(const std::string& name) {
-    ensureInitialized();
     return name.find("Stick") != std::string::npos ||
            name.find("DPad") != std::string::npos ||
            name.find("Trigger") != std::string::npos;
 }
 
 bool ControllerMapper::isButton(const std::string& name) {
-    ensureInitialized();
-    return buttonMap.contains_right(name);
+    return getInstance().getButtonMap().contains_right(name);
 }
 
 } // namespace game
