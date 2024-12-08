@@ -2,8 +2,7 @@
 
 namespace game {
 
-void MouseMapper::initializeMap() {
-    auto& buttonMap = getButtonMap();
+void MouseMapper::initializeButtonMap(Bimap<sf::Mouse::Button, std::string>& buttonMap) {
     buttonMap.insert(sf::Mouse::Left, "LeftButton");
     buttonMap.insert(sf::Mouse::Right, "RightButton");
     buttonMap.insert(sf::Mouse::Middle, "MiddleButton");
