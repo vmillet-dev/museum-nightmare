@@ -18,10 +18,30 @@ void KeyboardDevice::init() {
 
     // Load key bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        auto keys = config.getKeyboardBindingsForAction(actionStr);
+        spdlog::debug("Loading bindings for action: {}", actionStr);
+        auto* keys = config.getKeyboardBindingsForAction(actionStr);
+        if (!keys) {
+            spdlog::warn("No keyboard bindings found for action: {}", actionStr);
+            continue;
+        }
+
         for (const auto& key : *keys) {
+            if (!key) {
+                spdlog::warn("Invalid key binding for action: {}", actionStr);
+                continue;
+            }
+
             std::string keyName = key.value_or("");
+            if (keyName.empty()) {
+                spdlog::warn("Empty key binding for action: {}", actionStr);
+                continue;
+            }
+
             sf::Keyboard::Key sfKey = mapper.fromName(keyName);
+            if (sfKey == sf::Keyboard::Unknown) {
+                spdlog::warn("Unknown key name for action {}: {}", actionStr, keyName);
+                continue;
+            }
 
             setKeyBinding(sfKey, action);
             spdlog::debug("Set keyboard binding: {} -> {}", keyName, ActionUtil::toString(action));
