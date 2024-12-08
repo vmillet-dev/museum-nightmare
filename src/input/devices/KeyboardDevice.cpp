@@ -20,14 +20,14 @@ void KeyboardDevice::init() {
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
         spdlog::debug("Loading bindings for action: {}", actionStr);
         auto* keys = config.getKeyboardBindingsForAction(actionStr);
-        if (!keys) {
+        if (!keys || keys->empty()) {
             spdlog::warn("No keyboard bindings found for action: {}", actionStr);
             continue;
         }
 
         for (const auto& key : *keys) {
-            if (!key) {
-                spdlog::warn("Invalid key binding for action: {}", actionStr);
+            if (!key.is_string()) {
+                spdlog::warn("Invalid key binding type for action: {}", actionStr);
                 continue;
             }
 
