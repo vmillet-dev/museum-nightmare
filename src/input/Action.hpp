@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <unordered_map>
+#include "../core/containers/bimap.hpp"
 #include <stdexcept>
 
 namespace game {
@@ -22,59 +22,44 @@ class ActionUtil {
 public:
     // Convert Action enum to string
     static std::string toString(Action action) {
-        auto it = actionToStringMap().find(action);
-        if (it != actionToStringMap().end()) {
-            return it->second;
+        try {
+            return actionMap().get_left(action);
+        } catch (const std::out_of_range&) {
+            throw std::invalid_argument("Unknown Action value");
         }
-        throw std::invalid_argument("Unknown Action value");
     }
 
     // Convert string to Action enum
     static Action fromString(const std::string& actionStr) {
-        auto it = stringToActionMap().find(actionStr);
-        if (it != stringToActionMap().end()) {
-            return it->second;
+        try {
+            return actionMap().get_right(actionStr);
+        } catch (const std::out_of_range&) {
+            throw std::invalid_argument("Unknown action string: " + actionStr);
         }
-        throw std::invalid_argument("Unknown action string: " + actionStr);
     }
 
     // Get all available actions and their string representations
-    static const std::unordered_map<std::string, Action>& getActionMap() {
-        return stringToActionMap();
+    static const Bimap<Action, std::string>& getActionMap() {
+        return actionMap();
     }
 
 private:
-    // Lazy initialization for string to Action map
-    static const std::unordered_map<std::string, Action>& stringToActionMap() {
-        static const std::unordered_map<std::string, Action> map = {
-            {"MoveUp", Action::MoveUp},
-            {"MoveDown", Action::MoveDown},
-            {"MoveLeft", Action::MoveLeft},
-            {"MoveRight", Action::MoveRight},
-            {"Pause", Action::Pause},
-            {"Confirm", Action::Confirm},
-            {"Cancel", Action::Cancel},
-            {"Fire", Action::Fire}
-            //{"MouseLeft", Action::MouseLeft},
-            //{"MouseRight", Action::MouseRight}
-        };
-        return map;
-    }
-
-    // Lazy initialization for Action to string map
-    static const std::unordered_map<Action, std::string>& actionToStringMap() {
-        static const std::unordered_map<Action, std::string> map = {
-            {Action::MoveUp, "MoveUp"},
-            {Action::MoveDown, "MoveDown"},
-            {Action::MoveLeft, "MoveLeft"},
-            {Action::MoveRight, "MoveRight"},
-            {Action::Pause, "Pause"},
-            {Action::Confirm, "Confirm"},
-            {Action::Cancel, "Cancel"},
-            {Action::Fire, "Fire"}
-            //{Action::MouseLeft, "MouseLeft"},
-            //{Action::MouseRight, "MouseRight"}
-        };
+    // Lazy initialization for bidirectional action mapping
+    static const Bimap<Action, std::string>& actionMap() {
+        static const Bimap<Action, std::string> map = []() {
+            Bimap<Action, std::string> m;
+            m.insert(Action::MoveUp, "MoveUp");
+            m.insert(Action::MoveDown, "MoveDown");
+            m.insert(Action::MoveLeft, "MoveLeft");
+            m.insert(Action::MoveRight, "MoveRight");
+            m.insert(Action::Pause, "Pause");
+            m.insert(Action::Confirm, "Confirm");
+            m.insert(Action::Cancel, "Cancel");
+            m.insert(Action::Fire, "Fire");
+            //m.insert(Action::MouseLeft, "MouseLeft");
+            //m.insert(Action::MouseRight, "MouseRight");
+            return m;
+        }();
         return map;
     }
 };

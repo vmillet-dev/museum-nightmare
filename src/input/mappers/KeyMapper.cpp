@@ -4,45 +4,57 @@ namespace game {
 
 KeyMapper::KeyMapper() {
     // Initialize the key mappings
-    nameToKeyMap = {
-        {"A", sf::Keyboard::A}, {"B", sf::Keyboard::B}, {"C", sf::Keyboard::C},
-        {"D", sf::Keyboard::D}, {"E", sf::Keyboard::E}, {"F", sf::Keyboard::F},
-        {"G", sf::Keyboard::G}, {"H", sf::Keyboard::H}, {"I", sf::Keyboard::I},
-        {"J", sf::Keyboard::J}, {"K", sf::Keyboard::K}, {"L", sf::Keyboard::L},
-        {"M", sf::Keyboard::M}, {"N", sf::Keyboard::N}, {"O", sf::Keyboard::O},
-        {"P", sf::Keyboard::P}, {"Q", sf::Keyboard::Q}, {"R", sf::Keyboard::R},
-        {"S", sf::Keyboard::S}, {"T", sf::Keyboard::T}, {"U", sf::Keyboard::U},
-        {"V", sf::Keyboard::V}, {"W", sf::Keyboard::W}, {"X", sf::Keyboard::X},
-        {"Y", sf::Keyboard::Y}, {"Z", sf::Keyboard::Z},
-        {"Num0", sf::Keyboard::Num0}, {"Num1", sf::Keyboard::Num1},
-        {"Num2", sf::Keyboard::Num2}, {"Num3", sf::Keyboard::Num3},
-        {"Num4", sf::Keyboard::Num4}, {"Num5", sf::Keyboard::Num5},
-        {"Num6", sf::Keyboard::Num6}, {"Num7", sf::Keyboard::Num7},
-        {"Num8", sf::Keyboard::Num8}, {"Num9", sf::Keyboard::Num9},
-        {"Escape", sf::Keyboard::Escape}, {"Space", sf::Keyboard::Space},
-        {"Return", sf::Keyboard::Return}, {"BackSpace", sf::Keyboard::BackSpace},
-        {"Tab", sf::Keyboard::Tab}, {"Left", sf::Keyboard::Left},
-        {"Right", sf::Keyboard::Right}, {"Up", sf::Keyboard::Up},
-        {"Down", sf::Keyboard::Down}, {"LShift", sf::Keyboard::LShift},
-        {"RShift", sf::Keyboard::RShift}, {"LControl", sf::Keyboard::LControl},
-        {"RControl", sf::Keyboard::RControl}, {"LAlt", sf::Keyboard::LAlt},
-        {"RAlt", sf::Keyboard::RAlt}
-    };
+    keyMap.insert("A", sf::Keyboard::A); keyMap.insert("B", sf::Keyboard::B);
+    keyMap.insert("C", sf::Keyboard::C); keyMap.insert("D", sf::Keyboard::D);
+    keyMap.insert("E", sf::Keyboard::E); keyMap.insert("F", sf::Keyboard::F);
+    keyMap.insert("G", sf::Keyboard::G); keyMap.insert("H", sf::Keyboard::H);
+    keyMap.insert("I", sf::Keyboard::I); keyMap.insert("J", sf::Keyboard::J);
+    keyMap.insert("K", sf::Keyboard::K); keyMap.insert("L", sf::Keyboard::L);
+    keyMap.insert("M", sf::Keyboard::M); keyMap.insert("N", sf::Keyboard::N);
+    keyMap.insert("O", sf::Keyboard::O); keyMap.insert("P", sf::Keyboard::P);
+    keyMap.insert("Q", sf::Keyboard::Q); keyMap.insert("R", sf::Keyboard::R);
+    keyMap.insert("S", sf::Keyboard::S); keyMap.insert("T", sf::Keyboard::T);
+    keyMap.insert("U", sf::Keyboard::U); keyMap.insert("V", sf::Keyboard::V);
+    keyMap.insert("W", sf::Keyboard::W); keyMap.insert("X", sf::Keyboard::X);
+    keyMap.insert("Y", sf::Keyboard::Y); keyMap.insert("Z", sf::Keyboard::Z);
 
-    // Build reverse mapping
-    for (const auto& [name, key] : nameToKeyMap) {
-        keyToNameMap[key] = name;
-    }
+    keyMap.insert("Num0", sf::Keyboard::Num0); keyMap.insert("Num1", sf::Keyboard::Num1);
+    keyMap.insert("Num2", sf::Keyboard::Num2); keyMap.insert("Num3", sf::Keyboard::Num3);
+    keyMap.insert("Num4", sf::Keyboard::Num4); keyMap.insert("Num5", sf::Keyboard::Num5);
+    keyMap.insert("Num6", sf::Keyboard::Num6); keyMap.insert("Num7", sf::Keyboard::Num7);
+    keyMap.insert("Num8", sf::Keyboard::Num8); keyMap.insert("Num9", sf::Keyboard::Num9);
+
+    keyMap.insert("Escape", sf::Keyboard::Escape);
+    keyMap.insert("Space", sf::Keyboard::Space);
+    keyMap.insert("Return", sf::Keyboard::Return);
+    keyMap.insert("BackSpace", sf::Keyboard::BackSpace);
+    keyMap.insert("Tab", sf::Keyboard::Tab);
+    keyMap.insert("Left", sf::Keyboard::Left);
+    keyMap.insert("Right", sf::Keyboard::Right);
+    keyMap.insert("Up", sf::Keyboard::Up);
+    keyMap.insert("Down", sf::Keyboard::Down);
+    keyMap.insert("LShift", sf::Keyboard::LShift);
+    keyMap.insert("RShift", sf::Keyboard::RShift);
+    keyMap.insert("LControl", sf::Keyboard::LControl);
+    keyMap.insert("RControl", sf::Keyboard::RControl);
+    keyMap.insert("LAlt", sf::Keyboard::LAlt);
+    keyMap.insert("RAlt", sf::Keyboard::RAlt);
 }
 
 sf::Keyboard::Key KeyMapper::fromName(const std::string& keyName) {
-    auto it = nameToKeyMap.find(keyName);
-    return (it != nameToKeyMap.end()) ? it->second : sf::Keyboard::Unknown;
+    try {
+        return keyMap.get_right(keyName);
+    } catch (const std::out_of_range&) {
+        return sf::Keyboard::Unknown;
+    }
 }
 
 std::string KeyMapper::toName(sf::Keyboard::Key key) {
-    auto it = keyToNameMap.find(key);
-    return (it != keyToNameMap.end()) ? it->second : "Unknown";
+    try {
+        return keyMap.get_left(key);
+    } catch (const std::out_of_range&) {
+        return "Unknown";
+    }
 }
 
 } // namespace game

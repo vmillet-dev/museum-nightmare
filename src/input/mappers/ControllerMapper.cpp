@@ -2,39 +2,45 @@
 #include <stdexcept>
 #include <string>
 #include <regex>
+#include <unordered_map>
 
 namespace game {
 
-const std::unordered_map<std::string, unsigned int> ControllerMapper::buttonMap = {
-    {"A", 0},
-    {"B", 1},
-    {"X", 2},
-    {"Y", 3},
-    {"LB", 4},
-    {"RB", 5},
-    {"Back", 6},
-    {"Start", 7},
-    {"LeftStick", 8},
-    {"RightStick", 9}
-};
+// Initialize static members
+const Bimap<std::string, unsigned int> ControllerMapper::buttonMap = []() {
+    Bimap<std::string, unsigned int> map;
+    map.insert("A", 0);
+    map.insert("B", 1);
+    map.insert("X", 2);
+    map.insert("Y", 3);
+    map.insert("LB", 4);
+    map.insert("RB", 5);
+    map.insert("Back", 6);
+    map.insert("Start", 7);
+    map.insert("LeftStick", 8);
+    map.insert("RightStick", 9);
+    return map;
+}();
 
-const std::unordered_map<std::string, unsigned int> ControllerMapper::axisMap = {
-    {"LeftStickX", sf::Joystick::X},
-    {"LeftStickY", sf::Joystick::Y},
-    {"RightStickX", sf::Joystick::U},
-    {"RightStickY", sf::Joystick::V},
-    {"DPadX", sf::Joystick::PovX},
-    {"DPadY", sf::Joystick::PovY},
-    {"LeftTrigger", sf::Joystick::Z},
-    {"RightTrigger", sf::Joystick::R}
-};
+const Bimap<std::string, unsigned int> ControllerMapper::axisMap = []() {
+    Bimap<std::string, unsigned int> map;
+    map.insert("LeftStickX", sf::Joystick::X);
+    map.insert("LeftStickY", sf::Joystick::Y);
+    map.insert("RightStickX", sf::Joystick::U);
+    map.insert("RightStickY", sf::Joystick::V);
+    map.insert("DPadX", sf::Joystick::PovX);
+    map.insert("DPadY", sf::Joystick::PovY);
+    map.insert("LeftTrigger", sf::Joystick::Z);
+    map.insert("RightTrigger", sf::Joystick::R);
+    return map;
+}();
 
 unsigned int ControllerMapper::mapButtonName(const std::string& name) {
-    auto it = buttonMap.find(name);
-    if (it != buttonMap.end()) {
-        return it->second;
+    try {
+        return buttonMap.get_right(name);
+    } catch (const std::out_of_range&) {
+        throw std::runtime_error("Unknown controller button: " + name);
     }
-    throw std::runtime_error("Unknown controller button: " + name);
 }
 
 unsigned int ControllerMapper::mapAxisId(const std::string& name) {
@@ -54,11 +60,11 @@ unsigned int ControllerMapper::mapAxisId(const std::string& name) {
         }
     }
 
-    auto it = axisMap.find(result);
-    if (it != axisMap.end()) {
-        return it->second;
+    try {
+        return axisMap.get_right(result);
+    } catch (const std::out_of_range&) {
+        throw std::runtime_error("Unknown controller axis: " + name);
     }
-    throw std::runtime_error("Unknown controller axis: " + name);
 }
 
 bool ControllerMapper::isAxisPositive(const std::string& name) {
@@ -73,7 +79,7 @@ bool ControllerMapper::isAxis(const std::string& name) {
 }
 
 bool ControllerMapper::isButton(const std::string& name) {
-    return buttonMap.find(name) != buttonMap.end();
+    return buttonMap.contains_left(name);
 }
 
 } // namespace game

@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Window/Keyboard.hpp>
 #include <string>
-#include <unordered_map>
+#include "../../../core/containers/bimap.hpp"
 
 namespace game {
 
@@ -23,8 +23,7 @@ private:
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
-    std::unordered_map<std::string, sf::Keyboard::Key> nameToKeyMap;
-    std::unordered_map<sf::Keyboard::Key, std::string> keyToNameMap;
+    Bimap<std::string, sf::Keyboard::Key> keyMap;
 };
 
 } // namespace game

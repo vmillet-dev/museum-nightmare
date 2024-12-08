@@ -1,8 +1,7 @@
+#pragma once
 #include <SFML/Window.hpp>
-#include <unordered_map>
 #include <string>
-#include <iostream>
-#include "../mappers/ControllerMapper.hpp"
+#include "../../../core/containers/bimap.hpp"
 
 namespace game {
 
@@ -18,10 +17,8 @@ public:
     std::string buttonToString(sf::Mouse::Button button) const;
 
 private:
-    std::unordered_map<sf::Mouse::Button, std::string> buttonToStringMap;
-    std::unordered_map<std::string, sf::Mouse::Button> stringToButtonMap;
-
     MouseMapper();
+    Bimap<sf::Mouse::Button, std::string> buttonMap;
 };
 
 }
