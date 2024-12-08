@@ -5,6 +5,7 @@
 #include <concepts>
 #include <stdexcept>
 #include <utility>
+#include <mutex>
 
 namespace game {
 
@@ -60,13 +61,36 @@ public:
     };
 
 private:
+    mutable std::mutex mutex_;
     std::unordered_map<Left, Right> left_to_right;
     std::unordered_map<Right, Left> right_to_left;
 
 public:
     Bimap() = default;
 
+    // Move constructor
+    Bimap(Bimap&& other) noexcept {
+        std::lock_guard<std::mutex> lock(other.mutex_);
+        left_to_right = std::move(other.left_to_right);
+        right_to_left = std::move(other.right_to_left);
+    }
+
+    // Move assignment operator
+    Bimap& operator=(Bimap&& other) noexcept {
+        if (this != &other) {
+            std::scoped_lock lock(mutex_, other.mutex_);
+            left_to_right = std::move(other.left_to_right);
+            right_to_left = std::move(other.right_to_left);
+        }
+        return *this;
+    }
+
+    // Delete copy operations
+    Bimap(const Bimap&) = delete;
+    Bimap& operator=(const Bimap&) = delete;
+
     bool insert(const Left& left, const Right& right) {
+        std::lock_guard<std::mutex> lock(mutex_);
         if (left_to_right.contains(left) || right_to_left.contains(right)) {
             return false;
         }
@@ -76,6 +100,7 @@ public:
     }
 
     bool insert(Left&& left, Right&& right) {
+        std::lock_guard<std::mutex> lock(mutex_);
         if (left_to_right.contains(left) || right_to_left.contains(right)) {
             return false;
         }
@@ -87,6 +112,7 @@ public:
     }
 
     const Right& get_left(const Left& left) const {
+        std::lock_guard<std::mutex> lock(mutex_);
         auto it = left_to_right.find(left);
         if (it == left_to_right.end()) {
             throw std::out_of_range("Key not found in left map");
@@ -95,6 +121,7 @@ public:
     }
 
     const Left& get_right(const Right& right) const {
+        std::lock_guard<std::mutex> lock(mutex_);
         auto it = right_to_left.find(right);
         if (it == right_to_left.end()) {
             throw std::out_of_range("Key not found in right map");
@@ -103,28 +130,40 @@ public:
     }
 
     bool contains_left(const Left& left) const noexcept {
+        std::lock_guard<std::mutex> lock(mutex_);
         return left_to_right.contains(left);
     }
 
     bool contains_right(const Right& right) const noexcept {
+        std::lock_guard<std::mutex> lock(mutex_);
         return right_to_left.contains(right);
     }
 
     void clear() noexcept {
+        std::lock_guard<std::mutex> lock(mutex_);
         left_to_right.clear();
         right_to_left.clear();
     }
 
     [[nodiscard]] size_t size() const noexcept {
+        std::lock_guard<std::mutex> lock(mutex_);
         return left_to_right.size();
     }
 
     [[nodiscard]] bool empty() const noexcept {
+        std::lock_guard<std::mutex> lock(mutex_);
         return left_to_right.empty();
     }
 
-    const_iterator begin() const { return const_iterator(left_to_right.begin()); }
-    const_iterator end() const { return const_iterator(left_to_right.end()); }
+    const_iterator begin() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return const_iterator(left_to_right.begin());
+    }
+
+    const_iterator end() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return const_iterator(left_to_right.end());
+    }
 };
 
 } // namespace game

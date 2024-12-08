@@ -2,40 +2,46 @@
 #include <stdexcept>
 #include <string>
 #include <regex>
-#include <unordered_map>
+#include <mutex>
 
 namespace game {
 
-// Initialize static members
-const Bimap<unsigned int, std::string> ControllerMapper::buttonMap = []() {
-    Bimap<unsigned int, std::string> map;
-    map.insert(0, "A");
-    map.insert(1, "B");
-    map.insert(2, "X");
-    map.insert(3, "Y");
-    map.insert(4, "LB");
-    map.insert(5, "RB");
-    map.insert(6, "Back");
-    map.insert(7, "Start");
-    map.insert(8, "LeftStick");
-    map.insert(9, "RightStick");
-    return map;
-}();
+std::once_flag ControllerMapper::initFlag_;
+Bimap<unsigned int, std::string> ControllerMapper::buttonMap;
+Bimap<unsigned int, std::string> ControllerMapper::axisMap;
 
-const Bimap<unsigned int, std::string> ControllerMapper::axisMap = []() {
-    Bimap<unsigned int, std::string> map;
-    map.insert(sf::Joystick::X, "LeftStickX");
-    map.insert(sf::Joystick::Y, "LeftStickY");
-    map.insert(sf::Joystick::U, "RightStickX");
-    map.insert(sf::Joystick::V, "RightStickY");
-    map.insert(sf::Joystick::PovX, "DPadX");
-    map.insert(sf::Joystick::PovY, "DPadY");
-    map.insert(sf::Joystick::Z, "LeftTrigger");
-    map.insert(sf::Joystick::R, "RightTrigger");
-    return map;
-}();
+void ControllerMapper::ensureInitialized() {
+    std::call_once(initFlag_, []() {
+        initializeMap();
+    });
+}
+
+void ControllerMapper::initializeMap() {
+    // Initialize button mappings
+    buttonMap.insert(0, "A");
+    buttonMap.insert(1, "B");
+    buttonMap.insert(2, "X");
+    buttonMap.insert(3, "Y");
+    buttonMap.insert(4, "LB");
+    buttonMap.insert(5, "RB");
+    buttonMap.insert(6, "Back");
+    buttonMap.insert(7, "Start");
+    buttonMap.insert(8, "LeftStick");
+    buttonMap.insert(9, "RightStick");
+
+    // Initialize axis mappings
+    axisMap.insert(sf::Joystick::X, "LeftStickX");
+    axisMap.insert(sf::Joystick::Y, "LeftStickY");
+    axisMap.insert(sf::Joystick::U, "RightStickX");
+    axisMap.insert(sf::Joystick::V, "RightStickY");
+    axisMap.insert(sf::Joystick::PovX, "DPadX");
+    axisMap.insert(sf::Joystick::PovY, "DPadY");
+    axisMap.insert(sf::Joystick::Z, "LeftTrigger");
+    axisMap.insert(sf::Joystick::R, "RightTrigger");
+}
 
 unsigned int ControllerMapper::mapButtonName(const std::string& name) {
+    ensureInitialized();
     try {
         return buttonMap.get_right(name);
     } catch (const std::out_of_range&) {
@@ -60,6 +66,7 @@ unsigned int ControllerMapper::mapAxisId(const std::string& name) {
         }
     }
 
+    ensureInitialized();
     try {
         return axisMap.get_right(result);
     } catch (const std::out_of_range&) {
@@ -73,12 +80,14 @@ bool ControllerMapper::isAxisPositive(const std::string& name) {
 }
 
 bool ControllerMapper::isAxis(const std::string& name) {
+    ensureInitialized();
     return name.find("Stick") != std::string::npos ||
            name.find("DPad") != std::string::npos ||
            name.find("Trigger") != std::string::npos;
 }
 
 bool ControllerMapper::isButton(const std::string& name) {
+    ensureInitialized();
     return buttonMap.contains_right(name);
 }
 

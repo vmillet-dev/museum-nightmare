@@ -3,16 +3,13 @@
 
 namespace game {
 
-bool MouseMapper::initialized = false;
-std::mutex MouseMapper::initMutex;
+std::once_flag MouseMapper::initFlag_;
 Bimap<sf::Mouse::Button, std::string> MouseMapper::buttonMap;
 
 void MouseMapper::ensureInitialized() {
-    std::lock_guard<std::mutex> lock(initMutex);
-    if (!initialized) {
+    std::call_once(initFlag_, []() {
         initializeMap();
-        initialized = true;
-    }
+    });
 }
 
 void MouseMapper::initializeMap() {

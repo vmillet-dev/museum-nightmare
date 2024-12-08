@@ -19,7 +19,7 @@ void MouseDevice::init() {
 
         for (const auto& button : *buttons) {
             std::string buttonName = button.value_or("");
-            auto sfButton = MouseMapper::getInstance().stringToButton(buttonName);
+            auto sfButton = MouseMapper::stringToButton(buttonName);
             if (sfButton != sf::Mouse::Button::ButtonCount) {
 
                 setButtonBinding(sfButton, action);
@@ -45,7 +45,11 @@ void MouseDevice::setButtonBinding(sf::Mouse::Button button, Action action) {
 
 void MouseDevice::setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed) {
     std::string action = pressed ? "Pressed" : "Released";
-    spdlog::debug("Mouse Button {} {} at position ({}, {})", MouseMapper::getInstance().buttonToString(buttonEvent.button), action, buttonEvent.x, buttonEvent.y);
+    spdlog::debug("Mouse Button {} {} at position ({}, {})",
+                 MouseMapper::buttonToString(buttonEvent.button),
+                 action,
+                 buttonEvent.x,
+                 buttonEvent.y);
     setState(buttonEvent.button, pressed);
 }
 

@@ -18,8 +18,7 @@ private:
 
     static void ensureInitialized();
     static void initializeMap();
-    static bool initialized;
-    static std::mutex initMutex;
+    static std::once_flag initFlag_;
     static Bimap<sf::Mouse::Button, std::string> buttonMap;
 };
 

@@ -3,16 +3,13 @@
 
 namespace game {
 
-bool KeyMapper::initialized = false;
-std::mutex KeyMapper::initMutex;
+std::once_flag KeyMapper::initFlag_;
 Bimap<sf::Keyboard::Key, std::string> KeyMapper::keyMap;
 
 void KeyMapper::ensureInitialized() {
-    std::lock_guard<std::mutex> lock(initMutex);
-    if (!initialized) {
+    std::call_once(initFlag_, []() {
         initializeMap();
-        initialized = true;
-    }
+    });
 }
 
 void KeyMapper::initializeMap() {
