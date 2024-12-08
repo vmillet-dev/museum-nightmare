@@ -23,7 +23,7 @@ private:
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
-    Bimap<std::string, sf::Keyboard::Key> keyMap;
+    Bimap<sf::Keyboard::Key, std::string> keyMap;
 };
 
 } // namespace game

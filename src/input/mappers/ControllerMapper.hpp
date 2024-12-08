@@ -14,8 +14,8 @@ public:
     static bool isButton(const std::string& name);
 
 private:
-    static const Bimap<std::string, unsigned int> buttonMap;
-    static const Bimap<std::string, unsigned int> axisMap;
+    static const Bimap<unsigned int, std::string> buttonMap;
+    static const Bimap<unsigned int, std::string> axisMap;
 };
 
 } // namespace game
