@@ -37,7 +37,7 @@ const Bimap<unsigned int, std::string> ControllerMapper::axisMap = []() {
 
 unsigned int ControllerMapper::mapButtonName(const std::string& name) {
     try {
-        return buttonMap.get_right(name);
+        return buttonMap.get_left(name);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller button: " + name);
     }
@@ -61,7 +61,7 @@ unsigned int ControllerMapper::mapAxisId(const std::string& name) {
     }
 
     try {
-        return axisMap.get_right(result);
+        return axisMap.get_left(result);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller axis: " + name);
     }
@@ -79,7 +79,7 @@ bool ControllerMapper::isAxis(const std::string& name) {
 }
 
 bool ControllerMapper::isButton(const std::string& name) {
-    return buttonMap.contains_left(name);
+    return buttonMap.contains_right(name);
 }
 
 } // namespace game
