@@ -7,31 +7,31 @@
 namespace game {
 
 // Initialize static members
-const Bimap<std::string, unsigned int> ControllerMapper::buttonMap = []() {
-    Bimap<std::string, unsigned int> map;
-    map.insert("A", 0);
-    map.insert("B", 1);
-    map.insert("X", 2);
-    map.insert("Y", 3);
-    map.insert("LB", 4);
-    map.insert("RB", 5);
-    map.insert("Back", 6);
-    map.insert("Start", 7);
-    map.insert("LeftStick", 8);
-    map.insert("RightStick", 9);
+const Bimap<unsigned int, std::string> ControllerMapper::buttonMap = []() {
+    Bimap<unsigned int, std::string> map;
+    map.insert(0, "A");
+    map.insert(1, "B");
+    map.insert(2, "X");
+    map.insert(3, "Y");
+    map.insert(4, "LB");
+    map.insert(5, "RB");
+    map.insert(6, "Back");
+    map.insert(7, "Start");
+    map.insert(8, "LeftStick");
+    map.insert(9, "RightStick");
     return map;
 }();
 
-const Bimap<std::string, unsigned int> ControllerMapper::axisMap = []() {
-    Bimap<std::string, unsigned int> map;
-    map.insert("LeftStickX", sf::Joystick::X);
-    map.insert("LeftStickY", sf::Joystick::Y);
-    map.insert("RightStickX", sf::Joystick::U);
-    map.insert("RightStickY", sf::Joystick::V);
-    map.insert("DPadX", sf::Joystick::PovX);
-    map.insert("DPadY", sf::Joystick::PovY);
-    map.insert("LeftTrigger", sf::Joystick::Z);
-    map.insert("RightTrigger", sf::Joystick::R);
+const Bimap<unsigned int, std::string> ControllerMapper::axisMap = []() {
+    Bimap<unsigned int, std::string> map;
+    map.insert(sf::Joystick::X, "LeftStickX");
+    map.insert(sf::Joystick::Y, "LeftStickY");
+    map.insert(sf::Joystick::U, "RightStickX");
+    map.insert(sf::Joystick::V, "RightStickY");
+    map.insert(sf::Joystick::PovX, "DPadX");
+    map.insert(sf::Joystick::PovY, "DPadY");
+    map.insert(sf::Joystick::Z, "LeftTrigger");
+    map.insert(sf::Joystick::R, "RightTrigger");
     return map;
 }();
 
