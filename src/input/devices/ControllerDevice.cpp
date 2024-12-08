@@ -8,6 +8,7 @@
 namespace game {
 
 void ControllerDevice::init() {
+    spdlog::debug("Initializing ControllerDevice");
     auto& config = ConfigManager::getInstance();
 
     // Load controller settings
@@ -50,6 +51,7 @@ void ControllerDevice::init() {
             }
         }
     }
+    spdlog::debug("ControllerDevice initialized");
 }
 
 void ControllerDevice::update() {

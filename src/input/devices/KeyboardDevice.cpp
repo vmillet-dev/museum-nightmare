@@ -6,20 +6,28 @@
 
 namespace game {
 
+KeyboardDevice::KeyboardDevice() {
+    spdlog::debug("Creating KeyboardDevice");
+}
+
 void KeyboardDevice::init() {
+    spdlog::debug("Initializing KeyboardDevice");
     auto& config = ConfigManager::getInstance();
+    auto& mapper = KeyMapper::getInstance();
+    spdlog::debug("Got KeyMapper instance");
 
     // Load key bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
         auto keys = config.getKeyboardBindingsForAction(actionStr);
         for (const auto& key : *keys) {
             std::string keyName = key.value_or("");
-            sf::Keyboard::Key sfKey = KeyMapper::getInstance().fromName(keyName);
+            sf::Keyboard::Key sfKey = mapper.fromName(keyName);
 
             setKeyBinding(sfKey, action);
             spdlog::debug("Set keyboard binding: {} -> {}", keyName, ActionUtil::toString(action));
         }
     }
+    spdlog::debug("KeyboardDevice initialized");
 }
 
 void KeyboardDevice::handleEvent(const sf::Event& event) {

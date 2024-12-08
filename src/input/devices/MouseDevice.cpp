@@ -8,10 +8,14 @@ namespace game {
 MouseDevice::MouseDevice(sf::RenderWindow& window)
     : window(window)
     , lastMousePos(sf::Mouse::getPosition(window))
-{}
+{
+    spdlog::debug("Creating MouseDevice");
+}
 
 void MouseDevice::init() {
+    spdlog::debug("Initializing MouseDevice");
     auto& config = ConfigManager::getInstance();
+    auto& mapper = MouseMapper::getInstance();
 
     // Load mouse bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
@@ -19,14 +23,14 @@ void MouseDevice::init() {
 
         for (const auto& button : *buttons) {
             std::string buttonName = button.value_or("");
-            auto sfButton = MouseMapper::getInstance().stringToButton(buttonName);
+            auto sfButton = mapper.stringToButton(buttonName);
             if (sfButton != sf::Mouse::Button::ButtonCount) {
-
                 setButtonBinding(sfButton, action);
                 spdlog::debug("Set mouse binding: {} -> {}", buttonName, ActionUtil::toString(action));
             }
         }
     }
+    spdlog::debug("MouseDevice initialized");
 }
 
 void MouseDevice::handleEvent(const sf::Event& event) {
