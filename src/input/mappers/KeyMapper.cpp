@@ -2,8 +2,7 @@
 
 namespace game {
 
-void KeyMapper::initializeMap() {
-    auto& keyMap = getKeyMap();
+void KeyMapper::initializeKeyMap(Bimap<sf::Keyboard::Key, std::string>& keyMap) {
     keyMap.insert(sf::Keyboard::A, "A"); keyMap.insert(sf::Keyboard::B, "B");
     keyMap.insert(sf::Keyboard::C, "C"); keyMap.insert(sf::Keyboard::D, "D");
     keyMap.insert(sf::Keyboard::E, "E"); keyMap.insert(sf::Keyboard::F, "F");

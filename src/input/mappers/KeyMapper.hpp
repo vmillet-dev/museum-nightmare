@@ -17,16 +17,20 @@ public:
     std::string toName(sf::Keyboard::Key key);
 
 private:
-    KeyMapper() { initializeMap(); }
+    KeyMapper() = default;
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
     static Bimap<sf::Keyboard::Key, std::string>& getKeyMap() {
-        static Bimap<sf::Keyboard::Key, std::string> keyMap;
+        static Bimap<sf::Keyboard::Key, std::string> keyMap = []() {
+            Bimap<sf::Keyboard::Key, std::string> m;
+            initializeKeyMap(m);
+            return m;
+        }();
         return keyMap;
     }
 
-    void initializeMap();
+    static void initializeKeyMap(Bimap<sf::Keyboard::Key, std::string>& keyMap);
 };
 
 } // namespace game
