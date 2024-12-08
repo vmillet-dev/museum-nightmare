@@ -6,20 +6,48 @@
 
 namespace game {
 
+KeyboardDevice::KeyboardDevice() {
+    spdlog::debug("Creating KeyboardDevice");
+}
+
 void KeyboardDevice::init() {
+    spdlog::debug("Initializing KeyboardDevice");
     auto& config = ConfigManager::getInstance();
+    auto& mapper = KeyMapper::getInstance();
+    spdlog::debug("Got KeyMapper instance");
 
     // Load key bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        auto keys = config.getKeyboardBindingsForAction(actionStr);
+        spdlog::debug("Loading bindings for action: {}", actionStr);
+        auto* keys = config.getKeyboardBindingsForAction(actionStr);
+        if (!keys || keys->empty()) {
+            spdlog::warn("No keyboard bindings found for action: {}", actionStr);
+            continue;
+        }
+
         for (const auto& key : *keys) {
+            if (!key.is_string()) {
+                spdlog::warn("Invalid key binding type for action: {}", actionStr);
+                continue;
+            }
+
             std::string keyName = key.value_or("");
-            sf::Keyboard::Key sfKey = KeyMapper::getInstance().fromName(keyName);
+            if (keyName.empty()) {
+                spdlog::warn("Empty key binding for action: {}", actionStr);
+                continue;
+            }
+
+            sf::Keyboard::Key sfKey = mapper.fromName(keyName);
+            if (sfKey == sf::Keyboard::Unknown) {
+                spdlog::warn("Unknown key name for action {}: {}", actionStr, keyName);
+                continue;
+            }
 
             setKeyBinding(sfKey, action);
             spdlog::debug("Set keyboard binding: {} -> {}", keyName, ActionUtil::toString(action));
         }
     }
+    spdlog::debug("KeyboardDevice initialized");
 }
 
 void KeyboardDevice::handleEvent(const sf::Event& event) {
