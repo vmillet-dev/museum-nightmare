@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <concepts>
 #include <stdexcept>
+#include <utility>
 
 namespace game {
 
@@ -12,6 +13,43 @@ template<typename Left, typename Right>
              std::equality_comparable<Left> && std::equality_comparable<Right> &&
              std::default_initializable<Left> && std::default_initializable<Right>
 class Bimap {
+public:
+    // Pair type for iteration
+    using value_type = std::pair<Left, Right>;
+
+    // Iterator class
+    class const_iterator {
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = std::pair<Left, Right>;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const value_type*;
+        using reference = const value_type&;
+
+        explicit const_iterator(typename std::unordered_map<Left, Right>::const_iterator it)
+            : it_(it) {}
+
+        reference operator*() const { return *reinterpret_cast<const value_type*>(&*it_); }
+        pointer operator->() const { return reinterpret_cast<const value_type*>(&*it_); }
+
+        const_iterator& operator++() {
+            ++it_;
+            return *this;
+        }
+
+        const_iterator operator++(int) {
+            const_iterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        bool operator==(const const_iterator& other) const { return it_ == other.it_; }
+        bool operator!=(const const_iterator& other) const { return !(*this == other); }
+
+    private:
+        typename std::unordered_map<Left, Right>::const_iterator it_;
+    };
+
 private:
     std::unordered_map<Left, Right> left_to_right;
     std::unordered_map<Right, Left> right_to_left;
@@ -32,8 +70,6 @@ public:
         if (left_to_right.contains(left) || right_to_left.contains(right)) {
             return false;
         }
-
-        // Store moved values
         auto [l_it, l_inserted] = left_to_right.try_emplace(std::move(left), std::move(right));
         if (l_inserted) {
             right_to_left.try_emplace(l_it->second, l_it->first);
@@ -77,6 +113,10 @@ public:
     [[nodiscard]] bool empty() const noexcept {
         return left_to_right.empty();
     }
+
+    // Iterator support
+    const_iterator begin() const { return const_iterator(left_to_right.begin()); }
+    const_iterator end() const { return const_iterator(left_to_right.end()); }
 };
 
 } // namespace game
