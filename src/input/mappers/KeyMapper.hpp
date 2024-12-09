@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Window/Keyboard.hpp>
 #include <string>
-#include <unordered_map>
+#include <mutex>
+#include "../../core/containers/bimap.hpp"
 
 namespace game {
 
@@ -12,19 +13,24 @@ public:
         return instance;
     }
 
-    // Convert key name to SFML key code
     sf::Keyboard::Key fromName(const std::string& keyName);
-
-    // Convert SFML key code to key name
     std::string toName(sf::Keyboard::Key key);
 
 private:
-    KeyMapper();
+    KeyMapper() = default;
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
-    std::unordered_map<std::string, sf::Keyboard::Key> nameToKeyMap;
-    std::unordered_map<sf::Keyboard::Key, std::string> keyToNameMap;
+    static Bimap<sf::Keyboard::Key, std::string>& getKeyMap() {
+        static Bimap<sf::Keyboard::Key, std::string> keyMap = []() {
+            Bimap<sf::Keyboard::Key, std::string> m;
+            initializeKeyMap(m);
+            return m;
+        }();
+        return keyMap;
+    }
+
+    static void initializeKeyMap(Bimap<sf::Keyboard::Key, std::string>& keyMap);
 };
 
 } // namespace game

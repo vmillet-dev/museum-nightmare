@@ -1,27 +1,36 @@
+#pragma once
 #include <SFML/Window.hpp>
-#include <unordered_map>
 #include <string>
-#include <iostream>
-#include "../mappers/ControllerMapper.hpp"
+#include <mutex>
+#include "../../core/containers/bimap.hpp"
 
 namespace game {
 
 class MouseMapper {
 public:
-
     static MouseMapper& getInstance() {
         static MouseMapper instance;
         return instance;
     }
 
-    sf::Mouse::Button stringToButton(const std::string& buttonStr) const;
-    std::string buttonToString(sf::Mouse::Button button) const;
+    sf::Mouse::Button stringToButton(const std::string& buttonStr);
+    std::string buttonToString(sf::Mouse::Button button);
 
 private:
-    std::unordered_map<sf::Mouse::Button, std::string> buttonToStringMap;
-    std::unordered_map<std::string, sf::Mouse::Button> stringToButtonMap;
+    MouseMapper() = default;
+    MouseMapper(const MouseMapper&) = delete;
+    MouseMapper& operator=(const MouseMapper&) = delete;
 
-    MouseMapper();
+    static Bimap<sf::Mouse::Button, std::string>& getButtonMap() {
+        static Bimap<sf::Mouse::Button, std::string> buttonMap = []() {
+            Bimap<sf::Mouse::Button, std::string> m;
+            initializeButtonMap(m);
+            return m;
+        }();
+        return buttonMap;
+    }
+
+    static void initializeButtonMap(Bimap<sf::Mouse::Button, std::string>& buttonMap);
 };
 
-}
+} // namespace game

@@ -3,6 +3,9 @@
 #include <spdlog/spdlog.h>
 #include <algorithm>
 #include <typeinfo>
+#include "mappers/KeyMapper.hpp"
+#include "mappers/MouseMapper.hpp"
+#include "mappers/ControllerMapper.hpp"
 
 namespace game {
 
