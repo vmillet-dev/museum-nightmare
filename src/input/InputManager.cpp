@@ -12,18 +12,6 @@ namespace game {
 InputManager::InputManager(sf::RenderWindow& window) : window(window) {
     spdlog::info("Initializing InputManager");
 
-    // Initialize ActionUtil's static map first
-    spdlog::debug("Initializing action mappings");
-    ActionUtil::getActionMap();
-    spdlog::debug("Action mappings initialized");
-
-    // Initialize mappers before creating devices
-    spdlog::debug("Initializing input mappers");
-    KeyMapper::getInstance();
-    MouseMapper::getInstance();
-    ControllerMapper::getInstance();
-    spdlog::debug("Input mappers initialized");
-
     // Add keyboard device by default
     auto keyboardDevice = std::make_unique<KeyboardDevice>();
     keyboardDevice->init();

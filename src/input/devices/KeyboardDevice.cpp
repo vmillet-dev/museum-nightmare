@@ -6,15 +6,10 @@
 
 namespace game {
 
-KeyboardDevice::KeyboardDevice() {
-    spdlog::debug("Creating KeyboardDevice");
-}
-
 void KeyboardDevice::init() {
-    spdlog::debug("Initializing KeyboardDevice");
+    spdlog::debug("Creating and initializing KeyboardDevice");
     auto& config = ConfigManager::getInstance();
     auto& mapper = KeyMapper::getInstance();
-    spdlog::debug("Got KeyMapper instance");
 
     // Load key bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {

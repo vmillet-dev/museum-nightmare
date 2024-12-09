@@ -5,7 +5,6 @@ namespace game {
 
 class KeyboardDevice : public GenericInputDevice<sf::Keyboard::Key> {
 public:
-    KeyboardDevice();
     void init() override;
     void handleEvent(const sf::Event& event) override;
 
