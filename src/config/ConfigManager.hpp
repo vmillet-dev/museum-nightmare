@@ -26,9 +26,9 @@ public:
     std::string getWindowTitle() const;
 
     // Input binding methods
-    toml::v3::array* getKeyboardBindingsForAction(const std::string& action);
-    toml::v3::array* getMouseBindingsForAction(const std::string& action);
-    toml::v3::array* getControllerBindingsForAction(const std::string& action);
+    toml::v3::array* getKeyboardBindingsFromAction(const std::string& action);
+    toml::v3::array* getMouseBindingsFromAction(const std::string& action);
+    toml::v3::array* getControllerBindingsFromAction(const std::string& action);
 
     // Controller settings
     bool isControllerEnabled() const { return config["controller"]["enabled"].value_or(false); }
