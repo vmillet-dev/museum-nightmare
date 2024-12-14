@@ -64,6 +64,14 @@ protected:
             state.current = pressed;
         }
     }
+
+    void clearBindingsMap() { bindings.clear(); }
+    void clearStatesMap() { states.clear(); }
+
+    void clearBindingsAndStatesMap() {
+        bindings.clear();
+        states.clear();
+    }
 };
 
 } // namespace game

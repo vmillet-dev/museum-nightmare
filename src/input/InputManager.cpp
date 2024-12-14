@@ -9,20 +9,17 @@ namespace game {
 InputManager::InputManager(sf::RenderWindow& window) : window(window) {
     spdlog::info("Initializing InputManager");
 
-    // Add keyboard device by default
+    // Add keyboard and mouse devices by default
     auto keyboardDevice = std::make_unique<KeyboardDevice>();
-    keyboardDevice->init();
     devices.push_back(std::move(keyboardDevice));
 
-    // Add mouse device
     auto mouseDevice = std::make_unique<MouseDevice>(window);
-    mouseDevice->init();
     devices.push_back(std::move(mouseDevice));
 
     // Check for already connected controllers
     for (unsigned int i = 0; i < sf::Joystick::Count; ++i) {
         if (sf::Joystick::isConnected(i)) {
-            createControllerDevice();
+            createControllerDevice(i);
         }
     }
 
@@ -35,17 +32,20 @@ void InputManager::update() {
     }
 }
 
-void InputManager::createControllerDevice() {
-    auto controllerDevice = std::make_unique<ControllerDevice>();
-    controllerDevice->init();
+void InputManager::createControllerDevice(unsigned int controllerId) {
+    spdlog::info("Controller {} connected", controllerId);
+    auto controllerDevice = std::make_unique<ControllerDevice>(controllerId);
     devices.push_back(std::move(controllerDevice));
-    spdlog::info("Controller connected and initialized");
+    spdlog::info("Controller {} connected and initialized", controllerId);
 }
 
-void InputManager::removeControllerDevice() {
+void InputManager::removeControllerDevice(unsigned int controllerId) {
     devices.erase(
         std::remove_if(devices.begin(), devices.end(),
-            [](const auto& device) { return dynamic_cast<ControllerDevice*>(device.get()) != nullptr; }
+            [controllerId](const auto& device) {
+                auto* controllerDevice = dynamic_cast<ControllerDevice*>(device.get());
+                return controllerDevice && controllerDevice->getControllerId() == controllerId;
+            }
         ),
         devices.end()
     );
@@ -54,10 +54,10 @@ void InputManager::removeControllerDevice() {
 
 void InputManager::handleEvent(const sf::Event& event) {
     if (event.type == sf::Event::JoystickConnected) {
-        createControllerDevice();
+        createControllerDevice(event.joystickConnect.joystickId);
     }
     else if (event.type == sf::Event::JoystickDisconnected) {
-        removeControllerDevice();
+        removeControllerDevice(event.joystickConnect.joystickId);
     }
 
     // Forward events to all devices
