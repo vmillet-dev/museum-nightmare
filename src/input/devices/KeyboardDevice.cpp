@@ -1,50 +1,56 @@
 #include "KeyboardDevice.hpp"
-#include "../../config/ConfigManager.hpp"
 #include <spdlog/spdlog.h>
+
+#include "../../config/ConfigManager.hpp"
+#include "../mappers/KeyMapper.hpp"
 
 namespace game {
 
-void KeyboardDevice::init() {
+KeyboardDevice::KeyboardDevice() {
+    loadBinding();
+}
+
+void KeyboardDevice::loadBinding() {
+    spdlog::debug("Loading KeyboardDevice binding");
     auto& config = ConfigManager::getInstance();
+    auto mapper = KeyMapper();
+    clearBindingsAndStatesMap();
 
     // Load key bindings from config
-    keyBindings[config.getKeyBinding("move_up")] = Action::MoveUp;
-    keyBindings[config.getKeyBinding("move_down")] = Action::MoveDown;
-    keyBindings[config.getKeyBinding("move_left")] = Action::MoveLeft;
-    keyBindings[config.getKeyBinding("move_right")] = Action::MoveRight;
-    keyBindings[config.getKeyBinding("pause")] = Action::Pause;
-    keyBindings[config.getKeyBinding("confirm")] = Action::Confirm;
-    keyBindings[config.getKeyBinding("cancel")] = Action::Cancel;
-}
+    for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
+        auto* keys = config.getKeyboardBindingsFromAction(actionStr);
+        if (!keys || keys->empty()) {
+            continue;
+        }
 
-void KeyboardDevice::update() {
-    // Update key states for continuous input
-    for (const auto& binding : keyBindings) {
-        keyStates[binding.first] = sf::Keyboard::isKeyPressed(binding.first);
-    }
-}
+        for (const auto& key : *keys) {
+            if (!key.is_string()) {
+                spdlog::warn("Invalid key binding type for action: {} must be string type", actionStr);
+                continue;
+            }
 
-bool KeyboardDevice::isActionPressed(Action action) {
-    for (const auto& binding : keyBindings) {
-        if (binding.second == action && keyStates[binding.first]) {
-            return true;
+            std::string keyName = key.value_or("");
+            if (keyName.empty()) {
+                continue;
+            }
+
+            sf::Keyboard::Key sfKey = mapper.stringToKey(keyName);
+            if (sfKey == sf::Keyboard::Unknown) {
+                spdlog::warn("Unknown key name for action {}: {}", actionStr, keyName);
+                continue;
+            }
+
+            setBinding(sfKey, action);
+            spdlog::debug("Set keyboard binding: {} -> {}", keyName, ActionUtil::toString(action));
         }
     }
-    return false;
+    spdlog::debug("KeyboardDevice binding loaded");
 }
 
 void KeyboardDevice::handleEvent(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
-        setKeyState(event.key.code, event.type == sf::Event::KeyPressed);
+        setState(event.key.code, event.type == sf::Event::KeyPressed);
     }
-}
-
-void KeyboardDevice::setKeyBinding(Action action, sf::Keyboard::Key key) {
-    keyBindings[key] = action;
-}
-
-void KeyboardDevice::setKeyState(sf::Keyboard::Key key, bool pressed) {
-    keyStates[key] = pressed;
 }
 
 } // namespace game

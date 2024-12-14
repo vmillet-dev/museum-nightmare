@@ -1,34 +1,32 @@
 #pragma once
 #include "InputDevice.hpp"
+#include "GenericInputDevice.hpp"
 #include <unordered_map>
 
 namespace game {
 
-class ControllerDevice : public InputDevice {
+class ControllerDevice : public GenericInputDevice<unsigned int> {
 public:
-    void init() override;
+    explicit ControllerDevice(unsigned int controllerId);
     void update() override;
     bool isActionPressed(Action action) override;
+    bool isActionJustPressed(Action action) override;
+    bool isActionReleased(Action action) override;
     void handleEvent(const sf::Event& event) override;
+    void loadBinding() override;
 
-    void setButtonBinding(Action action, unsigned int button);
-    void setAxisBinding(Action action, sf::Joystick::Axis axis);
-    void setDeadzone(float value) { deadzone = value; }
-    void setSensitivity(float value) { sensitivity = value; }
-
-    // Add methods to check controller status
-    bool isConnected() const { return connected; }
-    int getControllerId() const { return controllerId; }
+    unsigned int getControllerId() const { return controllerId; }
 
 private:
-    std::unordered_map<Action, unsigned int> buttonBindings;
-    std::unordered_map<Action, sf::Joystick::Axis> axisBindings;
-    std::unordered_map<Action, bool> buttonStates;
-    std::unordered_map<Action, float> axisStates;
-    bool connected = false;
+    std::unordered_map<std::string, Action> axisBindings;
+    std::unordered_map<std::string, ActionState> axisStates;
+
     float deadzone = 20.0f;
     float sensitivity = 100.0f;
-    int controllerId = 0;
+    unsigned int controllerId = 0;
+
+    void setAxisBinding(std::string axis, Action action);
+    void setAxisState(unsigned int axis, float position);
 };
 
 } // namespace game

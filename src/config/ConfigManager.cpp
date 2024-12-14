@@ -13,7 +13,7 @@ ConfigManager::ConfigManager() {
 void ConfigManager::loadConfig() {
     try {
         config = toml::parse_file("assets/config.toml");
-        spdlog::info("Config loaded - Controller(enabled:{},deadzone:{:.1f},sens:{:.1f})", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
+        spdlog::info("Config loaded");
 
         // Set up logging level from config
         std::string logLevel = config["debug"]["level"].value_or("info");
@@ -34,7 +34,7 @@ void ConfigManager::loadConfig() {
 }
 
 void ConfigManager::createDefaultConfig() {
-    spdlog::info("Creating default config with controller settings");
+    spdlog::info("Creating default config");
     config = toml::table{
         {"window", toml::table{
             {"width", 800},
@@ -43,29 +43,32 @@ void ConfigManager::createDefaultConfig() {
         }},
         {"player", toml::table{
             {"speed", 200.0},
-            {"size", Constants::Physics::ACTOR_SIZE * 2}  // Full size is twice the half-size
+            {"size", Constants::Physics::ACTOR_SIZE * 2}
         }},
         {"debug", toml::table{
             {"level", "info"}
         }},
-        {"controls", toml::table{
-            {"move_up", "Z"},
-            {"move_down", "S"},
-            {"move_left", "Q"},
-            {"move_right", "D"},
-            {"pause", "Escape"},
-            {"confirm", "Return"},
-            {"cancel", "BackSpace"},
-            {"controller_enabled", true},
-            {"controller_deadzone", 20.0},
-            {"controller_sensitivity", 100.0},
-            {"controller_move_up", 0},
-            {"controller_move_down", 1},
-            {"controller_move_left", 2},
-            {"controller_move_right", 3},
-            {"controller_pause", 7},
-            {"controller_confirm", 4},
-            {"controller_cancel", 5}
+        {"actions", toml::table{
+            {"MoveUp", toml::table{
+                {"keyboard", toml::array{"Z", "Up"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickUp"}}
+            }},
+            {"MoveDown", toml::table{
+                {"keyboard", toml::array{"S", "Down"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickDown"}}
+            }},
+            {"MoveLeft", toml::table{
+                {"keyboard", toml::array{"Q", "Left"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickLeft"}}
+            }},
+            {"MoveRight", toml::table{
+                {"keyboard", toml::array{"D", "Right"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"LeftStickRight"}}
+            }}
         }}
     };
     saveConfig();
@@ -74,7 +77,7 @@ void ConfigManager::createDefaultConfig() {
 void ConfigManager::saveConfig() {
     std::ofstream file("assets/config.toml");
     file << config;
-    spdlog::info("Config saved with controller settings: enabled={}, deadzone={:.1f}, sensitivity={:.1f}", isControllerEnabled(), getControllerDeadzone(), getControllerSensitivity());
+    spdlog::info("Config saved");
 }
 
 int ConfigManager::getWindowWidth() const {
@@ -89,43 +92,37 @@ std::string ConfigManager::getWindowTitle() const {
     return config["window"]["title"].value_or("SFML Game");
 }
 
-float ConfigManager::getPlayerSpeed() const {
-    return config["player"]["speed"].value_or(200.0f);
+toml::v3::array* ConfigManager::getKeyboardBindingsFromAction(const std::string& action) {
+    try {
+        return config["actions"][action]["keyboard"].as_array();
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to get keyboard bindings for action {}: {}", action, e.what());
+    }
 }
 
-float ConfigManager::getPlayerSize() const {
-    return config["player"]["size"].value_or(Constants::Physics::ACTOR_SIZE * 2);  // Default to twice ACTOR_SIZE
+toml::v3::array* ConfigManager::getMouseBindingsFromAction(const std::string& action) {
+    try {
+        return config["actions"][action]["mouse"].as_array();
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to get mouse bindings for action {}: {}", action, e.what());
+    }
 }
 
-sf::Keyboard::Key ConfigManager::getKeyBinding(const std::string& action) const {
-    std::string keyName = config["controls"][action].value_or("");
-    auto key = KeyMapper::getInstance().fromName(keyName);
-    spdlog::debug("Key binding: {} -> {}", action, keyName);
-    return key;
-}
-
-bool ConfigManager::isControllerEnabled() const {
-    bool enabled = config["controls"]["controller_enabled"].value_or(true);
-    spdlog::debug("Controller enabled: {}", enabled);
-    return enabled;
+toml::v3::array* ConfigManager::getControllerBindingsFromAction(const std::string& action) {
+    std::vector<std::string> controls;
+    try {
+        return config["actions"][action]["controller"].as_array();
+    } catch (const std::exception& e) {
+        spdlog::warn("Failed to get controller bindings for action {}: {}", action, e.what());
+    }
 }
 
 float ConfigManager::getControllerDeadzone() const {
-    float deadzone = config["controls"]["controller_deadzone"].value_or(20.0f);
-    spdlog::debug("Controller deadzone: {:.1f}", deadzone);
-    return deadzone;
+    return config["controller"]["deadzone"].value_or(20.0f);
 }
 
 float ConfigManager::getControllerSensitivity() const {
-    float sensitivity = config["controls"]["controller_sensitivity"].value_or(100.0f);
-    spdlog::debug("Controller sensitivity: {:.1f}", sensitivity);
-    return sensitivity;
-}
-
-unsigned int ConfigManager::getControllerButton(const std::string& action) const {
-    unsigned int button = static_cast<unsigned int>(config["controls"][action].value_or(0));
-    spdlog::debug("Controller button for {}: {}", action, button);
-    return button;
+    return config["controller"]["sensitivity"].value_or(100.0f);
 }
 
 } // namespace game
