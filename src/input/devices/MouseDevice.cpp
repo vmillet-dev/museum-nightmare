@@ -17,7 +17,7 @@ void MouseDevice::loadBinding() {
 
     // Load mouse bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        auto* buttons = config.getMouseBindingsForAction(actionStr);
+        auto* buttons = config.getMouseBindingsFromAction(actionStr);
         if (!buttons || buttons->empty()) {
             continue;
         }
@@ -57,7 +57,7 @@ sf::Vector2i MouseDevice::getMousePosition() const {
 }
 
 void MouseDevice::setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed) {
-    spdlog::debug("Mouse Button {} at position ({}, {})",pressed ? "Pressed" : "Released", buttonEvent.x, buttonEvent.y);
+    spdlog::debug("Mouse Button {} at position ({}, {})", pressed ? "Pressed" : "Released", buttonEvent.x, buttonEvent.y);
     setState(buttonEvent.button, pressed);
 }
 

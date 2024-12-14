@@ -18,7 +18,7 @@ void KeyboardDevice::loadBinding() {
 
     // Load key bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        auto* keys = config.getKeyboardBindingsForAction(actionStr);
+        auto* keys = config.getKeyboardBindingsFromAction(actionStr);
         if (!keys || keys->empty()) {
             continue;
         }

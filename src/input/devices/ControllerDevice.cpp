@@ -23,7 +23,7 @@ void ControllerDevice::loadBinding() {
 
     // Load controller bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        auto controls = config.getControllerBindingsForAction(actionStr);
+        auto controls = config.getControllerBindingsFromAction(actionStr);
 
         for (const auto& control : *controls) {
             std::string controlStr = control.value_or("");
