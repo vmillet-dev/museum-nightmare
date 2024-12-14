@@ -92,7 +92,7 @@ std::string ConfigManager::getWindowTitle() const {
     return config["window"]["title"].value_or("SFML Game");
 }
 
-toml::v3::array* ConfigManager::getKeyboardBindingsForAction(const std::string& action) {
+toml::v3::array* ConfigManager::getKeyboardBindingsFromAction(const std::string& action) {
     try {
         return config["actions"][action]["keyboard"].as_array();
     } catch (const std::exception& e) {
@@ -100,8 +100,7 @@ toml::v3::array* ConfigManager::getKeyboardBindingsForAction(const std::string& 
     }
 }
 
-toml::v3::array* ConfigManager::getMouseBindingsForAction(const std::string& action) {
-    std::vector<sf::Mouse::Button> buttons;
+toml::v3::array* ConfigManager::getMouseBindingsFromAction(const std::string& action) {
     try {
         return config["actions"][action]["mouse"].as_array();
     } catch (const std::exception& e) {
@@ -109,14 +108,13 @@ toml::v3::array* ConfigManager::getMouseBindingsForAction(const std::string& act
     }
 }
 
-toml::v3::array* ConfigManager::getControllerBindingsForAction(const std::string& action) {
+toml::v3::array* ConfigManager::getControllerBindingsFromAction(const std::string& action) {
     std::vector<std::string> controls;
     try {
         return config["actions"][action]["controller"].as_array();
     } catch (const std::exception& e) {
         spdlog::warn("Failed to get controller bindings for action {}: {}", action, e.what());
     }
-
 }
 
 float ConfigManager::getControllerDeadzone() const {

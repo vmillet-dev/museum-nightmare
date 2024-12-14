@@ -7,49 +7,40 @@
 
 namespace game {
 
-void ControllerDevice::init() {
+ControllerDevice::ControllerDevice(unsigned int controllerId): controllerId(controllerId){
+    loadBinding();
+}
+
+void ControllerDevice::loadBinding() {
+    spdlog::debug("Loading ControllerDevice binding for controller {}", controllerId);
     auto& config = ConfigManager::getInstance();
+    auto mapper = ControllerMapper();
+    clearBindingsAndStatesMap();
 
     // Load controller settings
     deadzone = config.getControllerDeadzone();
     sensitivity = config.getControllerSensitivity();
 
-    // Check for any available controller
-    connected = false;
-    for (int i = 0; i < sf::Joystick::Count; ++i) {
-        if (sf::Joystick::isConnected(i)) {
-            connected = true;
-            controllerId = i;
-            spdlog::info("Controller connected on port {}", i);
-            break;
-        }
-    }
-
-    if (!connected) {
-        spdlog::warn("No controller connected");
-        return;
-    }
-
     // Load controller bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        auto controls = config.getControllerBindingsForAction(actionStr);
+        auto controls = config.getControllerBindingsFromAction(actionStr);
 
         for (const auto& control : *controls) {
             std::string controlStr = control.value_or("");
-            if (ControllerMapper::isAxis(controlStr)) {
-                unsigned int axisId = ControllerMapper::mapAxisId(controlStr);
-                std::string axisKey = (ControllerMapper::isAxisPositive(controlStr) ? "+" : "-") + std::to_string(axisId);
+
+            if (mapper.isAxis(controlStr)) {
+                std::string axisKey = mapper.stringToAxisKey(controlStr);
                 setAxisBinding(axisKey, action);
                 spdlog::debug("Set controller axis binding: {} -> {}", controlStr, ActionUtil::toString(action));
             }
-            else if (ControllerMapper::isButton(controlStr)) {
-                unsigned int buttonId = ControllerMapper::mapButtonName(controlStr);
-                setButtonBinding(buttonId, action);
+            else if (mapper.isButton(controlStr)) {
+                unsigned int buttonId = mapper.stringToButtonId(controlStr);
+                setBinding(buttonId, action);
                 spdlog::debug("Set controller button binding: {} -> {}", controlStr, ActionUtil::toString(action));
-
             }
         }
     }
+    spdlog::debug("ControllerDevice binding loaded");
 }
 
 void ControllerDevice::update() {
@@ -106,22 +97,11 @@ bool ControllerDevice::isActionReleased(Action action) {
 void ControllerDevice::handleEvent(const sf::Event& event) {
     if ((event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::JoystickButtonReleased) &&
         event.joystickButton.joystickId == controllerId) {
-        setButtonState(event.joystickButton.button, event.type == sf::Event::JoystickButtonPressed);
+        setState(event.joystickButton.button, event.type == sf::Event::JoystickButtonPressed);
     }
 
     if (event.type == sf::Event::JoystickMoved && event.joystickMove.joystickId == controllerId) {
         setAxisState(event.joystickMove.axis, event.joystickMove.position);
-    }
-}
-
-void ControllerDevice::setButtonBinding(unsigned int button, Action action) {
-    GenericInputDevice<unsigned int>::setBinding(button, action);
-}
-
-void ControllerDevice::setButtonState(unsigned int button, bool pressed) {
-    if (GenericInputDevice<unsigned int>::hasBinding(button)) {
-        spdlog::debug("Controller {}: Button {} {}", controllerId, button, pressed ? "Pressed" : "Released");
-        GenericInputDevice<unsigned int>::setState(button, pressed);
     }
 }
 
@@ -132,7 +112,7 @@ void ControllerDevice::setAxisBinding(std::string axis, Action action) {
 void ControllerDevice::setAxisState(unsigned int axisId, float position) {
     std::string axis = std::string(position > 0 ? "+" : "-") + std::to_string(axisId);
 
-    auto absPosition = std::abs(position) > (deadzone / 100.0f * 100.0f); // Convert from percentage to SFML's -100 to 100 range
+    auto absPosition = std::abs(position) > deadzone;
     if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {
         spdlog::debug("Controller {}: Axis {} moved to position {} ({})", controllerId, axisId, position, axis);
 

@@ -1,30 +1,24 @@
 #pragma once
 #include <SFML/Window/Keyboard.hpp>
 #include <string>
-#include <unordered_map>
+#include <mutex>
+#include "../../core/containers/bimap.hpp"
 
 namespace game {
 
 class KeyMapper {
 public:
-    static KeyMapper& getInstance() {
-        static KeyMapper instance;
-        return instance;
-    }
-
-    // Convert key name to SFML key code
-    sf::Keyboard::Key fromName(const std::string& keyName);
-
-    // Convert SFML key code to key name
-    std::string toName(sf::Keyboard::Key key);
+    KeyMapper();
+    sf::Keyboard::Key stringToKey(const std::string& keyName);
+    std::string keyToString(sf::Keyboard::Key key);
 
 private:
-    KeyMapper();
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
-    std::unordered_map<std::string, sf::Keyboard::Key> nameToKeyMap;
-    std::unordered_map<sf::Keyboard::Key, std::string> keyToNameMap;
+    Bimap<sf::Keyboard::Key, std::string> keyMap;
+
+    void initializeKeyMap();
 };
 
 } // namespace game

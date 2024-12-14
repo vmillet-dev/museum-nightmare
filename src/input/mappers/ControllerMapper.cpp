@@ -5,36 +5,47 @@
 
 namespace game {
 
-const std::unordered_map<std::string, unsigned int> ControllerMapper::buttonMap = {
-    {"A", 0},
-    {"B", 1},
-    {"X", 2},
-    {"Y", 3},
-    {"LB", 4},
-    {"RB", 5},
-    {"Back", 6},
-    {"Start", 7},
-    {"LeftStick", 8},
-    {"RightStick", 9}
-};
+ControllerMapper::ControllerMapper() {
+    initializeMap();
+}
 
-const std::unordered_map<std::string, unsigned int> ControllerMapper::axisMap = {
-    {"LeftStickX", sf::Joystick::X},
-    {"LeftStickY", sf::Joystick::Y},
-    {"RightStickX", sf::Joystick::U},
-    {"RightStickY", sf::Joystick::V},
-    {"DPadX", sf::Joystick::PovX},
-    {"DPadY", sf::Joystick::PovY},
-    {"LeftTrigger", sf::Joystick::Z},
-    {"RightTrigger", sf::Joystick::R}
-};
+void ControllerMapper::initializeMap() {
 
-unsigned int ControllerMapper::mapButtonName(const std::string& name) {
-    auto it = buttonMap.find(name);
-    if (it != buttonMap.end()) {
-        return it->second;
+    // Initialize button mappings
+    buttonMap.insert(0, "A");
+    buttonMap.insert(1, "B");
+    buttonMap.insert(2, "X");
+    buttonMap.insert(3, "Y");
+    buttonMap.insert(4, "LB");
+    buttonMap.insert(5, "RB");
+    buttonMap.insert(6, "Back");
+    buttonMap.insert(7, "Start");
+    buttonMap.insert(8, "LeftStick");
+    buttonMap.insert(9, "RightStick");
+
+    // Initialize axis mappings
+    axisMap.insert(sf::Joystick::X, "LeftStickX");
+    axisMap.insert(sf::Joystick::Y, "LeftStickY");
+    axisMap.insert(sf::Joystick::U, "RightStickX");
+    axisMap.insert(sf::Joystick::V, "RightStickY");
+    axisMap.insert(sf::Joystick::PovX, "DPadX");
+    axisMap.insert(sf::Joystick::PovY, "DPadY");
+    axisMap.insert(sf::Joystick::Z, "LeftTrigger");
+    axisMap.insert(sf::Joystick::R, "RightTrigger");
+}
+
+unsigned int ControllerMapper::stringToButtonId(const std::string& name) {
+    try {
+        return buttonMap.get_right(name);
+    } catch (const std::out_of_range&) {
+        throw std::runtime_error("Unknown controller button: " + name);
     }
-    throw std::runtime_error("Unknown controller button: " + name);
+}
+
+std::string ControllerMapper::stringToAxisKey(const std::string& name)
+{
+    unsigned int axisId = mapAxisId(name);
+    return (isAxisPositive(name) ? "+" : "-") + std::to_string(axisId);
 }
 
 unsigned int ControllerMapper::mapAxisId(const std::string& name) {
@@ -54,11 +65,11 @@ unsigned int ControllerMapper::mapAxisId(const std::string& name) {
         }
     }
 
-    auto it = axisMap.find(result);
-    if (it != axisMap.end()) {
-        return it->second;
+    try {
+        return axisMap.get_right(result);
+    } catch (const std::out_of_range&) {
+        throw std::runtime_error("Unknown controller axis: " + name);
     }
-    throw std::runtime_error("Unknown controller axis: " + name);
 }
 
 bool ControllerMapper::isAxisPositive(const std::string& name) {
@@ -73,7 +84,7 @@ bool ControllerMapper::isAxis(const std::string& name) {
 }
 
 bool ControllerMapper::isButton(const std::string& name) {
-    return buttonMap.find(name) != buttonMap.end();
+    return buttonMap.contains_right(name);
 }
 
 } // namespace game

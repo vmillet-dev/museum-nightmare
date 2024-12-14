@@ -21,8 +21,8 @@ public:
     sf::RenderWindow& getWindow() { return window; }
 
 private:
-    void createControllerDevice();
-    void removeControllerDevice();
+    void createControllerDevice(unsigned int controllerId);
+    void removeControllerDevice(unsigned int controllerId);
     std::vector<std::unique_ptr<InputDevice>> devices;
     sf::RenderWindow& window;
 };

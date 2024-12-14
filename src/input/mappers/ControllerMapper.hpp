@@ -1,21 +1,30 @@
 #pragma once
 #include <SFML/Window/Joystick.hpp>
 #include <string>
-#include <unordered_map>
+#include <mutex>
+#include "../../core/containers/bimap.hpp"
 
 namespace game {
 
 class ControllerMapper {
 public:
-    static unsigned int mapButtonName(const std::string& name);
-    static unsigned int mapAxisId(const std::string& name);
-    static bool isAxisPositive(const std::string& name);
-    static bool isAxis(const std::string& name);
-    static bool isButton(const std::string& name);
+    ControllerMapper();
+    unsigned int stringToButtonId(const std::string& name);
+    std::string stringToAxisKey(const std::string& name);
+
+    bool isAxis(const std::string& name);
+    bool isButton(const std::string& name);
 
 private:
-    static const std::unordered_map<std::string, unsigned int> buttonMap;
-    static const std::unordered_map<std::string, unsigned int> axisMap;
+    ControllerMapper(const ControllerMapper&) = delete;
+    ControllerMapper& operator=(const ControllerMapper&) = delete;
+
+    Bimap<unsigned int, std::string> buttonMap;
+    Bimap<unsigned int, std::string> axisMap;
+
+    void initializeMap();
+    unsigned int mapAxisId(const std::string& name);
+    bool isAxisPositive(const std::string& name);
 };
 
 } // namespace game
