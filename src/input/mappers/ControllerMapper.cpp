@@ -34,12 +34,18 @@ void ControllerMapper::initializeMap() {
     axisMap.insert(sf::Joystick::R, "RightTrigger");
 }
 
-unsigned int ControllerMapper::mapButtonName(const std::string& name) {
+unsigned int ControllerMapper::stringToButtonId(const std::string& name) {
     try {
         return buttonMap.get_right(name);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller button: " + name);
     }
+}
+
+std::string ControllerMapper::stringToAxisKey(const std::string& name)
+{
+    unsigned int axisId = mapAxisId(name);
+    return (isAxisPositive(name) ? "+" : "-") + std::to_string(axisId);
 }
 
 unsigned int ControllerMapper::mapAxisId(const std::string& name) {

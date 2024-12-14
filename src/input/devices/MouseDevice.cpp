@@ -5,15 +5,15 @@
 
 namespace game {
 
-MouseDevice::MouseDevice(sf::RenderWindow& window)
-    : window(window)
-    , lastMousePos(sf::Mouse::getPosition(window))
-{}
+MouseDevice::MouseDevice(sf::RenderWindow& window) : window(window), lastMousePos(sf::Mouse::getPosition(window)){
+    loadBinding();
+}
 
-void MouseDevice::init() {
-    spdlog::debug("Initializing MouseDevice");
+void MouseDevice::loadBinding() {
+    spdlog::debug("loading MouseDevice binding");
     auto& config = ConfigManager::getInstance();
-    auto& mapper = MouseMapper::getInstance();
+    auto mapper = MouseMapper();
+    clearBindingsAndStatesMap();
 
     // Load mouse bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
@@ -39,11 +39,11 @@ void MouseDevice::init() {
                 continue;
             }
 
-            setButtonBinding(sfButton, action);
+            setBinding(sfButton, action);
             spdlog::debug("Set mouse binding: {} -> {}", buttonName, ActionUtil::toString(action));
         }
     }
-    spdlog::debug("MouseDevice initialized");
+    spdlog::debug("MouseDevice binding loaded");
 }
 
 void MouseDevice::handleEvent(const sf::Event& event) {
@@ -56,17 +56,8 @@ sf::Vector2i MouseDevice::getMousePosition() const {
     return lastMousePos;
 }
 
-void MouseDevice::setButtonBinding(sf::Mouse::Button button, Action action) {
-    setBinding(button, action);
-}
-
 void MouseDevice::setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed) {
-    auto& mapper = MouseMapper::getInstance();
-    spdlog::debug("Mouse Button {} {} at position ({}, {})",
-                 mapper.buttonToString(buttonEvent.button),
-                 pressed ? "Pressed" : "Released",
-                 buttonEvent.x,
-                 buttonEvent.y);
+    spdlog::debug("Mouse Button {} at position ({}, {})",pressed ? "Pressed" : "Released", buttonEvent.x, buttonEvent.y);
     setState(buttonEvent.button, pressed);
 }
 

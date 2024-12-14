@@ -8,19 +8,14 @@ namespace game {
 
 class ControllerMapper {
 public:
-    static ControllerMapper& getInstance() {
-        static ControllerMapper instance;
-        return instance;
-    }
+    ControllerMapper();
+    unsigned int stringToButtonId(const std::string& name);
+    std::string stringToAxisKey(const std::string& name);
 
-    unsigned int mapButtonName(const std::string& name);
-    unsigned int mapAxisId(const std::string& name);
-    bool isAxisPositive(const std::string& name);
     bool isAxis(const std::string& name);
     bool isButton(const std::string& name);
 
 private:
-    ControllerMapper();
     ControllerMapper(const ControllerMapper&) = delete;
     ControllerMapper& operator=(const ControllerMapper&) = delete;
 
@@ -28,6 +23,8 @@ private:
     Bimap<unsigned int, std::string> axisMap;
 
     void initializeMap();
+    unsigned int mapAxisId(const std::string& name);
+    bool isAxisPositive(const std::string& name);
 };
 
 } // namespace game

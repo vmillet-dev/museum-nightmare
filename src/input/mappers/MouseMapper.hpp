@@ -8,16 +8,11 @@ namespace game {
 
 class MouseMapper {
 public:
-    static MouseMapper& getInstance() {
-        static MouseMapper instance;
-        return instance;
-    }
-
+    MouseMapper();
     sf::Mouse::Button stringToButton(const std::string& buttonStr);
     std::string buttonToString(sf::Mouse::Button button);
 
 private:
-    MouseMapper();
     MouseMapper(const MouseMapper&) = delete;
     MouseMapper& operator=(const MouseMapper&) = delete;
 

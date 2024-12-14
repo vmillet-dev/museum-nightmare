@@ -8,16 +8,11 @@ namespace game {
 
 class KeyMapper {
 public:
-    static KeyMapper& getInstance() {
-        static KeyMapper instance;
-        return instance;
-    }
-
+    KeyMapper();
     sf::Keyboard::Key stringToKey(const std::string& keyName);
     std::string keyToString(sf::Keyboard::Key key);
 
 private:
-    KeyMapper();
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 

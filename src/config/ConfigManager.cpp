@@ -101,7 +101,6 @@ toml::v3::array* ConfigManager::getKeyboardBindingsForAction(const std::string& 
 }
 
 toml::v3::array* ConfigManager::getMouseBindingsForAction(const std::string& action) {
-    std::vector<sf::Mouse::Button> buttons;
     try {
         return config["actions"][action]["mouse"].as_array();
     } catch (const std::exception& e) {
