@@ -28,7 +28,6 @@ void ControllerDevice::loadBinding() {
         for (const auto& control : *controls) {
             std::string controlStr = control.value_or("");
 
-
             if (mapper.isAxis(controlStr)) {
                 std::string axisKey = mapper.stringToAxisKey(controlStr);
                 setAxisBinding(axisKey, action);
