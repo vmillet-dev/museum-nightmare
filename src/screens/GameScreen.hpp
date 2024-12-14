@@ -4,6 +4,7 @@
 #include "../game/GameObjectManager.hpp"
 #include "../game/objects/actor/Player.hpp"
 #include "../game/objects/Wall.hpp"
+#include "../game/levels/Level.hpp"
 #include "../input/InputManager.hpp"
 #include "../core/Game.hpp"
 
@@ -22,6 +23,7 @@ public:
 private:
     Game& game;
     std::unique_ptr<GameObjectManager> gameObjectManager;
+    std::unique_ptr<Level> level;
     Player* playerPtr{nullptr};  // Non-owning pointer to player
 };
 
