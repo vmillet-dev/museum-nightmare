@@ -3,7 +3,7 @@
 
 namespace game {
 
-Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size, const core::ResourceManager& resourceManager) {
+Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size, const ResourceManager& resourceManager) {
     // Get font from ResourceManager
     const sf::Font* buttonFont = resourceManager.getFont("arial");
     if (!buttonFont) {

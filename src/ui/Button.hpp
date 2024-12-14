@@ -10,7 +10,7 @@ namespace game {
 
 class Button {
 public:
-    Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size, const core::ResourceManager& resourceManager);
+    Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size, const ResourceManager& resourceManager);
     void update(InputManager& inputManager);
     bool isClicked() const { return clicked; }
     void render(sf::RenderWindow& window);

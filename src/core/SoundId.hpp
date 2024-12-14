@@ -1,6 +1,6 @@
 #pragma once
 
-namespace core {
+namespace game {
 
 enum class SoundId {
     Slide,          // Slide sound effect

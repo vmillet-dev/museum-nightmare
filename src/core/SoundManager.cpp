@@ -1,7 +1,7 @@
 #include "SoundManager.hpp"
 #include <spdlog/spdlog.h>
 
-namespace core {
+namespace game {
 
 SoundManager::SoundManager(ResourceManager& resourceManager)
     : resourceManager(resourceManager) {}

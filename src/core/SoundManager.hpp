@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <memory>
 
-namespace core {
+namespace game {
 
 class SoundManager {
 public:

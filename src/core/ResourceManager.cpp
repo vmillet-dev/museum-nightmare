@@ -3,7 +3,7 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-namespace core {
+namespace game {
 
 ResourceManager::ResourceManager() {
     if (!loadResources()) {
@@ -45,7 +45,7 @@ bool ResourceManager::loadSounds(const toml::table& config) {
         for (const auto& [key, value] : *soundsTable) {
             if (auto path = value.as_string()) {
                 auto buffer = std::make_unique<sf::SoundBuffer>();
-                if (!buffer->loadFromFile(path->get())) {
+                if (!buffer->loadFromFile("assets/" + path->get())) {
                     spdlog::error("Failed to load sound: {}", path->get());
                     return false;
                 }
@@ -61,7 +61,7 @@ bool ResourceManager::loadMusic(const toml::table& config) {
         for (const auto& [key, value] : *musicTable) {
             if (auto path = value.as_string()) {
                 auto music = std::make_unique<sf::Music>();
-                if (!music->openFromFile(path->get())) {
+                if (!music->openFromFile("assets/" + path->get())) {
                     spdlog::error("Failed to load music: {}", path->get());
                     return false;
                 }
@@ -76,7 +76,7 @@ bool ResourceManager::loadFonts(const toml::table& config) {
     for (const auto& [key, value] : config) {
         if (auto path = value.as_string()) {
             auto font = std::make_unique<sf::Font>();
-            if (!font->loadFromFile(path->get())) {
+            if (!font->loadFromFile(std::format("{}{}", "assets/", path->get()))) {
                 spdlog::error("Failed to load font: {}", path->get());
                 return false;
             }

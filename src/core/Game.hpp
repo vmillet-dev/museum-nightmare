@@ -20,8 +20,8 @@ public:
     void quit();
     sf::RenderWindow& getWindow() { return window;  }
     InputManager& getInputManager() { return inputManager; }
-    core::ResourceManager& getResourceManager() { return resourceManager; }
-    core::SoundManager& getSoundManager() { return soundManager; }
+    ResourceManager& getResourceManager() { return resourceManager; }
+    SoundManager& getSoundManager() { return soundManager; }
     ScreenManager& getScreenManager() { return screenManager; }
 
 
@@ -33,8 +33,8 @@ private:
 
     sf::RenderWindow window;
 
-    core::ResourceManager resourceManager;
-    core::SoundManager soundManager{resourceManager};  // Initialize with resourceManager
+    ResourceManager resourceManager;
+    SoundManager soundManager{resourceManager};  // Initialize with resourceManager
     InputManager inputManager{ window };  // Initialize with window reference
     ScreenManager screenManager{ *this };
 };

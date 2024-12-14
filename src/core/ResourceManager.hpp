@@ -7,7 +7,7 @@
 #include <memory>
 #include <toml++/toml.h>
 
-namespace core {
+namespace game {
 
 class ResourceManager {
 public:
