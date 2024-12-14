@@ -2,7 +2,11 @@
 
 namespace game {
 
-void MouseMapper::initializeButtonMap(Bimap<sf::Mouse::Button, std::string>& buttonMap) {
+MouseMapper::MouseMapper() {
+    initializeButtonMap();
+}
+
+void MouseMapper::initializeButtonMap() {
     buttonMap.insert(sf::Mouse::Left, "LeftButton");
     buttonMap.insert(sf::Mouse::Right, "RightButton");
     buttonMap.insert(sf::Mouse::Middle, "MiddleButton");
@@ -12,7 +16,7 @@ void MouseMapper::initializeButtonMap(Bimap<sf::Mouse::Button, std::string>& but
 
 sf::Mouse::Button MouseMapper::stringToButton(const std::string& buttonStr) {
     try {
-        return getButtonMap().get_right(buttonStr);
+        return buttonMap.get_right(buttonStr);
     } catch (const std::out_of_range&) {
         return sf::Mouse::ButtonCount;  // Return an invalid button if not found
     }
@@ -20,7 +24,7 @@ sf::Mouse::Button MouseMapper::stringToButton(const std::string& buttonStr) {
 
 std::string MouseMapper::buttonToString(sf::Mouse::Button button) {
     try {
-        return getButtonMap().get_left(button);
+        return buttonMap.get_left(button);
     } catch (const std::out_of_range&) {
         return "unknown";  // Return "unknown" if button is not found
     }

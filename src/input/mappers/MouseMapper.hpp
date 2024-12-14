@@ -17,20 +17,13 @@ public:
     std::string buttonToString(sf::Mouse::Button button);
 
 private:
-    MouseMapper() = default;
+    MouseMapper();
     MouseMapper(const MouseMapper&) = delete;
     MouseMapper& operator=(const MouseMapper&) = delete;
 
-    static Bimap<sf::Mouse::Button, std::string>& getButtonMap() {
-        static Bimap<sf::Mouse::Button, std::string> buttonMap = []() {
-            Bimap<sf::Mouse::Button, std::string> m;
-            initializeButtonMap(m);
-            return m;
-        }();
-        return buttonMap;
-    }
+    Bimap<sf::Mouse::Button, std::string> buttonMap;
 
-    static void initializeButtonMap(Bimap<sf::Mouse::Button, std::string>& buttonMap);
+    void initializeButtonMap();
 };
 
 } // namespace game

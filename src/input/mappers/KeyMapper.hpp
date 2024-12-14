@@ -13,24 +13,17 @@ public:
         return instance;
     }
 
-    sf::Keyboard::Key fromName(const std::string& keyName);
-    std::string toName(sf::Keyboard::Key key);
+    sf::Keyboard::Key stringToKey(const std::string& keyName);
+    std::string keyToString(sf::Keyboard::Key key);
 
 private:
-    KeyMapper() = default;
+    KeyMapper();
     KeyMapper(const KeyMapper&) = delete;
     KeyMapper& operator=(const KeyMapper&) = delete;
 
-    static Bimap<sf::Keyboard::Key, std::string>& getKeyMap() {
-        static Bimap<sf::Keyboard::Key, std::string> keyMap = []() {
-            Bimap<sf::Keyboard::Key, std::string> m;
-            initializeKeyMap(m);
-            return m;
-        }();
-        return keyMap;
-    }
+    Bimap<sf::Keyboard::Key, std::string> keyMap;
 
-    static void initializeKeyMap(Bimap<sf::Keyboard::Key, std::string>& keyMap);
+    void initializeKeyMap();
 };
 
 } // namespace game

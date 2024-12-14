@@ -8,9 +8,7 @@ namespace game {
 MouseDevice::MouseDevice(sf::RenderWindow& window)
     : window(window)
     , lastMousePos(sf::Mouse::getPosition(window))
-{
-    spdlog::debug("Creating MouseDevice");
-}
+{}
 
 void MouseDevice::init() {
     spdlog::debug("Initializing MouseDevice");
@@ -19,22 +17,19 @@ void MouseDevice::init() {
 
     // Load mouse bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        spdlog::debug("Loading bindings for action: {}", actionStr);
         auto* buttons = config.getMouseBindingsForAction(actionStr);
         if (!buttons || buttons->empty()) {
-            spdlog::warn("No mouse bindings found for action: {}", actionStr);
             continue;
         }
 
         for (const auto& button : *buttons) {
             if (!button.is_string()) {
-                spdlog::warn("Invalid mouse button binding type for action: {}", actionStr);
+                spdlog::warn("Invalid mouse button binding type for action: {} must be a string type", actionStr);
                 continue;
             }
 
             std::string buttonName = button.value_or("");
             if (buttonName.empty()) {
-                spdlog::warn("Empty mouse button binding for action: {}", actionStr);
                 continue;
             }
 
@@ -66,11 +61,10 @@ void MouseDevice::setButtonBinding(sf::Mouse::Button button, Action action) {
 }
 
 void MouseDevice::setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed) {
-    std::string action = pressed ? "Pressed" : "Released";
     auto& mapper = MouseMapper::getInstance();
     spdlog::debug("Mouse Button {} {} at position ({}, {})",
                  mapper.buttonToString(buttonEvent.button),
-                 action,
+                 pressed ? "Pressed" : "Released",
                  buttonEvent.x,
                  buttonEvent.y);
     setState(buttonEvent.button, pressed);

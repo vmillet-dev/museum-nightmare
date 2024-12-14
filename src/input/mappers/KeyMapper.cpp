@@ -2,7 +2,11 @@
 
 namespace game {
 
-void KeyMapper::initializeKeyMap(Bimap<sf::Keyboard::Key, std::string>& keyMap) {
+KeyMapper::KeyMapper() {
+    initializeKeyMap();
+}
+
+void KeyMapper::initializeKeyMap() {
     keyMap.insert(sf::Keyboard::A, "A"); keyMap.insert(sf::Keyboard::B, "B");
     keyMap.insert(sf::Keyboard::C, "C"); keyMap.insert(sf::Keyboard::D, "D");
     keyMap.insert(sf::Keyboard::E, "E"); keyMap.insert(sf::Keyboard::F, "F");
@@ -40,17 +44,17 @@ void KeyMapper::initializeKeyMap(Bimap<sf::Keyboard::Key, std::string>& keyMap) 
     keyMap.insert(sf::Keyboard::RAlt, "RAlt");
 }
 
-sf::Keyboard::Key KeyMapper::fromName(const std::string& keyName) {
+sf::Keyboard::Key KeyMapper::stringToKey(const std::string& keyName) {
     try {
-        return getKeyMap().get_right(keyName);
+        return keyMap.get_right(keyName);
     } catch (const std::out_of_range&) {
         return sf::Keyboard::Unknown;
     }
 }
 
-std::string KeyMapper::toName(sf::Keyboard::Key key) {
+std::string KeyMapper::keyToString(sf::Keyboard::Key key) {
     try {
-        return getKeyMap().get_left(key);
+        return keyMap.get_left(key);
     } catch (const std::out_of_range&) {
         return "Unknown";
     }

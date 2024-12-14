@@ -5,9 +5,11 @@
 
 namespace game {
 
+ControllerMapper::ControllerMapper() {
+    initializeMap();
+}
+
 void ControllerMapper::initializeMap() {
-    auto& buttonMap = getButtonMap();
-    auto& axisMap = getAxisMap();
 
     // Initialize button mappings
     buttonMap.insert(0, "A");
@@ -34,7 +36,7 @@ void ControllerMapper::initializeMap() {
 
 unsigned int ControllerMapper::mapButtonName(const std::string& name) {
     try {
-        return getButtonMap().get_right(name);
+        return buttonMap.get_right(name);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller button: " + name);
     }
@@ -58,7 +60,7 @@ unsigned int ControllerMapper::mapAxisId(const std::string& name) {
     }
 
     try {
-        return getAxisMap().get_right(result);
+        return axisMap.get_right(result);
     } catch (const std::out_of_range&) {
         throw std::runtime_error("Unknown controller axis: " + name);
     }
@@ -76,7 +78,7 @@ bool ControllerMapper::isAxis(const std::string& name) {
 }
 
 bool ControllerMapper::isButton(const std::string& name) {
-    return getButtonMap().contains_right(name);
+    return buttonMap.contains_right(name);
 }
 
 } // namespace game

@@ -13,26 +13,23 @@ void KeyboardDevice::init() {
 
     // Load key bindings from config
     for (const auto& [actionStr, action] : ActionUtil::getActionMap()) {
-        spdlog::debug("Loading bindings for action: {}", actionStr);
         auto* keys = config.getKeyboardBindingsForAction(actionStr);
         if (!keys || keys->empty()) {
-            spdlog::warn("No keyboard bindings found for action: {}", actionStr);
             continue;
         }
 
         for (const auto& key : *keys) {
             if (!key.is_string()) {
-                spdlog::warn("Invalid key binding type for action: {}", actionStr);
+                spdlog::warn("Invalid key binding type for action: {} must be string type", actionStr);
                 continue;
             }
 
             std::string keyName = key.value_or("");
             if (keyName.empty()) {
-                spdlog::warn("Empty key binding for action: {}", actionStr);
                 continue;
             }
 
-            sf::Keyboard::Key sfKey = mapper.fromName(keyName);
+            sf::Keyboard::Key sfKey = mapper.stringToKey(keyName);
             if (sfKey == sf::Keyboard::Unknown) {
                 spdlog::warn("Unknown key name for action {}: {}", actionStr, keyName);
                 continue;
