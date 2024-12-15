@@ -96,4 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: win-release
-          path: build/Packaging/sfml_game.zip
+          path: |
+            assets/
+            build/_deps/**/Release/*.dll
+            build/sfml_game.exe
