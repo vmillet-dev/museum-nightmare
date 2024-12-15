@@ -89,7 +89,7 @@ jobs:
         shell: cmd
         run: |
           cd build
-          tree /f /a Release
-          copy "Release/sfml_game.exe" .
+          tree /f /a
+          copy Release\sfml_game.exe .
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
           .\sfml_game.exe --test-mode
