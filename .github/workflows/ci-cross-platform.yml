@@ -91,3 +91,9 @@ jobs:
           cd build
           copy Release\sfml_game.exe .
           .\sfml_game.exe --test-mode
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-release.zip
+          path: build/Packaging/sfml_game.zip
