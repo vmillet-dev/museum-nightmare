@@ -1,5 +1,5 @@
 # Configure cross-platform compile options
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Never")
     if(MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE
             /W4     # Warning level 4

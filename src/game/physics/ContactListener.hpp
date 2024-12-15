@@ -13,18 +13,18 @@ public:
         // Process begin contacts
         for (int32_t i = 0; i < events.beginCount; ++i) {
             const b2ContactBeginTouchEvent& event = events.beginEvents[i];
-            handleContact(worldId, event.shapeIdA, event.shapeIdB);
+            handleContact(event.shapeIdA, event.shapeIdB);
         }
 
         // Process hit contacts (significant impacts)
         for (int32_t i = 0; i < events.hitCount; ++i) {
             const b2ContactHitEvent& event = events.hitEvents[i];
-            handleContact(worldId, event.shapeIdA, event.shapeIdB);
+            handleContact(event.shapeIdA, event.shapeIdB);
         }
     }
 
 private:
-    static void handleContact(b2WorldId worldId, b2ShapeId shapeIdA, b2ShapeId shapeIdB) {
+    static void handleContact(b2ShapeId shapeIdA, b2ShapeId shapeIdB) {
         // Get the bodies from the shapes
         b2BodyId bodyIdA = b2Shape_GetBody(shapeIdA);
         b2BodyId bodyIdB = b2Shape_GetBody(shapeIdB);

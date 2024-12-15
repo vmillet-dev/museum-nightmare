@@ -41,14 +41,11 @@ jobs:
 
       - name: Configure CMake
         run: |
-          mkdir -p build
-          cd build
-          cmake ..
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
-          cd build
-          make -j$(nproc)
+          cmake --build build --config Release
 
       - name: Run Tests with Virtual Display
         run: |
@@ -76,10 +73,8 @@ jobs:
       - name: Build
         shell: powershell
         run: |
-          md -Force build
-          cd build
-          cmake .. -G "Visual Studio 17 2022" -A x64
-          cmake --build . --config Debug
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PACKAGE_ZIP=ON
+          cmake --build build --config Release 
 
       - name: Setup Virtual Display
         shell: powershell
@@ -93,9 +88,6 @@ jobs:
       - name: Run Tests
         shell: cmd
         run: |
-          cd build\Debug
-          copy ..\_deps\sfml-build\lib\Debug\*.dll .
-          copy ..\_deps\spdlog-build\Debug\*.dll .
-          copy ..\_deps\box2d-build\src\Debug\*.dll .
+          cd build
           copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
           .\sfml_game.exe --test-mode

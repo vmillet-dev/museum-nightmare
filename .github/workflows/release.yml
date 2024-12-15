@@ -26,7 +26,7 @@ jobs:
 
       - name: Update CHANGELOG.md
         run: |
-          echo "## [${GITHUB_REF#refs/tags/}] - $(date +%Y-%m-%d)" >> temp_changelog
+          echo "# [${GITHUB_REF#refs/tags/}] - $(date +%Y-%m-%d)" >> temp_changelog
           echo "" >> temp_changelog
           echo "${{ steps.changelog.outputs.changelog }}" >> temp_changelog
           echo "" >> temp_changelog
