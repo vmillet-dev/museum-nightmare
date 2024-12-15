@@ -1,8 +1,8 @@
-file(GLOB_RECURSE dll_files "${CMAKE_BINARY_DIR}/_deps/**/*.dll")
+file(GLOB_RECURSE DLL_FILES_1 "${CMAKE_BINARY_DIR}/_deps/**/${CMAKE_BUILD_TYPE}/*.dll")
+file(GLOB_RECURSE DLL_FILES_2 "${CMAKE_BINARY_DIR}/_deps/**/**/${CMAKE_BUILD_TYPE}/*.dll")
+file(GLOB_RECURSE DLL_FILES_3 "${CMAKE_BINARY_DIR}/_deps/**/extlibs/bin/x64/*.dll")
+set(ALL_FILES ${DLL_FILES_1} ${DLL_FILES_2} ${DLL_FILES_3})
 
-foreach(dll_file ${dll_files})
+foreach(dll_file ${ALL_FILES})
     file(COPY "${dll_file}" DESTINATION "${CMAKE_BINARY_DIR}")
-    if(EXISTS "${CMAKE_BINARY_DIR}/Packaging")
-        file(COPY "${dll_file}" DESTINATION "${CMAKE_BINARY_DIR}/Packaging/temp/")
-    endif()
 endforeach()
