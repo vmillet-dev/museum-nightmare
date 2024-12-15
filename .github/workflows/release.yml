@@ -21,8 +21,6 @@ jobs:
         with:
           configuration: ".github/changelog-config.json"
           commitMode: true
-          fromTag: ${{ github.ref }}
-          toTag: ${{ github.event.before }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
