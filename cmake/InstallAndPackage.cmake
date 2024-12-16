@@ -12,7 +12,7 @@ if(UNIX)
     set(LIBRARY_INSTALL_DIR "/usr/lib")
 
     # Linux .so search in _deps/**/Release/
-    file(GLOB EXTERNAL_LIBS
+    file(GLOB THIRD_PARTY_LIBS
         "${CMAKE_BINARY_DIR}/_deps/**/Release/*.so"
     )
 else()
@@ -21,7 +21,7 @@ else()
     set(ASSETS_INSTALL_DIR ".")
     set(LIBRARY_INSTALL_DIR ".")
 
-    file(GLOB EXTERNAL_LIBS
+    file(GLOB THIRD_PARTY_LIBS
         "${CMAKE_BINARY_DIR}/_deps/**/Release/*.dll"
     )
 endif()
@@ -34,8 +34,8 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
 endif()
 
 # Install external libraries
-if(EXTERNAL_LIBS)
-    install(FILES ${EXTERNAL_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
+if(THIRD_PARTY_LIBS)
+    install(FILES ${THIRD_PARTY_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
 endif()
 
 # CPack Configuration
