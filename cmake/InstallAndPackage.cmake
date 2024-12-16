@@ -35,13 +35,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
 endif()
 
 # Install external libraries
-message("project dep: ${PROJECT_DEPENDENCIES}")
-install(FILES 
-    $<TARGET_FILE:sfml-system>
-    $<TARGET_FILE:sfml-graphics>
-    $<TARGET_FILE:sfml-window>
-    DESTINATION .
-)
+foreach(DEP ${PROJECT_DEPENDENCIES})
+    install(FILES $<TARGET_FILE:${DEP}> DESTINATION .)
+endforeach()
 
 # CPack Configuration
 if(WIN32)
@@ -64,7 +60,6 @@ set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
 #set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
-set(CPACK_COMPONENTS_ALL_EXCLUDE_REGEX "lib/|include/|doc/|cmake/")
 
 # Include CPack module
 include(CPack)
