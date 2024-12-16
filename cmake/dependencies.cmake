@@ -52,6 +52,3 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
-add_library(tomlplusplus::tomlplusplus ALIAS tomlplusplus)
-add_library(spdlog::spdlog ALIAS spdlog)
-add_library(box2d::box2d ALIAS box2d)
