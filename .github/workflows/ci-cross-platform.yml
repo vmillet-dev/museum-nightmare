@@ -52,6 +52,10 @@ jobs:
           cd build
           xvfb-run --auto-servernum ./sfml_game --test-mode
 
+      - name: Packaging
+        run: |
+          cmake --build build --config Release --target package
+
   build-and-test-windows:
     runs-on: windows-latest
     steps:
@@ -91,6 +95,11 @@ jobs:
           cd build
           copy Release\sfml_game.exe .
           .\sfml_game.exe --test-mode
+
+      - name: Packaging
+        shell: powershell
+        run: |
+          cmake --build build --config Release --target package
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
