@@ -36,9 +36,7 @@ endif()
 
 # Install external libraries
 foreach(DEP ${PROJECT_DEPENDENCIES})
-    if(TARGET DEP)
-        install(FILES $<TARGET_FILE:${DEP}> DESTINATION ${LIBRARY_INSTALL_DIR})
-    endif()
+    install(FILES $<TARGET_FILE:${DEP}> DESTINATION ${LIBRARY_INSTALL_DIR} OPTIONAL)
 endforeach()
 
 # CPack Configuration
