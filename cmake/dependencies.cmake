@@ -51,3 +51,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+
+add_library(tomlplusplus INTERFACE)
+target_include_directories(tomlplusplus INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/tomlplusplus/include>)

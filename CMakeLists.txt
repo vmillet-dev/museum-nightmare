@@ -27,7 +27,6 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
-target_include_directories(${PROJECT_NAME} PRIVATE tomlplusplus/include)
 
 include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/InstallAndPackage.cmake)
