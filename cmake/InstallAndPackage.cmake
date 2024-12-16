@@ -28,13 +28,14 @@ else()
 endif()
 
 # Install rules
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${EXECUTABLE_INSTALL_DIR} COMPONENT applications)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${EXECUTABLE_INSTALL_DIR})
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
-    install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${ASSETS_INSTALL_DIR} COMPONENT assets)
+    install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${ASSETS_INSTALL_DIR})
 endif()
 
 # Install external libraries
+message("project dep: ${PROJECT_DEPENDENCIES}")
 install(FILES 
     $<TARGET_FILE:sfml-system>
     $<TARGET_FILE:sfml-graphics>
@@ -46,7 +47,6 @@ install(FILES
 if(WIN32)
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-    set(CPACK_COMPONENTS_ALL applications assets)
 else()
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>")
