@@ -35,9 +35,12 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
 endif()
 
 # Install external libraries
-#if(EXTERNAL_LIBS)
-#    install(FILES ${EXTERNAL_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
-#endif()
+install(FILES 
+    $<TARGET_FILE:sfml-system>
+    $<TARGET_FILE:sfml-graphics>
+    $<TARGET_FILE:sfml-window>
+    DESTINATION .
+)
 
 # CPack Configuration
 if(WIN32)
