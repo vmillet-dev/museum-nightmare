@@ -31,7 +31,12 @@ else()
     set(CPACK_GENERATOR "DEB")
     SET(CPACK_DEB_COMPONENT_INSTALL ON)
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Valentin MILLET <valentin.millet39@gmail.com>")
     set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://your-project-homepage.com")
+
+    # Debian package dependencies
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6")
 endif()
 
 SET(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
