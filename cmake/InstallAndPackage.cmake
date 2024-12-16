@@ -30,14 +30,12 @@ endif()
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${EXECUTABLE_INSTALL_DIR} COMPONENT applications)
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
-    install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets"
-        DESTINATION ${ASSETS_INSTALL_DIR}
-    )
+    install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${ASSETS_INSTALL_DIR} COMPONENT assets)
 endif()
 
 # Install external libraries
 if(EXTERNAL_LIBS)
-    install(FILES ${EXTERNAL_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} )
+    install(FILES ${EXTERNAL_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
 endif()
 
 # CPack Configuration
@@ -45,7 +43,7 @@ if(WIN32)
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-    set(CPACK_COMPONENTS_ALL applications)
+    set(CPACK_COMPONENTS_ALL applications assets libraries)
 else()
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>")
