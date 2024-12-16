@@ -56,6 +56,12 @@ jobs:
         run: |
           cmake --build build --config Release --target package
 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: build/sfml_game-0.1.0-Linux.deb
+
   build-and-test-windows:
     runs-on: windows-latest
     steps:
@@ -105,4 +111,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: win-release
-          path: build/Packaging/sfml_game.zip
+          path: build/sfml_game-0.1.0-win64.zip
