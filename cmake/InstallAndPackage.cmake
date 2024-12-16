@@ -35,18 +35,11 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
 endif()
 
 # Install external libraries
-#foreach(DEP ${PROJECT_DEPENDENCIES})
-#    install(FILES $<TARGET_FILE:${DEP}> DESTINATION .)
-#endforeach()
-
-install(FILES 
-    $<TARGET_FILE:sfml-system>
-    $<TARGET_FILE:sfml-graphics>
-    $<TARGET_FILE:sfml-window>
-    $<TARGET_FILE:box2d>
-    $<TARGET_FILE:spdlog>
-    DESTINATION .
-)
+foreach(DEP ${PROJECT_DEPENDENCIES})
+    if(TARGET DEP)
+        install(FILES $<TARGET_FILE:${DEP}> DESTINATION ${LIBRARY_INSTALL_DIR})
+    endif()
+endforeach()
 
 # CPack Configuration
 if(WIN32)
