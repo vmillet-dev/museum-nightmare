@@ -15,9 +15,9 @@ set(SFML_LIBRARIES
 
 set(PROJECT_DEPENDENCIES
     ${SFML_LIBRARIES}
-    tomlplusplus
-    spdlog
-    box2d
+    tomlplusplus::tomlplusplus
+    spdlog::spdlog
+    box2d::box2d
 )
 
 configure_sfml_build_options()
@@ -52,3 +52,4 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(SFML tomlplusplus spdlog box2d)
+add_library(box2d::box2d ALIAS box2d)
