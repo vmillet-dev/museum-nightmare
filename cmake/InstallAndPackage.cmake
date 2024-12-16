@@ -34,15 +34,15 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
 endif()
 
 # Install external libraries
-if(THIRD_PARTY_LIBS)
-    install(FILES ${THIRD_PARTY_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
-endif()
+#if(THIRD_PARTY_LIBS)
+#    install(FILES ${THIRD_PARTY_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
+#endif()
 
 # CPack Configuration
 if(WIN32)
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-    set(CPACK_COMPONENTS_ALL applications assets libraries)
+    set(CPACK_COMPONENTS_ALL applications assets)
 else()
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>")
