@@ -23,6 +23,8 @@ function(configure_sfml_build_options)
     set(SFML_BUILD_DOC OFF CACHE BOOL "" FORCE)
     set(SFML_BUILD_TEST_SUITE OFF CACHE BOOL "" FORCE)
     set(SFML_GENERATE_PDB ON CACHE BOOL "" FORCE)
+
+    set(TOML_HEADER_ONLY OFF CACHE BOOL "" FORCE)
 endfunction()
 
 function(configure_box2d_build_options)
