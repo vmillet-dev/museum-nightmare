@@ -11,9 +11,9 @@ if(UNIX)
     set(ASSETS_INSTALL_DIR "/usr/share/${PROJECT_NAME}/assets")
     set(LIBRARY_INSTALL_DIR "/usr/lib")
 
-    # Linux .so search in _deps/**/Release/
-    file(GLOB THIRD_PARTY_LIBS
-        "${CMAKE_BINARY_DIR}/_deps/**/Release/*.so"
+    file(GLOB EXTERNAL_LIBS
+        "${CMAKE_BINARY_DIR}/_deps/*-build/**/Release/*.so"
+        "${CMAKE_BINARY_DIR}/_deps/*-build/**/**/Release/*.so"
     )
 else()
     # Windows-specific installation paths
@@ -21,28 +21,29 @@ else()
     set(ASSETS_INSTALL_DIR ".")
     set(LIBRARY_INSTALL_DIR ".")
 
-    file(GLOB THIRD_PARTY_LIBS
-        "${CMAKE_BINARY_DIR}/_deps/**/Release/*.dll"
+    file(GLOB EXTERNAL_LIBS
+        "${CMAKE_BINARY_DIR}/_deps/*-build/**/Release/*.so"
+        "${CMAKE_BINARY_DIR}/_deps/*-build/**/**/Release/*.so"
     )
 endif()
 
 # Install rules
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${EXECUTABLE_INSTALL_DIR} COMPONENT applications)
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
-    install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${ASSETS_INSTALL_DIR} COMPONENT assets)
-endif()
+#if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
+#    install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${ASSETS_INSTALL_DIR} COMPONENT assets)
+#endif()
 
 # Install external libraries
-#if(THIRD_PARTY_LIBS)
-#    install(FILES ${THIRD_PARTY_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
+#if(EXTERNAL_LIBS)
+#    install(FILES ${EXTERNAL_LIBS} DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libraries)
 #endif()
 
 # CPack Configuration
 if(WIN32)
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-    set(CPACK_COMPONENTS_ALL applications assets)
+    set(CPACK_COMPONENTS_ALL applications)
 else()
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name <your.email@example.com>")
