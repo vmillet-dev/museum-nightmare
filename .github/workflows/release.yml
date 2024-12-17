@@ -48,7 +48,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DOVERRIDED_VERSION=${{ VERSION }}
 
       - name: Packaging
         run: |
