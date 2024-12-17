@@ -1,9 +1,3 @@
-if (WIN32)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets/
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/copy_dlls.cmake)
-endif()
-
 # Installation Directories
 if(UNIX)
     set(EXECUTABLE_INSTALL_DIR "/usr/bin")
