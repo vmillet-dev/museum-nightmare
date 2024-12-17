@@ -46,13 +46,9 @@ jobs:
         with:
           cmakeVersion: "3.25.0"
 
-      - name: Configure CMake
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-
       - name: Packaging
         run: |
-          cmake --build build --config Release --target package
+          cmake -B build -DCMAKE_BUILD_TYPE=Release --build build --config Release --target package
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

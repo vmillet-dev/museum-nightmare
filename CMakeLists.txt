@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-if(DEFINED ENV{GITHUB_REF})
+if(DEFINED ENV{GITHUB_REF} AND "$ENV{GITHUB_REF_TYPE}" STREQUAL "tag")
     string(REGEX REPLACE "^refs/tags/v?" "" PROJECT_VERSION "$ENV{GITHUB_REF}")
 else()
     set(PROJECT_VERSION "0.1.0")
