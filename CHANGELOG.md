@@ -1,3 +1,14 @@
+# [v0.1.2] - 2024-12-17
+
+## 🚀 Features
+
+- feat: Attach zip and deb artefacts on release (#40)
+
+
+
+## Other Changes
+
+
 ## [v0.1.1] - 2024-12-15
 
 ## 🚀 Features

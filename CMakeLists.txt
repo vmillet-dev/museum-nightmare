@@ -4,7 +4,7 @@ if(OVERRIDED_VERSION)
     message(STATUS "Version overridden by GitHub CI: ${OVERRIDED_VERSION}")
     string(REGEX REPLACE "^v" "" PROJECT_VERSION "${OVERRIDED_VERSION}")
 else()
-    set(PROJECT_VERSION "0.1.1")
+    set(PROJECT_VERSION "0.1.2")
     message(STATUS "Default project version: ${PROJECT_VERSION}")
 endif()
 
