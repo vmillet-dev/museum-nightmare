@@ -15,6 +15,7 @@ set(SFML_LIBRARIES
 
 set(PROJECT_DEPENDENCIES
     ${SFML_LIBRARIES}
+    tomlplusplus::tomlplusplus
     spdlog
     box2d
 )
