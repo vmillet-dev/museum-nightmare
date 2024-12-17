@@ -14,8 +14,9 @@ install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${ASSETS_INSTALL_DIR}
 
 foreach(DEP ${PROJECT_DEPENDENCIES})
     get_target_property(DEP_TYPE ${DEP} TYPE)
-    message("dep type: ${DEP_TYPE}")
-    install(FILES $<TARGET_FILE:${DEP}> DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libs)
+    if(DEP_TYPE STREQUAL "SHARED_LIBRARY" OR DEP_TYPE STREQUAL "MODULE_LIBRARY")
+        install(FILES $<TARGET_FILE:${DEP}> DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT libs)
+    endif()
 endforeach()
 
 # CPack Configuration
