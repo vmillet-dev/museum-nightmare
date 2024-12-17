@@ -46,10 +46,13 @@ jobs:
         with:
           cmakeVersion: "3.25.0"
 
-      - name: Packaging
+      - name: Configure CMake
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release
+
+      - name: Packaging
+        run: |
+          cmake --build build --config Release --target package
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -97,7 +100,7 @@ jobs:
           VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
           sed -i 's/set(PROJECT_VERSION ".*")/set(PROJECT_VERSION "'${{ VERSION }}'")/' CMakeLists.txt
 
-      - name: Commit CHANGELOG.md
+      - name: Commit CHANGELOG. and CMakeLists.txt
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main

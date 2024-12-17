@@ -39,9 +39,12 @@ jobs:
             libogg-dev \
             xvfb
 
-      - name: Build
+      - name: Configure CMake
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
           cmake --build build --config Release
 
       - name: Run Tests with Virtual Display
@@ -67,10 +70,12 @@ jobs:
         with:
           cmakeVersion: "3.25.0"
 
-      - name: Build
-        shell: powershell
+      - name: Configure CMake
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
           cmake --build build --config Release
 
       - name: Setup Virtual Display
