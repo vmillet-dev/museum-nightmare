@@ -1,6 +1,13 @@
 name: CI Cross-Platform Build
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: # Run only for branch pushes, not for tags
+      - "*"
+    tags-ignore: # Ignore all tag pushes
+      - "*"
+  pull_request: # Run for pull requests
+  workflow_dispatch: # Allow manual triggers
 
 concurrency:
   group: environment-${{github.ref}}

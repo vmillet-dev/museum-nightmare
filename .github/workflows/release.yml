@@ -97,8 +97,8 @@ jobs:
 
       - name: Update CMakeLists.txt
         run: |
-          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          sed -i 's/set(PROJECT_VERSION ".*")/set(PROJECT_VERSION "'${{ VERSION }}'")/' CMakeLists.txt
+          sed -i 's/set(PROJECT_VERSION ".*")/set(PROJECT_VERSION "'${GITHUB_REF_NAME#v}'")/' CMakeLists.txt
+
 
       - name: Commit CHANGELOG. and CMake
         uses: stefanzweifel/git-auto-commit-action@v5

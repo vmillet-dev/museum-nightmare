@@ -1,16 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
 
 if(OVERRIDED_VERSION)
-    message("Version overrided by Github CI: ${OVERRIDED_VERSION}")
-
-    if(OVERRIDED_VERSION MATCHES "^v(.*)")
-        set(OVERRIDED_VERSION "${CMAKE_MATCH_1}")
-    endif()
-    set(PROJECT_VERSION ${OVERRIDED_VERSION})
-
+    message(STATUS "Version overridden by GitHub CI: ${OVERRIDED_VERSION}")
+    string(REGEX REPLACE "^v" "" PROJECT_VERSION "${OVERRIDED_VERSION}")
 else()
     set(PROJECT_VERSION "0.1.1")
-    message("Project version: ${PROJECT_VERSION}")
+    message(STATUS "Default project version: ${PROJECT_VERSION}")
 endif()
 
 project(sfml_game VERSION ${PROJECT_VERSION} LANGUAGES CXX)
