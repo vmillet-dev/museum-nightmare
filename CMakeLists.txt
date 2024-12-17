@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.18)
 
 if(OVERRIDED_VERSION)
     message("Version overrided by Github CI: ${OVERRIDED_VERSION}")
+
+    if(OVERRIDED_VERSION MATCHES "^v(.*)")
+        set(OVERRIDED_VERSION "${CMAKE_MATCH_1}")
+    endif()
     set(PROJECT_VERSION ${OVERRIDED_VERSION})
 
 else()
