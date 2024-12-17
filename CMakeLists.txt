@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.18)
 
 if(DEFINED ENV{GITHUB_REF} AND "$ENV{GITHUB_REF_TYPE}" STREQUAL "tag")
     string(REGEX REPLACE "^refs/tags/v?" "" PROJECT_VERSION "$ENV{GITHUB_REF}")
+    message("Project version: overrided by Github CI with tag ${ENV{GITHUB_REF}}: ${PROJECT_VERSION}")
 else()
-    set(PROJECT_VERSION "0.1.0")
+    set(PROJECT_VERSION "0.1.1")
+    message("Project version: ${PROJECT_VERSION}")
 endif()
 
 project(sfml_game VERSION ${PROJECT_VERSION} LANGUAGES CXX)
@@ -37,6 +39,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
 include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/InstallAndPackage.cmake)
 
+# Copy needed folders or libs to avoid erros on pipeline or when running the exe on windows
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets/)
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/copy_dlls.cmake)
