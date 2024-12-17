@@ -39,28 +39,14 @@ jobs:
             libogg-dev \
             xvfb
 
-      - name: Configure CMake
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-
       - name: Build
         run: |
-          cmake --build build --config Release
+          cmake -B build -DCMAKE_BUILD_TYPE=Release --build build --config Release
 
       - name: Run Tests with Virtual Display
         run: |
           cd build
           xvfb-run --auto-servernum ./sfml_game --test-mode
-
-      - name: Packaging
-        run: |
-          cmake --build build --config Release --target package
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-release
-          path: build/sfml_game-0.1.0-Linux.deb
 
   build-and-test-windows:
     runs-on: windows-latest
@@ -83,8 +69,7 @@ jobs:
       - name: Build
         shell: powershell
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PACKAGE_ZIP=ON
-          cmake --build build --config Release 
+          cmake -B build -DCMAKE_BUILD_TYPE=Release --build build --config Release
 
       - name: Setup Virtual Display
         shell: powershell
@@ -102,13 +87,3 @@ jobs:
           copy Release\sfml_game.exe .
           .\sfml_game.exe --test-mode
 
-      - name: Packaging
-        shell: powershell
-        run: |
-          cmake --build build --config Release --target package
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: win-release
-          path: build/sfml_game-0.1.0-win64.zip

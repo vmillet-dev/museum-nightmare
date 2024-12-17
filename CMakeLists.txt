@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(sfml_game VERSION 0.1.0 LANGUAGES CXX)
+if(DEFINED ENV{GITHUB_REF})
+    string(REGEX REPLACE "^refs/tags/v?" "" PROJECT_VERSION "$ENV{GITHUB_REF}")
+else()
+    set(PROJECT_VERSION "0.1.0")
+endif()
+
+project(sfml_game VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

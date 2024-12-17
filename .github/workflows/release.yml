@@ -46,18 +46,14 @@ jobs:
         with:
           cmakeVersion: "3.25.0"
 
-      - name: Setup CMake
-        run: |
-            cmake -B build -DCMAKE_BUILD_TYPE=Release
-            
       - name: Packaging
         run: |
-          cmake --build build --config Release --target package
+          cmake -B build -DCMAKE_BUILD_TYPE=Release --build build --config Release --target package
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-release
+          name: ${{ github.ref_name }}-release
           path: |
             build/*.deb
             build/*.zip
@@ -74,7 +70,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: win-release
+          name: ${{ github.ref_name }}-release
           path: ./
 
       - name: Generate changelog
@@ -95,12 +91,17 @@ jobs:
           cat CHANGELOG.md >> temp_changelog
           mv temp_changelog CHANGELOG.md
 
+      - name: Update CMakeLists.txt
+        run: |
+          VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          sed -i 's/set(PROJECT_VERSION ".*")/set(PROJECT_VERSION "'${{ VERSION }}'")/' CMakeLists.txt
+
       - name: Commit CHANGELOG.md
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }}"
-          file_pattern: CHANGELOG.md
+          commit_message: "docs: update CHANGELOG.md and bump project version to ${{ github.ref_name }}"
+          file_pattern: CHANGELOG.md CMakeLists.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -110,4 +111,5 @@ jobs:
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            win-release.zip
+            *.zip
+            *.deb
