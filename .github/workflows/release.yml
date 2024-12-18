@@ -6,41 +6,112 @@ on:
       - 'v*'
 
 jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Dependencies
+        uses: actions/cache@v4.1.2
+        with:
+          path: |
+            build/_deps
+          key: ${{ runner.os }}-deps-${{ hashFiles('cmake/dependencies.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+            
+      - name: Install Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libx11-dev \
+            libgl1-mesa-dev \
+            libudev-dev \
+            libopenal-dev \
+            libvorbis-dev \
+            libflac-dev \
+            libfreetype-dev \
+            xorg-dev \
+            libogg-dev
+            
+      - name: Get CMake (Windows)
+        if: runner.os == 'Windows'
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "3.25.0"
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DOVERRIDED_VERSION=${{ github.ref_name }}
+
+      - name: Packaging
+        run: |
+          cmake --build build --config Release --target package
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ github.ref_name }}-release
+          path: |
+            build/*.deb
+            build/*.zip
+
   release:
+    needs: [build-and-test]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Download Artifact (Linux)
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux-${{ github.ref_name }}-release
+          path: ./
+
+      - name: Download Artifact (Windows)
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-${{ github.ref_name }}-release
+          path: ./
+
       - name: Generate changelog
         id: changelog
-        uses: mikepenz/release-changelog-builder-action@v4
+        uses: mikepenz/release-changelog-builder-action@v5
         with:
           configuration: ".github/changelog-config.json"
-          commitMode: true
-          fromTag: ${{ github.ref }}
-          toTag: ${{ github.event.before }}
+          commitMode: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update CHANGELOG.md
         run: |
-          echo "## [${GITHUB_REF#refs/tags/}] - $(date +%Y-%m-%d)" >> temp_changelog
+          echo "# [${GITHUB_REF#refs/tags/}] - $(date +%Y-%m-%d)" >> temp_changelog
           echo "" >> temp_changelog
           echo "${{ steps.changelog.outputs.changelog }}" >> temp_changelog
           echo "" >> temp_changelog
           cat CHANGELOG.md >> temp_changelog
           mv temp_changelog CHANGELOG.md
 
-      - name: Commit CHANGELOG.md
+      - name: Update CMakeLists.txt
+        run: |
+          sed -i 's/set(PROJECT_VERSION ".*")/set(PROJECT_VERSION "'${GITHUB_REF_NAME#v}'")/' CMakeLists.txt
+
+      - name: Commit CHANGELOG. and CMake
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }}"
-          file_pattern: CHANGELOG.md
+          commit_message: "docs: update CHANGELOG.md and bump project version to ${{ github.ref_name }}"
+          file_pattern: CHANGELOG.md CMakeLists.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -49,3 +120,6 @@ jobs:
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            *.zip
+            *.deb

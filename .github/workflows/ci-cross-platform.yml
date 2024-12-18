@@ -1,6 +1,13 @@
 name: CI Cross-Platform Build
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: # Run only for branch pushes, not for tags
+      - "*"
+    tags-ignore: # Ignore all tag pushes
+      - "*"
+  pull_request: # Run for pull requests
+  workflow_dispatch: # Allow manual triggers
 
 concurrency:
   group: environment-${{github.ref}}
@@ -40,16 +47,10 @@ jobs:
             libsfml-dev \
             xvfb
 
-      - name: Configure CMake
-        run: |
-          mkdir -p build
-          cd build
-          cmake ..
-
       - name: Build
         run: |
-          cd build
-          make -j$(nproc)
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
 
       - name: Run Tests with Virtual Display
         run: |
@@ -77,10 +78,8 @@ jobs:
       - name: Build
         shell: powershell
         run: |
-          md -Force build
-          cd build
-          cmake .. -G "Visual Studio 17 2022" -A x64
-          cmake --build . --config Debug
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release 
 
       - name: Setup Virtual Display
         shell: powershell
@@ -94,9 +93,7 @@ jobs:
       - name: Run Tests
         shell: cmd
         run: |
-          cd build\Debug
-          copy ..\_deps\sfml-build\lib\Debug\*.dll .
-          copy ..\_deps\spdlog-build\Debug\*.dll .
-          copy ..\_deps\box2d-build\src\Debug\*.dll .
-          copy "C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64\OpenAL32.dll" .
+          cd build
+          copy Release\sfml_game.exe .
           .\sfml_game.exe --test-mode
+

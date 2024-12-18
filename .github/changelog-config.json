@@ -2,19 +2,19 @@
   "categories": [
     {
       "title": "## 🚀 Features",
-      "labels": ["feature", "enhancement"]
+      "labels": [ "feat", "feature", "enhancement" ]
     },
     {
       "title": "## 🐛 Bug Fixes",
-      "labels": ["bug", "fix"]
+      "labels": [ "bug", "fix" ]
     },
     {
       "title": "## 📝 Documentation",
-      "labels": ["documentation", "docs"]
+      "labels": [ "documentation", "docs" ]
     },
     {
       "title": "## 🔧 Maintenance",
-      "labels": ["maintenance", "refactor"]
+      "labels": [ "maintenance", "refactor" ]
     }
   ],
   "template": "${{CHANGELOG}}\n\n## Other Changes\n${{UNCATEGORIZED}}",
@@ -22,20 +22,8 @@
   "empty_template": "- No changes",
   "label_extractor": [
     {
-      "pattern": "^feat.*",
-      "target": "feature"
-    },
-    {
-      "pattern": "^fix.*",
-      "target": "bug"
-    },
-    {
-      "pattern": "^docs.*",
-      "target": "documentation"
-    },
-    {
-      "pattern": "^refactor.*",
-      "target": "maintenance"
+      "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+      "target": "$1"
     }
   ]
 }
