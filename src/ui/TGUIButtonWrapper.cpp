@@ -22,18 +22,21 @@ TGUIButtonWrapper::TGUIButtonWrapper(const std::string& buttonText, const sf::Ve
     button->setTextSize(24);
 
     // Match original Button text centering logic
-    auto textBounds = button->getFullSize();
-    button->setOrigin({textBounds.x / 2.f, textBounds.y / 2.f});
+    auto buttonSize = button->getSize();
+    button->setOrigin({buttonSize.x / 2.f, buttonSize.y / 2.f});
     button->setPosition({position.x, position.y});
 
     // Set text alignment to center (TGUI specific)
-    button->setTextHorizontalAlignment(tgui::Button::HorizontalAlignment::Center);
-    button->setTextVerticalAlignment(tgui::Button::VerticalAlignment::Center);
+    button->getRenderer()->setTextStyle(tgui::TextStyle::Regular);
+    button->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+    button->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 
     // Match original Button colors and outline
     button->getRenderer()->setBackgroundColor(tgui::Color(defaultColor.r, defaultColor.g, defaultColor.b));
     button->getRenderer()->setBorderColor(tgui::Color::White);
-    button->getRenderer()->setBorders(2);
+    button->getRenderer()->setBorderColorHover(tgui::Color::White);
+    button->getRenderer()->setBorderColorFocused(tgui::Color::White);
+    button->getRenderer()->setBorders({2, 2, 2, 2}); // Match original 2px outline thickness
 
     // Disable TGUI's default hover effects to match original Button behavior
     button->getRenderer()->setBackgroundColorHover(tgui::Color(defaultColor.r, defaultColor.g, defaultColor.b));
