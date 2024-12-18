@@ -1,7 +1,6 @@
 #pragma once
 #include "Screen.hpp"
-#include <TGUI/Backend/SFML-Graphics.hpp>
-#include <TGUI/Widgets/Button.hpp>
+#include "../ui/TGUIButtonWrapper.hpp"
 #include "ScreenManager.hpp"
 #include <memory>
 #include <vector>
@@ -22,7 +21,7 @@ public:
 
 private:
     tgui::Gui gui;
-    std::vector<tgui::Button::Ptr> buttons;
+    std::vector<std::unique_ptr<TGUIButtonWrapper>> buttons;
     bool shouldQuit = false;
     Game& game;
     size_t selectedButtonIndex;  // Track currently selected button

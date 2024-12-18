@@ -6,39 +6,13 @@
 namespace game {
 
 MainMenuScreen::MainMenuScreen(Game& game) : game(game), gui(game.getWindow()), selectedButtonIndex(0) {
-    auto playButton = tgui::Button::create("Play");
-    playButton->setPosition({"300", "200"});
-    playButton->setSize({"200", "50"});
+    buttons.push_back(std::make_unique<TGUIButtonWrapper>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50)));
+    buttons.push_back(std::make_unique<TGUIButtonWrapper>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50)));
 
-    auto quitButton = tgui::Button::create("Quit");
-    quitButton->setPosition({"300", "300"});
-    quitButton->setSize({"200", "50"});
-
-    // Style buttons
-    for (auto& button : {playButton, quitButton}) {
-        button->getRenderer()->setBackgroundColor(tgui::Color(100, 100, 100));
-        button->getRenderer()->setBorderColor(tgui::Color::White);
-        button->getRenderer()->setTextColor(tgui::Color::White);
-        button->getRenderer()->setBackgroundColorHover(tgui::Color(150, 150, 150));
-        button->getRenderer()->setBackgroundColorFocused(tgui::Color(200, 200, 200));
-    }
-
-    // Set up button callbacks
-    playButton->onPress([this, &game]() {
-        spdlog::info("Starting game");
-        game.getScreenManager().setState(GameState::Playing);
-    });
-
-    quitButton->onPress([this, &game]() {
-        spdlog::info("Quitting game");
-        game.getScreenManager().setState(GameState::Quit);
-    });
-
-    buttons = {playButton, quitButton};
     for (auto& button : buttons) {
-        gui.add(button);
+        gui.add(button->getWidget());
     }
-    buttons[selectedButtonIndex]->setFocused(true);
+    buttons[selectedButtonIndex]->setSelected(true);
 }
 
 void MainMenuScreen::update(float deltaTime) {
@@ -46,16 +20,30 @@ void MainMenuScreen::update(float deltaTime) {
 
     // Handle button navigation
     if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        buttons[selectedButtonIndex]->setFocused(false);
+        buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
-        buttons[selectedButtonIndex]->setFocused(true);
+        buttons[selectedButtonIndex]->setSelected(true);
         spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
     if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        buttons[selectedButtonIndex]->setFocused(false);
+        buttons[selectedButtonIndex]->setSelected(false);
         selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
-        buttons[selectedButtonIndex]->setFocused(true);
+        buttons[selectedButtonIndex]->setSelected(true);
         spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
+    }
+
+    // Update buttons and handle clicks
+    for (size_t i = 0; i < buttons.size(); ++i) {
+        buttons[i]->update(inputManager);
+        if (buttons[i]->isClicked()) {
+            if (i == 0) {
+                spdlog::info("Starting game");
+                game.getScreenManager().setState(GameState::Playing);
+            } else if (i == 1) {
+                spdlog::info("Quitting game");
+                game.getScreenManager().setState(GameState::Quit);
+            }
+        }
     }
 }
 
