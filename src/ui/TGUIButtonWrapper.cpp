@@ -31,8 +31,9 @@ TGUIButtonWrapper::TGUIButtonWrapper(const std::string& buttonText, const sf::Ve
     button->getRenderer()->setTextStyle(tgui::TextStyle::Regular);
     button->setTextSize(24); // Match original Button text size
     button->getRenderer()->setTextColor(tgui::Color::White);
-    button->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
-    button->setVerticalAlignment(tgui::VerticalAlignment::Center);
+
+    // Center text using relative positioning and origin (matching original Button implementation)
+    button->setTextPosition({"50%", "50%"}, {0.5f, 0.5f});
 
     // Match original Button colors and outline
     button->getRenderer()->setBackgroundColor(tgui::Color(defaultColor.r, defaultColor.g, defaultColor.b));
