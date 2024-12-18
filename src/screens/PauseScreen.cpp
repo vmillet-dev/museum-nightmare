@@ -5,12 +5,30 @@
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game), gui(game.getWindow()) {
+PauseScreen::PauseScreen(Game& game) : game(game) {
     spdlog::info("Initializing pause screen");
+    gui.setTarget(game.getWindow());
 
-    // Create buttons
-    buttons.push_back(std::make_unique<TGUIButtonWrapper>("Resume", sf::Vector2f(400, 250), sf::Vector2f(200, 50)));
-    buttons.push_back(std::make_unique<TGUIButtonWrapper>("Main Menu", sf::Vector2f(400, 350), sf::Vector2f(200, 50)));
+    // Create buttons with consistent layout
+    const float buttonWidth = 200.f;
+    const float buttonHeight = 50.f;
+    const float buttonSpacing = 20.f;
+    const sf::Vector2u windowSize = game.getWindow().getSize();
+    const float startY = windowSize.y / 2.f - ((2 * buttonHeight + buttonSpacing) / 2.f);
+
+    // Resume button
+    buttons.push_back(std::make_unique<TGUIButtonWrapper>(
+        "Resume",
+        sf::Vector2f(windowSize.x / 2.f, startY),
+        sf::Vector2f(buttonWidth, buttonHeight)
+    ));
+
+    // Main Menu button
+    buttons.push_back(std::make_unique<TGUIButtonWrapper>(
+        "Main Menu",
+        sf::Vector2f(windowSize.x / 2.f, startY + buttonHeight + buttonSpacing),
+        sf::Vector2f(buttonWidth, buttonHeight)
+    ));
 
     // Add buttons to GUI
     for (auto& button : buttons) {
@@ -31,7 +49,7 @@ PauseScreen::PauseScreen(Game& game) : game(game), gui(game.getWindow()) {
     // Center the pause text
     sf::FloatRect textBounds = pauseText.getLocalBounds();
     pauseText.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    pauseText.setPosition(400, 150);
+    pauseText.setPosition(windowSize.x / 2.f, startY - buttonHeight);
 }
 
 void PauseScreen::update(float deltaTime) {
@@ -52,7 +70,7 @@ void PauseScreen::update(float deltaTime) {
     // Update buttons and handle clicks
     for (size_t i = 0; i < buttons.size(); ++i) {
         buttons[i]->update(inputManager);
-        if (buttons[i]->isClicked()) {
+        if (buttons[i]->wasClicked()) {
             if (i == 0) {
                 spdlog::info("Resuming game");
                 game.getScreenManager().setState(GameState::Playing);
@@ -66,14 +84,12 @@ void PauseScreen::update(float deltaTime) {
 
 void PauseScreen::render(sf::RenderWindow& window) {
     // Draw semi-transparent background
-    sf::RectangleShape overlay(sf::Vector2f(800, 600));
+    sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
     overlay.setFillColor(sf::Color(0, 0, 0, 128));
     window.draw(overlay);
 
-    // Draw pause text
+    // Draw pause text and GUI elements
     window.draw(pauseText);
-
-    // Draw GUI elements
     gui.draw();
 }
 

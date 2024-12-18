@@ -7,6 +7,8 @@
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 
 namespace game {
 

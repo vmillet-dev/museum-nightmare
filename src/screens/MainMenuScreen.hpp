@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 #include <spdlog/spdlog.h>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 
 namespace game {
 
