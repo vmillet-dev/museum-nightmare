@@ -19,11 +19,12 @@ TGUIButtonWrapper::TGUIButtonWrapper(const std::string& buttonText, const sf::Ve
     button->getRenderer()->setTextColor(tgui::Color::White);
 
     // Center text using the same logic as original Button
-    auto textSize = button->getFullSize();
-    button->setTextSize(24); // Reset size after getting full size
-    float xOffset = (size.x - textSize.x) / 2.f;
-    float yOffset = (size.y - textSize.y) / 2.f;
-    button->getRenderer()->setPadding({xOffset, yOffset});
+    button->setTextSize(24);
+
+    // Match original Button text centering logic
+    auto textBounds = button->getFullSize();
+    button->setOrigin({textBounds.x / 2.f, textBounds.y / 2.f});
+    button->setPosition({position.x, position.y});
 
     // Match original Button colors and outline
     button->getRenderer()->setBackgroundColor(tgui::Color(defaultColor.r, defaultColor.g, defaultColor.b));
