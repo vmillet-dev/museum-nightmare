@@ -28,8 +28,8 @@ TGUIButtonWrapper::TGUIButtonWrapper(const std::string& buttonText, const sf::Ve
 
     // Set text alignment to center (TGUI specific)
     button->getRenderer()->setTextStyle(tgui::TextStyle::Regular);
-    button->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-    button->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    button->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
+    button->setVerticalAlignment(tgui::VerticalAlignment::Center);
 
     // Match original Button colors and outline
     button->getRenderer()->setBackgroundColor(tgui::Color(defaultColor.r, defaultColor.g, defaultColor.b));
