@@ -9,7 +9,7 @@ namespace game {
 Game::Game() : window(
     sf::VideoMode(ConfigManager::getInstance().getWindowWidth(),ConfigManager::getInstance().getWindowHeight()),
     ConfigManager::getInstance().getWindowTitle()
-) {
+), soundManager(resourceManager) {  // Initialize soundManager with resourceManager
     sf::err().rdbuf(nullptr);  // Disable SFML error output
     spdlog::info("Game initialized successfully");
 }

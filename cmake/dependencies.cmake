@@ -11,6 +11,7 @@ set(SFML_LIBRARIES
     sfml-graphics
     sfml-window
     sfml-system
+    sfml-audio
 )
 
 set(PROJECT_DEPENDENCIES

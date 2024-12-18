@@ -6,10 +6,11 @@
 namespace game {
 
 MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
-    buttons.push_back(std::make_unique<Button>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50)));
-    buttons.push_back(std::make_unique<Button>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50)));
+    buttons.push_back(std::make_unique<Button>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50), game.getResourceManager()));
+    buttons.push_back(std::make_unique<Button>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50), game.getResourceManager()));
     // Set initial button selection
     buttons[selectedButtonIndex]->setSelected(true);
+    game.getSoundManager().playMusic(MusicId::MenuTheme);
 }
 
 void MainMenuScreen::update(float deltaTime) {

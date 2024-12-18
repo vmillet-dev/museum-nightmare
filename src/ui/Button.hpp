@@ -2,13 +2,15 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <spdlog/spdlog.h>
+#include "../core/ResourceManager.hpp"
 #include "../input/InputManager.hpp"
+
 
 namespace game {
 
 class Button {
 public:
-    Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size);
+    Button(const std::string& text, const sf::Vector2f& position, const sf::Vector2f& size, const ResourceManager& resourceManager);
     void update(InputManager& inputManager);
     bool isClicked() const { return clicked; }
     void render(sf::RenderWindow& window);

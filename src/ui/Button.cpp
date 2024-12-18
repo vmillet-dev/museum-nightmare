@@ -3,10 +3,12 @@
 
 namespace game {
 
-Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size) {
-    // Load font
-    if (!font.loadFromFile("assets/arial.ttf")) {
-        spdlog::error("Failed to load font in Button!");
+Button::Button(const std::string& buttonText, const sf::Vector2f& position, const sf::Vector2f& size, const ResourceManager& resourceManager) {
+    // Get font from ResourceManager
+    const sf::Font* buttonFont = resourceManager.getFont("arial");
+    if (!buttonFont) {
+        spdlog::error("Failed to get arial font from ResourceManager in Button!");
+        return;
     }
 
     // Setup shape
@@ -18,7 +20,7 @@ Button::Button(const std::string& buttonText, const sf::Vector2f& position, cons
     shape.setOutlineColor(sf::Color::White);
 
     // Setup text
-    text.setFont(font);
+    text.setFont(*buttonFont);
     text.setString(buttonText);
     text.setCharacterSize(24);
     text.setFillColor(sf::Color::White);

@@ -1,0 +1,17 @@
+# Game Resources Configuration
+
+[audio]
+# Sound effects
+[audio.sounds]
+slide = "audio/Slide.ogg"
+
+# Background music
+[audio.music]
+menu_theme = "audio/MenuTheme.ogg"
+
+# Future resource types can be added here
+[sprites]
+# sprite configurations will go here
+
+[fonts]
+arial = "fonts/arial.ttf"
