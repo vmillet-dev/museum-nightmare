@@ -1,6 +1,7 @@
 #pragma once
 #include "Screen.hpp"
-#include "../ui/Button.hpp"
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <TGUI/Widgets/Button.hpp>
 #include "ScreenManager.hpp"
 #include <memory>
 #include <vector>
@@ -18,11 +19,11 @@ public:
     PauseScreen(Game& game);
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
+    void handleEvent(const sf::Event& event) { gui.handleEvent(event); }
 
 private:
-    std::vector<std::unique_ptr<Button>> buttons;
-    std::unique_ptr<Button> resumeButton;
-    std::unique_ptr<Button> mainMenuButton;
+    tgui::Gui gui;
+    std::vector<tgui::Button::Ptr> buttons;
     sf::Font font;
     sf::Text pauseText;
     Game& game;

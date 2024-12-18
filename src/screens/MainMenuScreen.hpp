@@ -1,6 +1,7 @@
 #pragma once
 #include "Screen.hpp"
-#include "../ui/Button.hpp"
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <TGUI/Widgets/Button.hpp>
 #include "ScreenManager.hpp"
 #include <memory>
 #include <vector>
@@ -17,9 +18,11 @@ public:
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
     bool shouldExitGame() const { return shouldQuit; }
+    void handleEvent(const sf::Event& event) { gui.handleEvent(event); }
 
 private:
-    std::vector<std::unique_ptr<Button>> buttons;
+    tgui::Gui gui;
+    std::vector<tgui::Button::Ptr> buttons;
     bool shouldQuit = false;
     Game& game;
     size_t selectedButtonIndex;  // Track currently selected button

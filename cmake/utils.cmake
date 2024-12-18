@@ -37,3 +37,10 @@ function(configure_box2d_build_options)
         set(BOX2D_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
     endif()
 endfunction()
+
+# Configure TGUI build options
+function(configure_tgui_build_options)
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+    set(TGUI_BACKEND SFML_GRAPHICS CACHE STRING "" FORCE)
+    set(TGUI_CXX_STANDARD 23 CACHE STRING "" FORCE)
+endfunction()

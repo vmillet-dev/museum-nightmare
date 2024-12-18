@@ -32,6 +32,13 @@ void Game::handleEvent(const sf::Event& event) {
         return;
     }
 
+    // Forward events to the current screen's GUI
+    if (auto* mainMenu = dynamic_cast<MainMenuScreen*>(screenManager.getCurrentScreen())) {
+        mainMenu->handleEvent(event);
+    } else if (auto* pauseScreen = dynamic_cast<PauseScreen*>(screenManager.getCurrentScreen())) {
+        pauseScreen->handleEvent(event);
+    }
+
     // Handle all input events through InputManager
     inputManager.handleEvent(event);
 }
