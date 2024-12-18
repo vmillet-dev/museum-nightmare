@@ -12,25 +12,15 @@ TGUIButtonWrapper::TGUIButtonWrapper(const std::string& buttonText, const sf::Ve
 
     // Match original Button positioning and size
     button->setSize({size.x, size.y});
-    button->setPosition({position.x - size.x / 2.f, position.y - size.y / 2.f});
 
-    // Match original Button text styling
-    button->setTextSize(24);
-    button->getRenderer()->setTextColor(tgui::Color::White);
-
-    // Center text using the same logic as original Button
-    button->setTextSize(24);
-
-    // Match original Button text centering logic
-    auto buttonSize = button->getSize();
-    button->setOrigin({buttonSize.x / 2.f, buttonSize.y / 2.f});
+    // Set button origin and position (matching original Button implementation)
+    button->setOrigin({size.x / 2.f, size.y / 2.f});
     button->setPosition({position.x, position.y});
 
     // Set text properties to match original Button implementation
-    button->setAutoSize(false); // Maintain fixed button size
-    button->getRenderer()->setTextStyle(tgui::TextStyle::Regular);
     button->setTextSize(24); // Match original Button text size
     button->getRenderer()->setTextColor(tgui::Color::White);
+    button->getRenderer()->setTextStyle(tgui::TextStyle::Regular);
 
     // Center text using relative positioning and origin (matching original Button implementation)
     button->setTextPosition({"50%", "50%"}, {0.5f, 0.5f});
