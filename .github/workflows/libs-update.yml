@@ -1,13 +1,6 @@
 name: Scheduled check of available libs updates
 
-on: 
-  workflow_dispatch:    
-    inputs:
-        branch:
-          description: 'Branch to test the workflow'
-          required: false  # Branch input is optional
-          default: '${{ github.ref_name }}'
-  push:
+on: [workflow_dispatch, push]
 
 jobs:
   periodic-check:
