@@ -7,8 +7,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Never")
             /MP     # Multi-processor compilation
             /EHsc   # Exception handling model
             /permissive-  # Strict C++ conformance
-            /std:c11  # Enable C11 support
-            /experimental:c11atomics  # Enable C11 atomics support
         )
     else()
         target_compile_options(${PROJECT_NAME} PRIVATE
