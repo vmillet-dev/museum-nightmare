@@ -66,7 +66,7 @@ jobs:
         if: env.update == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: update-files-branch
+          branch: ${{ env.branch_name }}
           title: "Automated Update from Periodic Task"
           body: |
             This PR contains automated updates from the periodic task.
