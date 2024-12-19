@@ -2,6 +2,11 @@ name: Scheduled check of available libs updates
 
 on: [workflow_dispatch, push]
 
+defaults:
+  run:
+    shell: bash
+    working-directory: ./tools/dependency_checker
+
 jobs:
   periodic-check:
     runs-on: ubuntu-latest
@@ -11,7 +16,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        working-directory: ./tools/dependency_checker
         with:
           fetch-depth: 0  # Fetch the full history for diffing
 
