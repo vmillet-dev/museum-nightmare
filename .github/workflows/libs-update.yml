@@ -1,4 +1,4 @@
-name: Scheduled check of available libs updates
+name: Scheduled update checking for external libs
 
 on: [workflow_dispatch, push]
 
@@ -8,7 +8,7 @@ defaults:
     working-directory: ./tools/dependency_checker
 
 jobs:
-  periodic-check:
+  update-checking:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed to create PRs
@@ -40,8 +40,22 @@ jobs:
             echo "update=false" >> $GITHUB_ENV
           fi
 
-      - name: Update Files If Needed
+      - name: Determine Branch Name
         if: env.update == 'true'
+        id: determine_branch
         run: |
-          # Modify files as needed
-          echo "Updating files..."
+          OPEN_PR=$(gh pr list --label dependencies --json headRefName --jq '.[].headRefName')
+          if [[ -n "$OPEN_PR" ]]; then
+            echo "branch_name=$OPEN_PR" >> $GITHUB_ENV
+          else
+            TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+            echo "branch_name=dependabot/update-${TIMESTAMP}" >> $GITHUB_ENV
+          fi
+
+      - name: Commit dependencies changes
+        if: env.update == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: ${{ env.branch_name }}  # Use the determined branch name
+          create_branch: true
+          commit_message: "deps: Update dependencies"
