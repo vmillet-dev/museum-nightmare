@@ -34,7 +34,7 @@ jobs:
       - name: Check if any dependencies have been updated
         id: task
         run: |
-          if [[ $(git status | grep modified | xargs | wc -c) -gt 0 ]]; then
+          if [[ $(git status | grep modified | xargs | wc -c) -gt 1 ]]; then
             echo "update=true" >> $GITHUB_ENV
           else
             echo "update=false" >> $GITHUB_ENV
