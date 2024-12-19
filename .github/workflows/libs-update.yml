@@ -61,3 +61,13 @@ jobs:
           branch: ${{ env.branch_name }}  # Use the determined branch name
           create_branch: true
           commit_message: "deps: Update dependencies"
+
+      - name: Create Pull Request
+        if: env.update == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: update-files-branch
+          title: "Automated Update from Periodic Task"
+          body: |
+            This PR contains automated updates from the periodic task.
+          labels: dependencies
