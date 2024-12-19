@@ -31,36 +31,17 @@ jobs:
           ./build.sh
           ./build/dependency_checker --dependencies-file ../../cmake/dependencies.cmake       
 
-      - name: Run Periodic Task
+      - name: Check if any dependencies have been updated
         id: task
         run: |
-          if [[ -f "update_needed.flag" ]]; then
+          if [[ $(git status | grep modified | xargs | wc -c) -gt 0 ]]; then
             echo "update=true" >> $GITHUB_ENV
           else
             echo "update=false" >> $GITHUB_ENV
+          fi
 
       - name: Update Files If Needed
         if: env.update == 'true'
         run: |
           # Modify files as needed
           echo "Updating files..."
-          echo "New content" > file.txt
-
-      - name: Commit Changes
-        if: env.update == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b update-files-branch
-          git add .
-          git commit -m "Automated update for periodic task"
-
-      - name: Create Pull Request
-        if: env.update == 'true'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: update-files-branch
-          title: "Automated Update from Periodic Task"
-          body: |
-            This PR contains automated updates from the periodic task.
-          labels: automated, periodic
