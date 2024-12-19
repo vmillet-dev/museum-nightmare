@@ -27,7 +27,7 @@ make
 ```
 
 ## Requirements
-- CMake 3.18 or higher
+- CMake 3.16 or higher
 - C++ compiler with C++17 support
 - libcurl
 - nlohmann_json

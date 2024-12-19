@@ -96,38 +96,28 @@ std::optional<std::string> GitHubAPI::getLatestVersion(const std::string& repo_u
         auto [owner, repo] = parseGitHubUrl(repo_url);
         std::string api_url = "https://api.github.com/repos/" + owner + "/" + repo + "/tags";
 
-        std::cout << "Checking latest version for " << owner << "/" << repo << std::endl;
-
         std::string response = makeRequest(api_url);
         auto tags = json::parse(response);
-
-        std::cout << "Found " << tags.size() << " tags" << std::endl;
 
         std::optional<std::string> latest_version;
         std::vector<int> highest_version;
 
         for (const auto& tag : tags) {
             std::string tag_name = tag["name"];
-            std::cout << "Processing tag: " << tag_name;
-
             if (std::regex_match(tag_name, std::regex(R"(v?\d+\.\d+\.\d+$)"))) {
                 auto version_components = versionToComponents(tag_name);
-                std::cout << " (valid semver)";
 
                 if (latest_version.has_value()) {
                     auto current_highest = versionToComponents(latest_version.value());
                     if (version_components > current_highest) {
-                        std::cout << " - new highest version";
                         latest_version = tag_name;
                         highest_version = version_components;
                     }
                 } else {
-                    std::cout << " - first valid version";
                     latest_version = tag_name;
                     highest_version = version_components;
                 }
             }
-            std::cout << std::endl;
         }
 
         if (latest_version) {

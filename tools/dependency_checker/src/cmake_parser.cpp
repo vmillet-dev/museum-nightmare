@@ -42,8 +42,6 @@ std::pair<std::vector<Dependency>, std::string> CMakeParser::parseDependencies(c
     buffer << file.rdbuf();
     std::string content = buffer.str();
 
-    std::cout << "File contents:\n" << content << "\n=== END FILE CONTENTS ===\n";
-
     auto variables = parseVersionVariables(content);
     std::vector<Dependency> dependencies;
 

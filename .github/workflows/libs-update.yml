@@ -1,0 +1,63 @@
+name: Scheduled check of available libs updates
+
+on: 
+  workflow_dispatch
+
+jobs:
+  periodic-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to create PRs
+      pull-requests: write  # Needed to create PRs
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        working-directory: ./tools/dependency_checker
+        with:
+          fetch-depth: 0  # Fetch the full history for diffing
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake
+
+      - name: Build & execute
+        run: |
+          ./build.sh
+          ./build/dependency_checker --dependencies-file ../../cmake/dependencies.cmake       
+
+      - name: Run Periodic Task
+        id: task
+        run: |
+          if [[ -f "update_needed.flag" ]]; then
+            echo "update=true" >> $GITHUB_ENV
+          else
+            echo "update=false" >> $GITHUB_ENV
+
+      - name: Update Files If Needed
+        if: env.update == 'true'
+        run: |
+          # Modify files as needed
+          echo "Updating files..."
+          echo "New content" > file.txt
+
+      - name: Commit Changes
+        if: env.update == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b update-files-branch
+          git add .
+          git commit -m "Automated update for periodic task"
+
+      - name: Create Pull Request
+        if: env.update == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: update-files-branch
+          title: "Automated Update from Periodic Task"
+          body: |
+            This PR contains automated updates from the periodic task.
+          labels: automated, periodic

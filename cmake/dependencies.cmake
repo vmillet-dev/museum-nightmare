@@ -1,3 +1,4 @@
+include(${CMAKE_CURRENT_LIST_DIR}/configure_ext_libs.cmake)
 include(FetchContent)
 
 # Dependencies versions

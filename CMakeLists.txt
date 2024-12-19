@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.18)
 
+set(PROJECT_VERSION "0.1.2")
 if(OVERRIDED_VERSION)
     message(STATUS "Version overridden by GitHub CI: ${OVERRIDED_VERSION}")
     string(REGEX REPLACE "^v" "" PROJECT_VERSION "${OVERRIDED_VERSION}")
-else()
-    set(PROJECT_VERSION "0.1.2")
-    message(STATUS "Default project version: ${PROJECT_VERSION}")
 endif()
 
 project(sfml_game VERSION ${PROJECT_VERSION} LANGUAGES CXX)
@@ -13,27 +11,18 @@ project(sfml_game VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set build type if not set
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
-# Add source files
-file(GLOB_RECURSE SOURCES
-    "src/*.cpp"
-)
-
-# Remove main.cpp from sources
+file(GLOB_RECURSE SOURCES "src/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
-# Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
 
 include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)

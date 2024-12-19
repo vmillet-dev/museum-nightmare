@@ -1,27 +1,11 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 project(dependency_checker VERSION 1.0.0)
 
 # Set C++20 standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Only include what we need
-include(FetchContent)
-
-# Define versions
-set(NLOHMANN_JSON_VERSION "3.11.3")
-
-# Find CURL package
-find_package(CURL REQUIRED)
-
-# Fetch JSON library
-FetchContent_Declare(
-    nlohmann_json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v${NLOHMANN_JSON_VERSION}
-)
-
-FetchContent_MakeAvailable(nlohmann_json)
+include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 # Create the executable
 add_executable(dependency_checker
