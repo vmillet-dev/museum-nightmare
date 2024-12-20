@@ -23,7 +23,7 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) 
             spdlog::info("Quitting game");
             game.getScreenManager().setState(GameState::Quit);
         })
-        ->setTheme("themes/dark.theme")
+        ->setTheme("assets/themes/dark.theme")
         ->setResponsive(true)
         ->build();
 

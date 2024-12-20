@@ -25,7 +25,7 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
             spdlog::info("Returning to main menu");
             game.getScreenManager().setState(GameState::MainMenu);
         })
-        ->setTheme("themes/dark.theme")
+        ->setTheme("assets/themes/dark.theme")
         ->setResponsive(true)
         ->build();
 
