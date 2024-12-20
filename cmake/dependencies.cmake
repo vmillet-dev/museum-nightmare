@@ -3,9 +3,9 @@ include(FetchContent)
 
 # Dependencies versions
 set(BOX2D_VERSION "3.0.0")
-set(SFML_VERSION "2.6.1")
-set(TOMLPLUSPLUS_VERSION "3.3.0")
-set(SPDLOG_VERSION "1.14.0")
+set(SFML_VERSION "2.6.2")
+set(TOMLPLUSPLUS_VERSION "3.4.0")
+set(SPDLOG_VERSION "1.15.0")
 
 # Define required libraries
 set(SFML_LIBRARIES
