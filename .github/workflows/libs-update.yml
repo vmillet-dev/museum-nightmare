@@ -36,6 +36,8 @@ jobs:
         run: |
           if [[ $(git status | grep modified | xargs | wc -c) -gt 1 ]]; then
             echo "update=true" >> $GITHUB_ENV
+            echo "pr_title="$(cat title.log) >> $GITHUB_ENV
+            echo "pr_body="$(cat title.log)  >> $GITHUB_ENV            
           else
             echo "update=false" >> $GITHUB_ENV
           fi
@@ -54,20 +56,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit dependencies changes
-        if: env.update == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch: ${{ env.branch_name }}  # Use the determined branch name
-          create_branch: true
-          commit_message: "deps: Update dependencies"
-
       - name: Create Pull Request
         if: env.update == 'true'
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: ${{ env.branch_name }}
-          title: "Automated Update from Periodic Task"
-          body: |
-            This PR contains automated updates from the periodic task.
+          title: ${{ env.pr_title }}
+          body: ${{ env.pr_body }}
           labels: dependencies

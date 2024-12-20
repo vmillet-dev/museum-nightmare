@@ -1,6 +1,7 @@
 #include "github_api.hpp"
 #include "cmake_parser.hpp"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <filesystem>
 #include <vector>
@@ -59,6 +60,8 @@ int main(int argc, char* argv[]) {
 
         // Check each dependency for updates
         bool updates_available = false;
+        std::string title = "deps: Bump";
+        std::string body;
         for (auto& dep : dependencies) {
             std::cout << "Checking " << dep.name << " (" << dep.repo << ")...\n";
 
@@ -74,8 +77,9 @@ int main(int argc, char* argv[]) {
             auto latest = GitHubAPI::versionToComponents(*latest_version);
 
             if (latest > current) {
-                std::cout << "  Update available for " << dep.name << ": "
-                         << *latest_version << " (current: " << dep.tag << ")\n";
+                std::cout << "  Update available for " << dep.name << ": " << *latest_version << " (current: " << dep.tag << ")\n";
+                title += (" " + dep.name + " to " + *latest_version + ",");
+                body += ("Bump " + dep.name + " from " + dep.tag + " to " + *latest_version);
                 updates_available = true;
             } else {
                 std::cout << "  " << dep.name << " is up-to-date (current version: "
@@ -86,6 +90,16 @@ int main(int argc, char* argv[]) {
         // Update the file if needed and not in dry-run mode
         if (updates_available) {
             if (!options.dry_run) {
+
+                std::ofstream myfile;
+                myfile.open ("title.log");
+                myfile << title;
+                myfile.close();
+
+                myfile.open ("body.log");
+                myfile << body;
+                myfile.close();
+
                 CMakeParser::updateFile(content, dependencies, options.dependencies_file);
                 std::cout << "File updated successfully.\n";
             } else {
