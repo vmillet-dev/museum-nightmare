@@ -37,7 +37,7 @@ jobs:
           if [[ $(git status | grep modified | xargs | wc -c) -gt 1 ]]; then
             echo "update=true" >> $GITHUB_ENV
             echo "pr_title="$(cat title.log) >> $GITHUB_ENV
-            echo "pr_body="$(cat title.log)  >> $GITHUB_ENV            
+            echo "pr_body="$(cat body.log)  >> $GITHUB_ENV            
           else
             echo "update=false" >> $GITHUB_ENV
           fi
@@ -62,6 +62,5 @@ jobs:
         with:
           branch: ${{ env.branch_name }}
           title: ${{ env.pr_title }}
-          body: |
-            ${{ env.pr_body }}
+          body: ${{ env.pr_body }}
           labels: dependencies

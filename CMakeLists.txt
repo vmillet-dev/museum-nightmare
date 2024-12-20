@@ -11,13 +11,10 @@ project(sfml_game VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
+option(CMAKE_BUILD_TYPE "Setup build mode (Debug or Release)" Debug)
+option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
-
-option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")

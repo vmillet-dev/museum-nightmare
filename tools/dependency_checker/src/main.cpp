@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 
             if (latest > current) {
                 std::cout << "  Update available for " << dep.name << ": " << *latest_version << " (current: " << dep.tag << ")\n";
-                if(!updates_available) {
+                if(updates_available) {
                     title += ",";
                 }
                 title += (" " + dep.name + " to " + *latest_version);
