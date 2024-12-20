@@ -15,6 +15,7 @@ MenuBuilder::Ptr MenuBuilder::addButton(const std::string& name, const std::stri
     button->getRenderer()->setBorderColor(tgui::Color::White);
     button->getRenderer()->setBorders(2);
     button->setTextSize(24);
+    button->setTextPosition({"50%", "50%"}, {0.5f, 0.5f});
     m_widgets[name] = button;
     m_container->add(button, name);
     return shared_from_this();
