@@ -15,6 +15,10 @@
     {
       "title": "## 🔧 Maintenance",
       "labels": [ "maintenance", "refactor" ]
+    },
+    {
+      "title": "## 📦 Dependency updates",
+      "labels": [ "dependencies" ]
     }
   ],
   "template": "${{CHANGELOG}}\n\n## Other Changes\n${{UNCATEGORIZED}}",

@@ -1,0 +1,66 @@
+name: Scheduled update checking for external libs
+
+on: [workflow_dispatch, push]
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./tools/dependency_checker
+
+jobs:
+  update-checking:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to create PRs
+      pull-requests: write  # Needed to create PRs
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch the full history for diffing
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake
+
+      - name: Build & execute
+        run: |
+          ./build.sh
+          ./build/dependency_checker --dependencies-file ../../cmake/dependencies.cmake       
+
+      - name: Check if any dependencies have been updated
+        id: task
+        run: |
+          if [[ $(git status | grep modified | xargs | wc -c) -gt 1 ]]; then
+            echo "update=true" >> $GITHUB_ENV
+            echo "pr_title="$(cat title.log) >> $GITHUB_ENV
+            echo "pr_body="$(cat body.log)  >> $GITHUB_ENV            
+          else
+            echo "update=false" >> $GITHUB_ENV
+          fi
+
+      - name: Determine Branch Name
+        if: env.update == 'true'
+        id: determine_branch
+        run: |
+          OPEN_PR=$(gh pr list --label dependencies --json headRefName --jq '.[].headRefName')
+          if [[ -n "$OPEN_PR" ]]; then
+            echo "branch_name=$OPEN_PR" >> $GITHUB_ENV
+          else
+            TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+            echo "branch_name=dependabot/update-${TIMESTAMP}" >> $GITHUB_ENV
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request
+        if: env.update == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: ${{ env.branch_name }}
+          title: ${{ env.pr_title }}
+          body: ${{ env.pr_body }}
+          labels: dependencies
