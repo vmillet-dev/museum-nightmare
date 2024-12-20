@@ -1,14 +1,14 @@
 #pragma once
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include "Screen.hpp"
-#include "../ui/TGUIButtonWrapper.hpp"
+#include "../ui/MenuBuilder.hpp"
 #include "ScreenManager.hpp"
 #include <memory>
 #include <vector>
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Font.hpp>
-#include <TGUI/Backend/SFML-Graphics.hpp>
-#include <TGUI/TGUI.hpp>
 
 namespace game {
 
@@ -24,7 +24,8 @@ public:
 
 private:
     tgui::Gui gui;
-    std::vector<std::unique_ptr<TGUIButtonWrapper>> buttons;
+    std::shared_ptr<MenuBuilder> m_menuBuilder;
+    tgui::Container::Ptr m_container;
     sf::Font font;
     sf::Text pauseText;
     Game& game;

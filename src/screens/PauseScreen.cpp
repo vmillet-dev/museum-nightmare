@@ -9,32 +9,32 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     spdlog::info("Initializing pause screen");
     gui.setTarget(game.getWindow());
 
-    // Create buttons with consistent layout
-    const float buttonWidth = 200.f;
-    const float buttonHeight = 50.f;
-    const float buttonSpacing = 20.f;
-    const sf::Vector2u windowSize = game.getWindow().getSize();
-    const float startY = windowSize.y / 2.f - ((2 * buttonHeight + buttonSpacing) / 2.f);
+    // Initialize MenuBuilder and create buttons
+    m_menuBuilder = std::make_shared<MenuBuilder>(&gui);
+    m_container = m_menuBuilder
+        ->addButton("resumeButton", "Resume")
+        ->addButton("mainMenuButton", "Main Menu")
+        ->setVerticalLayout()
+        ->setSpacing(20.f)
+        ->setPadding(50.f)
+        ->onClick("resumeButton", [this, &game]{
+            spdlog::info("Resuming game");
+            game.getScreenManager().setState(GameState::Playing);
+        })
+        ->onClick("mainMenuButton", [this, &game]{
+            spdlog::info("Returning to main menu");
+            game.getScreenManager().setState(GameState::MainMenu);
+        })
+        ->setTheme("themes/dark.theme")
+        ->setResponsive(true)
+        ->build();
 
-    // Resume button
-    buttons.push_back(std::make_unique<TGUIButtonWrapper>(
-        "Resume",
-        sf::Vector2f(windowSize.x / 2.f, startY),
-        sf::Vector2f(buttonWidth, buttonHeight)
-    ));
+    gui.add(m_container);
 
-    // Main Menu button
-    buttons.push_back(std::make_unique<TGUIButtonWrapper>(
-        "Main Menu",
-        sf::Vector2f(windowSize.x / 2.f, startY + buttonHeight + buttonSpacing),
-        sf::Vector2f(buttonWidth, buttonHeight)
-    ));
-
-    // Add buttons to GUI
-    for (auto& button : buttons) {
-        gui.add(button->getWidget());
+    // Initialize first button as selected
+    if (auto button = m_container->get<tgui::Button>("resumeButton")) {
+        button->setFocused(true);
     }
-    buttons[selectedButtonIndex]->setSelected(true);
 
     // Load font and setup pause text
     if (!font.loadFromFile("assets/arial.ttf")) {
@@ -49,6 +49,11 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
     // Center the pause text
     sf::FloatRect textBounds = pauseText.getLocalBounds();
     pauseText.setOrigin(textBounds.width / 2, textBounds.height / 2);
+
+    // Position the pause text above the buttons
+    const sf::Vector2u windowSize = game.getWindow().getSize();
+    const float buttonHeight = 50.f;
+    const float startY = windowSize.y / 2.f - buttonHeight;
     pauseText.setPosition(windowSize.x / 2.f, startY - buttonHeight);
 }
 
@@ -57,28 +62,24 @@ void PauseScreen::update(float deltaTime) {
 
     // Handle button navigation
     if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
+        if (auto currentButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
+            currentButton->setFocused(false);
+        }
+        selectedButtonIndex = (selectedButtonIndex + 1) % 2;
+        if (auto nextButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
+            nextButton->setFocused(true);
+        }
+        spdlog::debug("Pause menu: Selected button {}", selectedButtonIndex);
     }
     if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-    }
-
-    // Update buttons and handle clicks
-    for (size_t i = 0; i < buttons.size(); ++i) {
-        buttons[i]->update(inputManager);
-        if (buttons[i]->wasClicked()) {
-            if (i == 0) {
-                spdlog::info("Resuming game");
-                game.getScreenManager().setState(GameState::Playing);
-            } else if (i == 1) {
-                spdlog::info("Returning to main menu");
-                game.getScreenManager().setState(GameState::MainMenu);
-            }
+        if (auto currentButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
+            currentButton->setFocused(false);
         }
+        selectedButtonIndex = (selectedButtonIndex - 1 + 2) % 2;
+        if (auto nextButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
+            nextButton->setFocused(true);
+        }
+        spdlog::debug("Pause menu: Selected button {}", selectedButtonIndex);
     }
 }
 
@@ -88,8 +89,10 @@ void PauseScreen::render(sf::RenderWindow& window) {
     overlay.setFillColor(sf::Color(0, 0, 0, 128));
     window.draw(overlay);
 
-    // Draw pause text and GUI elements
+    // Draw pause text
     window.draw(pauseText);
+
+    // Draw GUI elements
     gui.draw();
 }
 
