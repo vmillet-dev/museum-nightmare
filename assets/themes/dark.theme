@@ -6,7 +6,6 @@ Button.base {
     BorderColor = rgb(255, 255, 255);
     Borders = 2;
     TextSize = 24;
-    TextAlignment = Center;
     TextOutlineColor = rgb(0, 0, 0);
     TextOutlineThickness = 1;
 }
