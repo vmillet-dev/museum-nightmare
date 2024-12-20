@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 
                 std::ofstream myfile;
                 myfile.open ("title.log");
-                myfile << title;
+                myfile << title.pop_back();
                 myfile.close();
 
                 myfile.open ("body.log");
