@@ -78,7 +78,10 @@ int main(int argc, char* argv[]) {
 
             if (latest > current) {
                 std::cout << "  Update available for " << dep.name << ": " << *latest_version << " (current: " << dep.tag << ")\n";
-                title += (" " + dep.name + " to " + *latest_version + ",");
+                if(!updates_available) {
+                    title += ",";
+                }
+                title += (" " + dep.name + " to " + *latest_version);
                 body += ("Bump " + dep.name + " from " + dep.tag + " to " + *latest_version);
                 updates_available = true;
             } else {
@@ -93,7 +96,7 @@ int main(int argc, char* argv[]) {
 
                 std::ofstream myfile;
                 myfile.open ("title.log");
-                myfile << title.pop_back();
+                myfile << title;
                 myfile.close();
 
                 myfile.open ("body.log");
