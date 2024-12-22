@@ -58,8 +58,10 @@ WidgetBuilder MenuBuilder::addButton(const std::string& text, std::function<void
 
 WidgetBuilder MenuBuilder::addLabel(const std::string& text) {
     auto label = tgui::Label::create(text);
-    label->setTextSize(24);
+    label->setSize(tgui::Layout(200), tgui::Layout(50));
     label->getRenderer()->setTextColor(tgui::Color::White);
+    label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+    label->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     m_widgets.push_back(label);
     m_container->add(label);
     return WidgetBuilder(*this, label);
