@@ -122,17 +122,6 @@ MenuBuilder& MenuBuilder::setTheme(const std::string& themePath) {
 
 void MenuBuilder::build() {
     spdlog::info("Building menu with {} widgets", m_widgets.size());
-
-    // Log detailed widget information before arrangement
-    for (const auto& widget : m_widgets) {
-        spdlog::debug("Widget type: {}, Position: ({},{}), Size: ({},{})",
-            widget->getWidgetType().toStdString(),
-            widget->getPosition().x,
-            widget->getPosition().y,
-            widget->getSize().x,
-            widget->getSize().y);
-    }
-
     arrangeWidgets();
     if (m_responsive) {
         m_container->setSize(tgui::Layout("100%"), tgui::Layout("100%"));

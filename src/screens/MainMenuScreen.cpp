@@ -79,17 +79,7 @@ void MainMenuScreen::update(float deltaTime) {
 }
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
-    // Store current view
-    sf::View currentView = window.getView();
-
-    // Reset to default view for TGUI rendering
-    window.setView(window.getDefaultView());
-
-    // Draw GUI elements
     gui.draw();
-
-    // Restore original view
-    window.setView(currentView);
 }
 
 } // namespace game

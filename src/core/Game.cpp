@@ -57,19 +57,7 @@ void Game::update(float deltaTime) {
 
 void Game::render() {
     window.clear(sf::Color::Black);
-
-    // Store current view
-    sf::View currentView = window.getView();
-
-    // Reset to default view for TGUI rendering
-    window.setView(window.getDefaultView());
-
-    // Render game elements
     screenManager.render(window);
-
-    // Restore original view
-    window.setView(currentView);
-
     window.display();
 }
 

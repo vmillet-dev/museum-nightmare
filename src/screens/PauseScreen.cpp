@@ -101,12 +101,6 @@ void PauseScreen::update(float deltaTime) {
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {
-    // Store current view
-    sf::View currentView = window.getView();
-
-    // Reset to default view for TGUI rendering
-    window.setView(window.getDefaultView());
-
     // Draw semi-transparent background
     sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
     overlay.setFillColor(sf::Color(0, 0, 0, 128));
@@ -117,9 +111,6 @@ void PauseScreen::render(sf::RenderWindow& window) {
 
     // Draw GUI elements
     gui.draw();
-
-    // Restore original view
-    window.setView(currentView);
 }
 
 } // namespace game
