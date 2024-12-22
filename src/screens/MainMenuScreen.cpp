@@ -8,30 +8,40 @@ namespace game {
 MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
     gui.setTarget(game.getWindow());
 
-    m_menuBuilder = std::make_shared<MenuBuilder>(&gui);
-    m_container = m_menuBuilder
-        ->addButton("playButton", "Play")
-        ->addButton("quitButton", "Quit")
-        ->setVerticalLayout()
-        ->setSpacing(20.f)
-        ->setPadding(50.f)
-        ->onClick("playButton", [this, &game]{
-            spdlog::info("Starting game");
-            game.getScreenManager().setState(GameState::Playing);
-        })
-        ->onClick("quitButton", [this, &game]{
-            spdlog::info("Quitting game");
-            game.getScreenManager().setState(GameState::Quit);
-        })
-        ->setTheme("assets/themes/dark.theme")
-        ->setResponsive(true)
-        ->build();
+    MenuBuilder menuBuilder(&gui);
 
-    gui.add(m_container);
+    // Create buttons with WidgetBuilder pattern
+    menuBuilder.addButton("Play", [this, &game]{
+        spdlog::info("Starting game");
+        game.getScreenManager().setState(GameState::Playing);
+    })
+    .setSize("200", "50")
+    .setText("Play")
+    .build()
+    .addButton("Quit", [this, &game]{
+        spdlog::info("Quitting game");
+        game.getScreenManager().setState(GameState::Quit);
+    })
+    .setSize("200", "50")
+    .setText("Quit")
+    .build()
+    .setLayout(MenuBuilder::LayoutType::Vertical)
+    .setSpacing(20.f)
+    .setPadding(50.f)
+    .setTheme("assets/themes/dark.theme")
+    .setResponsive(true);
+
+    menuBuilder.build();
+
+    // Store references to buttons for navigation
+    m_buttons = {
+        gui.get<tgui::Button>("Play"),
+        gui.get<tgui::Button>("Quit")
+    };
 
     // Initialize first button as selected
-    if (auto button = m_container->get<tgui::Button>("playButton")) {
-        button->setFocused(true);
+    if (!m_buttons.empty() && m_buttons[0]) {
+        m_buttons[0]->setFocused(true);
     }
 }
 
@@ -40,22 +50,22 @@ void MainMenuScreen::update(float deltaTime) {
 
     // Handle button navigation
     if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        if (auto currentButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "playButton" : "quitButton")) {
-            currentButton->setFocused(false);
+        if (!m_buttons.empty() && m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(false);
         }
-        selectedButtonIndex = (selectedButtonIndex + 1) % 2;
-        if (auto nextButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "playButton" : "quitButton")) {
-            nextButton->setFocused(true);
+        selectedButtonIndex = (selectedButtonIndex + 1) % m_buttons.size();
+        if (m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(true);
         }
         spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
     if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        if (auto currentButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "playButton" : "quitButton")) {
-            currentButton->setFocused(false);
+        if (!m_buttons.empty() && m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(false);
         }
-        selectedButtonIndex = (selectedButtonIndex - 1 + 2) % 2;
-        if (auto nextButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "playButton" : "quitButton")) {
-            nextButton->setFocused(true);
+        selectedButtonIndex = (selectedButtonIndex - 1 + m_buttons.size()) % m_buttons.size();
+        if (m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(true);
         }
         spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
     }
