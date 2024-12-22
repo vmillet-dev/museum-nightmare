@@ -24,8 +24,7 @@ public:
 
 private:
     tgui::Gui gui;
-    std::shared_ptr<MenuBuilder> m_menuBuilder;
-    tgui::Container::Ptr m_container;
+    std::vector<tgui::Button::Ptr> m_buttons;
     sf::Font font;
     sf::Text pauseText;
     Game& game;

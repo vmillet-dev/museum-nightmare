@@ -5,35 +5,45 @@
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game) {
+PauseScreen::PauseScreen(Game& game) : game(game), selectedButtonIndex(0) {
     spdlog::info("Initializing pause screen");
     gui.setTarget(game.getWindow());
 
     // Initialize MenuBuilder and create buttons
-    m_menuBuilder = std::make_shared<MenuBuilder>(&gui);
-    m_container = m_menuBuilder
-        ->addButton("resumeButton", "Resume")
-        ->addButton("mainMenuButton", "Main Menu")
-        ->setVerticalLayout()
-        ->setSpacing(20.f)
-        ->setPadding(50.f)
-        ->onClick("resumeButton", [this, &game]{
-            spdlog::info("Resuming game");
-            game.getScreenManager().setState(GameState::Playing);
-        })
-        ->onClick("mainMenuButton", [this, &game]{
-            spdlog::info("Returning to main menu");
-            game.getScreenManager().setState(GameState::MainMenu);
-        })
-        ->setTheme("assets/themes/dark.theme")
-        ->setResponsive(true)
-        ->build();
+    MenuBuilder menuBuilder(&gui);
 
-    gui.add(m_container);
+    // Create buttons with WidgetBuilder pattern
+    menuBuilder.addButton("Resume", [this, &game]{
+        spdlog::info("Resuming game");
+        game.getScreenManager().setState(GameState::Playing);
+    })
+    .setSize("200", "50")
+    .setText("Resume")
+    .build()
+    .addButton("Main Menu", [this, &game]{
+        spdlog::info("Returning to main menu");
+        game.getScreenManager().setState(GameState::MainMenu);
+    })
+    .setSize("200", "50")
+    .setText("Main Menu")
+    .build()
+    .setLayout(MenuBuilder::LayoutType::Vertical)
+    .setSpacing(20.f)
+    .setPadding(50.f)
+    .setTheme("assets/themes/dark.theme")
+    .setResponsive(true);
+
+    menuBuilder.build();
+
+    // Store references to buttons for navigation
+    m_buttons = {
+        gui.get<tgui::Button>("Resume"),
+        gui.get<tgui::Button>("Main Menu")
+    };
 
     // Initialize first button as selected
-    if (auto button = m_container->get<tgui::Button>("resumeButton")) {
-        button->setFocused(true);
+    if (!m_buttons.empty() && m_buttons[0]) {
+        m_buttons[0]->setFocused(true);
     }
 
     // Load font and setup pause text
@@ -62,22 +72,22 @@ void PauseScreen::update(float deltaTime) {
 
     // Handle button navigation
     if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        if (auto currentButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
-            currentButton->setFocused(false);
+        if (!m_buttons.empty() && m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(false);
         }
-        selectedButtonIndex = (selectedButtonIndex + 1) % 2;
-        if (auto nextButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
-            nextButton->setFocused(true);
+        selectedButtonIndex = (selectedButtonIndex + 1) % m_buttons.size();
+        if (m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(true);
         }
         spdlog::debug("Pause menu: Selected button {}", selectedButtonIndex);
     }
     if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        if (auto currentButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
-            currentButton->setFocused(false);
+        if (!m_buttons.empty() && m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(false);
         }
-        selectedButtonIndex = (selectedButtonIndex - 1 + 2) % 2;
-        if (auto nextButton = m_container->get<tgui::Button>(selectedButtonIndex == 0 ? "resumeButton" : "mainMenuButton")) {
-            nextButton->setFocused(true);
+        selectedButtonIndex = (selectedButtonIndex - 1 + m_buttons.size()) % m_buttons.size();
+        if (m_buttons[selectedButtonIndex]) {
+            m_buttons[selectedButtonIndex]->setFocused(true);
         }
         spdlog::debug("Pause menu: Selected button {}", selectedButtonIndex);
     }
