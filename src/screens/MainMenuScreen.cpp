@@ -11,25 +11,32 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) 
     MenuBuilder menuBuilder(&gui);
 
     // Create buttons with WidgetBuilder pattern
+    menuBuilder
+    .setLayout(game::LayoutType::Vertical)
+    .setSpacing(20.f)
+    .setPadding(50.f)
+    .setTheme("assets/themes/dark.theme")
+    .setResponsive(true);
+
+    // Add title
+    menuBuilder.addLabel("Museum Nightmare")
+        .setSize("400", "50")
+        .build();
+
+    // Add buttons
     menuBuilder.addButton("Play", [this, &game]{
         spdlog::info("Starting game");
         game.getScreenManager().setState(GameState::Playing);
     })
     .setSize("200", "50")
-    .setText("Play")
-    .build()
-    .addButton("Quit", [this, &game]{
+    .build();
+
+    menuBuilder.addButton("Quit", [this, &game]{
         spdlog::info("Quitting game");
         game.getScreenManager().setState(GameState::Quit);
     })
     .setSize("200", "50")
-    .setText("Quit")
-    .build()
-    .setLayout(MenuBuilder::LayoutType::Vertical)
-    .setSpacing(20.f)
-    .setPadding(50.f)
-    .setTheme("assets/themes/dark.theme")
-    .setResponsive(true);
+    .build();
 
     menuBuilder.build();
 

@@ -12,26 +12,33 @@ PauseScreen::PauseScreen(Game& game) : game(game), selectedButtonIndex(0) {
     // Initialize MenuBuilder and create buttons
     MenuBuilder menuBuilder(&gui);
 
-    // Create buttons with WidgetBuilder pattern
+    // Set up menu layout first
+    menuBuilder
+    .setLayout(game::LayoutType::Vertical)
+    .setSpacing(20.f)
+    .setPadding(50.f)
+    .setTheme("assets/themes/dark.theme")
+    .setResponsive(true);
+
+    // Add pause title
+    menuBuilder.addLabel("Paused")
+        .setSize("400", "50")
+        .build();
+
+    // Add buttons
     menuBuilder.addButton("Resume", [this, &game]{
         spdlog::info("Resuming game");
         game.getScreenManager().setState(GameState::Playing);
     })
     .setSize("200", "50")
-    .setText("Resume")
-    .build()
-    .addButton("Main Menu", [this, &game]{
+    .build();
+
+    menuBuilder.addButton("Main Menu", [this, &game]{
         spdlog::info("Returning to main menu");
         game.getScreenManager().setState(GameState::MainMenu);
     })
     .setSize("200", "50")
-    .setText("Main Menu")
-    .build()
-    .setLayout(MenuBuilder::LayoutType::Vertical)
-    .setSpacing(20.f)
-    .setPadding(50.f)
-    .setTheme("assets/themes/dark.theme")
-    .setResponsive(true);
+    .build();
 
     menuBuilder.build();
 

@@ -7,12 +7,12 @@ WidgetBuilder::WidgetBuilder(MenuBuilder& parent, tgui::Widget::Ptr widget)
     : parent(parent), widget(widget) {}
 
 WidgetBuilder& WidgetBuilder::setSize(const std::string& width, const std::string& height) {
-    widget->setSize(width, height);
+    widget->setSize(tgui::Layout(width), tgui::Layout(height));
     return *this;
 }
 
 WidgetBuilder& WidgetBuilder::setPosition(const std::string& x, const std::string& y) {
-    widget->setPosition(x, y);
+    widget->setPosition(tgui::Layout(x), tgui::Layout(y));
     return *this;
 }
 
@@ -65,7 +65,7 @@ WidgetBuilder MenuBuilder::addLabel(const std::string& text) {
     return WidgetBuilder(*this, label);
 }
 
-MenuBuilder& MenuBuilder::setLayout(LayoutType type) {
+MenuBuilder& MenuBuilder::setLayout(game::LayoutType type) {
     m_layout = type;
     return *this;
 }
@@ -107,17 +107,17 @@ void MenuBuilder::arrangeWidgets() {
 
     for (auto& widget : m_widgets) {
         switch (m_layout) {
-            case LayoutType::Vertical:
-                widget->setPosition("50%", y);
+            case game::LayoutType::Vertical:
+                widget->setPosition(tgui::Layout("50%"), tgui::Layout(y));
                 widget->setOrigin(0.5f, 0.0f);
                 y += widget->getSize().y + m_spacing;
                 break;
-            case LayoutType::Horizontal:
-                widget->setPosition(x, "50%");
+            case game::LayoutType::Horizontal:
+                widget->setPosition(tgui::Layout(x), tgui::Layout("50%"));
                 widget->setOrigin(0.0f, 0.5f);
                 x += widget->getSize().x + m_spacing;
                 break;
-            case LayoutType::Grid:
+            case game::LayoutType::Grid:
                 // Grid layout implementation can be added here
                 break;
         }
