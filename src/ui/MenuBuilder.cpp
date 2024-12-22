@@ -46,11 +46,13 @@ MenuBuilder& WidgetBuilder::build() {
 MenuBuilder::MenuBuilder(tgui::Gui* gui) : m_gui(gui) {
     spdlog::info("Initializing MenuBuilder with GUI");
     m_container = tgui::Panel::create();
-    m_container->setSize(tgui::Layout("100%"), tgui::Layout("100%"));
-    spdlog::debug("Created container panel with 100% size");
 
-    tgui::Theme::setDefault("");
-    spdlog::debug("Set default TGUI theme");
+    // Set explicit pixel sizes instead of percentages
+    auto windowSize = m_gui->getTarget()->getSize();
+    m_container->setSize({windowSize.x, windowSize.y});
+    m_container->setPosition({0, 0});
+
+    spdlog::debug("Created container panel with size {}x{}", windowSize.x, windowSize.y);
 }
 
 WidgetBuilder MenuBuilder::addButton(const std::string& text, std::function<void()> callback) {
@@ -122,38 +124,43 @@ MenuBuilder& MenuBuilder::setTheme(const std::string& themePath) {
 
 void MenuBuilder::build() {
     spdlog::info("Building menu with {} widgets", m_widgets.size());
-    arrangeWidgets();
+
+    // Update container size before arrangement
     if (m_responsive) {
-        m_container->setSize(tgui::Layout("100%"), tgui::Layout("100%"));
-        spdlog::debug("Set container to responsive mode");
+        auto windowSize = m_gui->getTarget()->getSize();
+        m_container->setSize({windowSize.x, windowSize.y});
+        spdlog::debug("Updated container size to {}x{}",
+            windowSize.x, windowSize.y);
     }
+
+    arrangeWidgets();
     m_gui->add(m_container);
     spdlog::info("Menu built and added to GUI");
 }
 
 void MenuBuilder::arrangeWidgets() {
     spdlog::debug("Arranging widgets with layout type: {}", static_cast<int>(m_layout));
+    auto windowSize = m_gui->getTarget()->getSize();
+    float centerX = windowSize.x / 2.0f;
     float y = m_padding;
-    float x = m_padding;
 
     for (auto& widget : m_widgets) {
         switch (m_layout) {
             case LayoutType::Vertical:
-                widget->setPosition(tgui::Layout("50%"), tgui::Layout(y));
-                widget->setOrigin(0.5f, 0.0f);
+                // Center horizontally and stack vertically
+                widget->setPosition({centerX - widget->getSize().x / 2.0f, y});
                 y += widget->getSize().y + m_spacing;
-                spdlog::debug("Positioned widget vertically at y: {}", y);
                 break;
             case LayoutType::Horizontal:
-                widget->setPosition(tgui::Layout(x), tgui::Layout("50%"));
-                widget->setOrigin(0.0f, 0.5f);
-                x += widget->getSize().x + m_spacing;
-                spdlog::debug("Positioned widget horizontally at x: {}", x);
+                // Implement horizontal layout if needed
+                spdlog::debug("Horizontal layout not fully implemented");
                 break;
             case LayoutType::Grid:
                 spdlog::debug("Grid layout not implemented yet");
                 break;
         }
+        spdlog::debug("Positioned widget at ({}, {})",
+            widget->getPosition().x, widget->getPosition().y);
     }
 }
 

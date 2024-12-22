@@ -101,6 +101,9 @@ void PauseScreen::update(float deltaTime) {
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {
+    spdlog::debug("PauseScreen rendering - Window size: {}x{}",
+        window.getSize().x, window.getSize().y);
+
     // Draw semi-transparent background
     sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
     overlay.setFillColor(sf::Color(0, 0, 0, 128));

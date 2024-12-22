@@ -79,6 +79,8 @@ void MainMenuScreen::update(float deltaTime) {
 }
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
+    spdlog::debug("MainMenu rendering - Window size: {}x{}",
+        window.getSize().x, window.getSize().y);
     gui.draw();
 }
 
