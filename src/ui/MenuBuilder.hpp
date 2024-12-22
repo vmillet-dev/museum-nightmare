@@ -24,8 +24,8 @@ public:
     WidgetBuilder(MenuBuilder& parent, tgui::Widget::Ptr widget);
 
     // Setter methods with chaining
-    WidgetBuilder& setSize(const std::string& width, const std::string& height);
-    WidgetBuilder& setPosition(const std::string& x, const std::string& y);
+    WidgetBuilder& setSize(tgui::Layout width, tgui::Layout height);
+    WidgetBuilder& setPosition(tgui::Layout x, tgui::Layout y);
     WidgetBuilder& setColor(const tgui::Color& color);
     WidgetBuilder& setText(const std::string& text);
 

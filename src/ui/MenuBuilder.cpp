@@ -6,13 +6,13 @@ namespace game {
 WidgetBuilder::WidgetBuilder(MenuBuilder& parent, tgui::Widget::Ptr widget)
     : parent(parent), widget(widget) {}
 
-WidgetBuilder& WidgetBuilder::setSize(const std::string& width, const std::string& height) {
-    widget->setSize(tgui::Layout(width), tgui::Layout(height));
+WidgetBuilder& WidgetBuilder::setSize(tgui::Layout width, tgui::Layout height) {
+    widget->setSize(width, height);
     return *this;
 }
 
-WidgetBuilder& WidgetBuilder::setPosition(const std::string& x, const std::string& y) {
-    widget->setPosition(tgui::Layout(x), tgui::Layout(y));
+WidgetBuilder& WidgetBuilder::setPosition(tgui::Layout x, tgui::Layout y) {
+    widget->setPosition(x, y);
     return *this;
 }
 
@@ -40,12 +40,12 @@ MenuBuilder& WidgetBuilder::build() {
 // MenuBuilder Implementation
 MenuBuilder::MenuBuilder(tgui::Gui* gui) : m_gui(gui) {
     m_container = tgui::Panel::create();
-    m_container->setSize("100%", "100%");
+    m_container->setSize(tgui::Layout("100%"), tgui::Layout("100%"));
 }
 
 WidgetBuilder MenuBuilder::addButton(const std::string& text, std::function<void()> callback) {
     auto button = tgui::Button::create(text);
-    button->setSize(200, 50);
+    button->setSize(tgui::Layout(200), tgui::Layout(50));
     button->getRenderer()->setTextColor(tgui::Color::White);
     button->getRenderer()->setBorderColor(tgui::Color::White);
     button->getRenderer()->setBorders(2);
@@ -96,7 +96,7 @@ MenuBuilder& MenuBuilder::setTheme(const std::string& themePath) {
 void MenuBuilder::build() {
     arrangeWidgets();
     if (m_responsive) {
-        m_container->setSize("100%", "100%");
+        m_container->setSize(tgui::Layout("100%"), tgui::Layout("100%"));
     }
     m_gui->add(m_container);
 }
