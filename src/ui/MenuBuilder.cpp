@@ -41,6 +41,9 @@ MenuBuilder& WidgetBuilder::build() {
 MenuBuilder::MenuBuilder(tgui::Gui* gui) : m_gui(gui) {
     m_container = tgui::Panel::create();
     m_container->setSize(tgui::Layout("100%"), tgui::Layout("100%"));
+
+    // Create a default theme to ensure no invalid properties are inherited
+    tgui::Theme::setDefault("");
 }
 
 WidgetBuilder MenuBuilder::addButton(const std::string& text, std::function<void()> callback) {
@@ -59,9 +62,15 @@ WidgetBuilder MenuBuilder::addButton(const std::string& text, std::function<void
 WidgetBuilder MenuBuilder::addLabel(const std::string& text) {
     auto label = tgui::Label::create(text);
     label->setSize(tgui::Layout(200), tgui::Layout(50));
-    label->getRenderer()->setTextColor(tgui::Color::White);
+
+    // Set alignment properties explicitly before theme application
     label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
     label->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+
+    // Set default properties that would normally come from theme
+    label->getRenderer()->setTextColor(tgui::Color::White);
+    label->setTextSize(24);
+
     m_widgets.push_back(label);
     m_container->add(label);
     return WidgetBuilder(*this, label);
@@ -90,7 +99,11 @@ MenuBuilder& MenuBuilder::setResponsive(bool enabled) {
 MenuBuilder& MenuBuilder::setTheme(const std::string& themePath) {
     m_theme = themePath;
     if (!m_theme.empty()) {
-        tgui::Theme::setDefault(m_theme);
+        // Load theme directly to widgets instead of setting as default
+        tgui::Theme theme(m_theme);
+        for (auto& widget : m_widgets) {
+            theme.apply(widget);
+        }
     }
     return *this;
 }
