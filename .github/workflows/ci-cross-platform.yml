@@ -48,8 +48,9 @@ jobs:
 
       - name: Build
         run: |
+          rm -rf build
           cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release
+          cmake --build build --config Release --clean-first
 
       - name: Run Tests with Virtual Display
         run: |
@@ -77,8 +78,9 @@ jobs:
       - name: Build
         shell: powershell
         run: |
+          Remove-Item -Path build -Recurse -ErrorAction SilentlyContinue
           cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release 
+          cmake --build build --config Release --clean-first
 
       - name: Setup Virtual Display
         shell: powershell
