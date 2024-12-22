@@ -64,8 +64,8 @@ WidgetBuilder MenuBuilder::addLabel(const std::string& text) {
     label->setSize(tgui::Layout(200), tgui::Layout(50));
 
     // Set alignment properties explicitly before theme application
-    label->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-    label->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    label->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
+    label->setVerticalAlignment(tgui::VerticalAlignment::Center);
 
     // Set default properties that would normally come from theme
     label->getRenderer()->setTextColor(tgui::Color::White);
@@ -99,10 +99,10 @@ MenuBuilder& MenuBuilder::setResponsive(bool enabled) {
 MenuBuilder& MenuBuilder::setTheme(const std::string& themePath) {
     m_theme = themePath;
     if (!m_theme.empty()) {
-        // Load theme directly to widgets instead of setting as default
+        // Load theme and apply it to each widget using the renderer
         tgui::Theme theme(m_theme);
         for (auto& widget : m_widgets) {
-            theme.apply(widget);
+            widget->setRenderer(theme.getRenderer(widget->getWidgetType()));
         }
     }
     return *this;
