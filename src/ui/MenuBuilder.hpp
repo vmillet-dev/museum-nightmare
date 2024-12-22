@@ -9,6 +9,13 @@
 
 namespace game {
 
+// Layout type enum
+enum class LayoutType {
+    Vertical,
+    Horizontal,
+    Grid
+};
+
 class MenuBuilder;
 
 // WidgetBuilder class for configuring individual widgets
@@ -63,13 +70,7 @@ private:
     float m_padding{50.f};
     bool m_responsive{false};
     std::string m_theme;
-
-    // Layout type enum
-    enum class LayoutType {
-        Vertical,
-        Horizontal,
-        Grid
-    } m_layout{LayoutType::Vertical};
+    LayoutType m_layout{LayoutType::Vertical};
 
     void arrangeWidgets();
 };
