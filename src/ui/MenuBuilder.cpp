@@ -197,8 +197,8 @@ void MenuBuilder::handleInput(const InputManager& inputManager) {
 
     if (inputManager.isActionJustPressed(Action::Confirm)) {
         if (auto button = std::dynamic_pointer_cast<tgui::Button>(m_focusableWidgets[m_currentFocusIndex])) {
-            button->onClick.emit(button.get());
-            spdlog::debug("Button pressed via controller: {}", button->getText().toStdString());
+            spdlog::debug("Activating button: {}", button->getText());
+            button->onClick.emit(button.get(), tgui::Vector2f{});
         }
     }
 }

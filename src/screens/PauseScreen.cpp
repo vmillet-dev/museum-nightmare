@@ -22,14 +22,14 @@ PauseScreen::PauseScreen(Game& game) : game(game), m_menuBuilder(&game.getGui())
         .build();
 
     // Add buttons
-    m_menuBuilder.addButton("Resume", [this]{
+    m_menuBuilder.addButton("Resume", [this, &game]{
         spdlog::info("Resuming game");
         game.getScreenManager().setState(GameState::Playing);
     })
     .setSize("200", "50")
     .build();
 
-    m_menuBuilder.addButton("Main Menu", [this]{
+    m_menuBuilder.addButton("Main Menu", [this, &game]{
         spdlog::info("Returning to main menu");
         game.getScreenManager().setState(GameState::MainMenu);
     })

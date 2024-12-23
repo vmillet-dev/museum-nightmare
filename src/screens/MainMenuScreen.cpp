@@ -22,14 +22,14 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), m_menuBuilder(&game.get
         .build();
 
     // Add buttons
-    m_menuBuilder.addButton("Play", [this]{
+    m_menuBuilder.addButton("Play", [this, &game]{
         spdlog::info("Starting game");
         game.getScreenManager().setState(GameState::Playing);
     })
     .setSize("200", "50")
     .build();
 
-    m_menuBuilder.addButton("Quit", [this]{
+    m_menuBuilder.addButton("Quit", [this, &game]{
         spdlog::info("Quitting game");
         game.getScreenManager().setState(GameState::Quit);
     })
