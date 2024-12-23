@@ -2,54 +2,34 @@
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
 #include <spdlog/spdlog.h>
+#include "../ui/GuiBuilder.hpp"
 
 namespace game {
 
 MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
     gui.setTarget(game.getWindow());
 
-    MenuBuilder menuBuilder(&gui);
-
-    // Create buttons with WidgetBuilder pattern
-    menuBuilder
-    .setLayout(game::LayoutType::Vertical)
-    .setSpacing(20.f)
-    .setPadding(50.f)
-    .setTheme("assets/themes/dark.theme")
-    .setResponsive(true);
-
-    // Add title
-    menuBuilder.addLabel("Museum Nightmare")
-        .setSize("400", "50")
+    GuiBuilder(gui)
+        .addVerticalLayout("mainLayout")
+        .addLabel("Game Menu")
+        .addButton("Play", []() { std::cout << "Play button" << std::endl; })
+            .setTextSize(20)
+            .endButton()
+        .addButton("Quit", []() { std::cout << "Quit button" << std::endl; })
+            .setTextSize(20)
+            .endButton()
         .build();
 
-    // Add buttons
-    menuBuilder.addButton("Play", [this, &game]{
-        spdlog::info("Starting game");
-        game.getScreenManager().setState(GameState::Playing);
-    })
-    .setSize("200", "50")
-    .build();
-
-    menuBuilder.addButton("Quit", [this, &game]{
-        spdlog::info("Quitting game");
-        game.getScreenManager().setState(GameState::Quit);
-    })
-    .setSize("200", "50")
-    .build();
-
-    menuBuilder.build();
-
     // Store references to buttons for navigation
-    m_buttons = {
-        gui.get<tgui::Button>("Play"),
-        gui.get<tgui::Button>("Quit")
-    };
-
-    // Initialize first button as selected
-    if (!m_buttons.empty() && m_buttons[0]) {
-        m_buttons[0]->setFocused(true);
-    }
+    //m_buttons = {
+    //    gui.get<tgui::Button>("Play"),
+    //    gui.get<tgui::Button>("Quit")
+    //};
+    //
+    //// Initialize first button as selected
+    //if (!m_buttons.empty() && m_buttons[0]) {
+    //    m_buttons[0]->setFocused(true);
+    //}
 }
 
 void MainMenuScreen::update(float deltaTime) {

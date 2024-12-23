@@ -5,7 +5,7 @@ set(BOX2D_VERSION "3.0.0")
 set(SFML_VERSION "2.6.2")
 set(TOMLPLUSPLUS_VERSION "3.4.0")
 set(SPDLOG_VERSION "1.15.0")
-set(TGUI_VERSION "1.6.1")
+set(TGUI_VERSION "1.7.0")
 
 # Define required libraries
 set(SFML_LIBRARIES
