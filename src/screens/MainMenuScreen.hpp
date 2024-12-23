@@ -5,7 +5,6 @@
 #include "../ui/MenuBuilder.hpp"
 #include "ScreenManager.hpp"
 #include <memory>
-#include <vector>
 #include <spdlog/spdlog.h>
 
 namespace game {
@@ -18,15 +17,13 @@ public:
     MainMenuScreen(Game& game);
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
-    bool shouldExitGame() const { return shouldQuit; }
-    void handleEvent(const sf::Event& event) { gui.handleEvent(event); }
+    void handleInput(Game& game);
+    void handleEvent(const sf::Event& event);
 
 private:
-    tgui::Gui gui;
-    std::vector<tgui::Button::Ptr> m_buttons;
-    bool shouldQuit = false;
     Game& game;
-    size_t selectedButtonIndex;  // Track currently selected button
+    MenuBuilder m_menuBuilder;
+    bool shouldQuit = false;
 };
 
 } // namespace game

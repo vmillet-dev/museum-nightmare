@@ -65,7 +65,15 @@ WidgetBuilder MenuBuilder::addButton(const std::string& text, std::function<void
     button->setTextSize(24);
     button->onClick(callback);
     m_widgets.push_back(button);
+    m_focusableWidgets.push_back(button);  // Track focusable widgets
     m_container->add(button);
+
+    // Set initial focus if this is the first focusable widget
+    if (m_focusableWidgets.size() == 1) {
+        button->setFocused(true);
+        spdlog::debug("Set initial focus to first button: {}", text);
+    }
+
     spdlog::debug("Button created and added to container");
     return WidgetBuilder(*this, button);
 }
@@ -162,6 +170,51 @@ void MenuBuilder::arrangeWidgets() {
         spdlog::debug("Positioned widget at ({}, {})",
             widget->getPosition().x, widget->getPosition().y);
     }
+}
+
+void MenuBuilder::handleInput(const InputManager& inputManager) {
+    if (m_focusableWidgets.empty()) {
+        spdlog::debug("No focusable widgets available for input handling");
+        return;
+    }
+
+    bool focusChanged = false;
+    if (inputManager.isActionJustPressed(Action::MoveDown)) {
+        m_currentFocusIndex = (m_currentFocusIndex + 1) % m_focusableWidgets.size();
+        focusChanged = true;
+        spdlog::debug("Moving focus down to index {}", m_currentFocusIndex);
+    }
+    else if (inputManager.isActionJustPressed(Action::MoveUp)) {
+        m_currentFocusIndex = (m_currentFocusIndex == 0) ?
+            m_focusableWidgets.size() - 1 : m_currentFocusIndex - 1;
+        focusChanged = true;
+        spdlog::debug("Moving focus up to index {}", m_currentFocusIndex);
+    }
+
+    if (focusChanged) {
+        updateFocus();
+    }
+
+    if (inputManager.isActionJustPressed(Action::Confirm)) {
+        if (auto button = std::dynamic_pointer_cast<tgui::Button>(m_focusableWidgets[m_currentFocusIndex])) {
+            button->onClick.emit(button.get());
+            spdlog::debug("Button pressed via controller: {}", button->getText().toStdString());
+        }
+    }
+}
+
+void MenuBuilder::handleEvent(const sf::Event& event) {
+    if (m_gui) {
+        m_gui->handleEvent(event);
+        spdlog::debug("MenuBuilder handled SFML event type: {}", static_cast<int>(event.type));
+    }
+}
+
+void MenuBuilder::updateFocus() {
+    for (size_t i = 0; i < m_focusableWidgets.size(); ++i) {
+        m_focusableWidgets[i]->setFocused(i == m_currentFocusIndex);
+    }
+    spdlog::debug("Updated focus states, current focus index: {}", m_currentFocusIndex);
 }
 
 } // namespace game

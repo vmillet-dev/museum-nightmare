@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "../input/InputManager.hpp"
 
 namespace game {
 
@@ -56,6 +57,10 @@ public:
     // Theme management
     MenuBuilder& setTheme(const std::string& themePath);
 
+    // Input handling
+    void handleInput(const InputManager& inputManager);
+    void handleEvent(const sf::Event& event);
+
     // Build method
     void build();
 
@@ -66,6 +71,8 @@ private:
     tgui::Gui* m_gui;
     tgui::Container::Ptr m_container;
     std::vector<tgui::Widget::Ptr> m_widgets;
+    std::vector<tgui::Widget::Ptr> m_focusableWidgets;
+    size_t m_currentFocusIndex{0};
     float m_spacing{20.f};
     float m_padding{50.f};
     bool m_responsive{false};
@@ -73,6 +80,7 @@ private:
     LayoutType m_layout{LayoutType::Vertical};
 
     void arrangeWidgets();
+    void updateFocus();
 };
 
 } // namespace game

@@ -17,9 +17,10 @@ public:
     Game();
     void run();
     void quit();
-    sf::RenderWindow& getWindow() { return window;  }
+    sf::RenderWindow& getWindow() { return window; }
     InputManager& getInputManager() { return inputManager; }
     ScreenManager& getScreenManager() { return screenManager; }
+    tgui::Gui& getGui() { return gui; }
 
 private:
     void handleEvent(const sf::Event& event);
@@ -28,8 +29,9 @@ private:
     void render();
 
     sf::RenderWindow window;
-    InputManager inputManager{ window };  // Initialize with window reference
-    ScreenManager screenManager{ *this };
+    tgui::Gui gui{window};
+    InputManager inputManager{window};
+    ScreenManager screenManager{*this};
 };
 
 } // namespace game

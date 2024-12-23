@@ -5,83 +5,57 @@
 
 namespace game {
 
-MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
-    gui.setTarget(game.getWindow());
+MainMenuScreen::MainMenuScreen(Game& game) : game(game), m_menuBuilder(&game.getGui()) {
+    spdlog::info("Initializing MainMenuScreen");
 
-    MenuBuilder menuBuilder(&gui);
-
-    // Create buttons with WidgetBuilder pattern
-    menuBuilder
-    .setLayout(game::LayoutType::Vertical)
-    .setSpacing(20.f)
-    .setPadding(50.f)
-    .setTheme("assets/themes/dark.theme")
-    .setResponsive(true);
+    // Configure menu
+    m_menuBuilder
+        .setLayout(game::LayoutType::Vertical)
+        .setSpacing(20.f)
+        .setPadding(50.f)
+        .setTheme("assets/themes/dark.theme")
+        .setResponsive(true);
 
     // Add title
-    menuBuilder.addLabel("Museum Nightmare")
+    m_menuBuilder.addLabel("Museum Nightmare")
         .setSize("400", "50")
         .build();
 
     // Add buttons
-    menuBuilder.addButton("Play", [this, &game]{
+    m_menuBuilder.addButton("Play", [this]{
         spdlog::info("Starting game");
         game.getScreenManager().setState(GameState::Playing);
     })
     .setSize("200", "50")
     .build();
 
-    menuBuilder.addButton("Quit", [this, &game]{
+    m_menuBuilder.addButton("Quit", [this]{
         spdlog::info("Quitting game");
         game.getScreenManager().setState(GameState::Quit);
     })
     .setSize("200", "50")
     .build();
 
-    menuBuilder.build();
+    m_menuBuilder.build();
+    spdlog::info("MainMenuScreen initialized");
+}
 
-    // Store references to buttons for navigation
-    m_buttons = {
-        gui.get<tgui::Button>("Play"),
-        gui.get<tgui::Button>("Quit")
-    };
+void MainMenuScreen::handleInput(Game& game) {
+    auto& inputManager = game.getInputManager();
+    m_menuBuilder.handleInput(inputManager);
+}
 
-    // Initialize first button as selected
-    if (!m_buttons.empty() && m_buttons[0]) {
-        m_buttons[0]->setFocused(true);
-    }
+void MainMenuScreen::handleEvent(const sf::Event& event) {
+    m_menuBuilder.handleEvent(event);
 }
 
 void MainMenuScreen::update(float deltaTime) {
-    auto& inputManager = game.getInputManager();
-
-    // Handle button navigation
-    if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        if (!m_buttons.empty() && m_buttons[selectedButtonIndex]) {
-            m_buttons[selectedButtonIndex]->setFocused(false);
-        }
-        selectedButtonIndex = (selectedButtonIndex + 1) % m_buttons.size();
-        if (m_buttons[selectedButtonIndex]) {
-            m_buttons[selectedButtonIndex]->setFocused(true);
-        }
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
-    }
-    if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        if (!m_buttons.empty() && m_buttons[selectedButtonIndex]) {
-            m_buttons[selectedButtonIndex]->setFocused(false);
-        }
-        selectedButtonIndex = (selectedButtonIndex - 1 + m_buttons.size()) % m_buttons.size();
-        if (m_buttons[selectedButtonIndex]) {
-            m_buttons[selectedButtonIndex]->setFocused(true);
-        }
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
-    }
+    // No update logic needed as input handling is done in handleInput
 }
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
     spdlog::debug("MainMenu rendering - Window size: {}x{}",
         window.getSize().x, window.getSize().y);
-    gui.draw();
 }
 
 } // namespace game
