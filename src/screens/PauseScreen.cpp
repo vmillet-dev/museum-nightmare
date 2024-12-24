@@ -11,13 +11,13 @@ PauseScreen::PauseScreen(Game& game) : game(game), m_guiBuilder(game.getGui()) {
     m_guiBuilder
         .addVerticalLayout("mainLayout")
         .addLabel("Paused")
-        .addButton("Resume", [this]() {
+        .addButton("Resume", [this, &game]() {
             spdlog::info("Resuming game");
             game.getScreenManager().setState(GameState::Playing);
         })
         .setTextSize(20)
         .endButton()
-        .addButton("Main Menu", [this]() {
+        .addButton("Main Menu", [this, &game]() {
             spdlog::info("Returning to main menu");
             game.getScreenManager().setState(GameState::MainMenu);
         })

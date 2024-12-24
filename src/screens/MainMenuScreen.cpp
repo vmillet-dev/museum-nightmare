@@ -11,13 +11,13 @@ MainMenuScreen::MainMenuScreen(Game& game) : game(game), m_guiBuilder(game.getGu
     m_guiBuilder
         .addVerticalLayout("mainLayout")
         .addLabel("Museum Nightmare")
-        .addButton("Play", [this]() {
+        .addButton("Play", [this, &game]() {
             spdlog::info("Starting game");
             game.getScreenManager().setState(GameState::Playing);
         })
         .setTextSize(20)
         .endButton()
-        .addButton("Quit", [this]() {
+        .addButton("Quit", [this, &game]() {
             spdlog::info("Quitting game");
             game.getScreenManager().setState(GameState::Quit);
         })
