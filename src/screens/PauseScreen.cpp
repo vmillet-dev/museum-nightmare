@@ -5,52 +5,39 @@
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game), m_menuBuilder(&game.getGui()) {
+PauseScreen::PauseScreen(Game& game) : game(game), m_guiBuilder(game.getGui()) {
     spdlog::info("Initializing PauseScreen");
 
-    // Configure menu
-    m_menuBuilder
-        .setLayout(game::LayoutType::Vertical)
-        .setSpacing(20.f)
-        .setPadding(50.f)
-        .setTheme("assets/themes/dark.theme")
-        .setResponsive(true);
-
-    // Add title
-    m_menuBuilder.addLabel("Paused")
-        .setSize("400", "50")
+    m_guiBuilder
+        .addVerticalLayout("mainLayout")
+        .addLabel("Paused")
+        .addButton("Resume", [this]() {
+            spdlog::info("Resuming game");
+            game.getScreenManager().setState(GameState::Playing);
+        })
+        .setTextSize(20)
+        .endButton()
+        .addButton("Main Menu", [this]() {
+            spdlog::info("Returning to main menu");
+            game.getScreenManager().setState(GameState::MainMenu);
+        })
+        .setTextSize(20)
+        .endButton()
         .build();
 
-    // Add buttons
-    m_menuBuilder.addButton("Resume", [this, &game]{
-        spdlog::info("Resuming game");
-        game.getScreenManager().setState(GameState::Playing);
-    })
-    .setSize("200", "50")
-    .build();
-
-    m_menuBuilder.addButton("Main Menu", [this, &game]{
-        spdlog::info("Returning to main menu");
-        game.getScreenManager().setState(GameState::MainMenu);
-    })
-    .setSize("200", "50")
-    .build();
-
-    m_menuBuilder.build();
     spdlog::info("PauseScreen initialized");
 }
 
 void PauseScreen::handleInput(Game& game) {
-    auto& inputManager = game.getInputManager();
-    m_menuBuilder.handleInput(inputManager);
+    // Input handling is now managed by TGUI
 }
 
 void PauseScreen::handleEvent(const sf::Event& event) {
-    m_menuBuilder.handleEvent(event);
+    game.getGui().handleEvent(event);
 }
 
 void PauseScreen::update(float deltaTime) {
-    // No update logic needed as input handling is done in handleInput
+    // No update logic needed as input handling is done by TGUI
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {

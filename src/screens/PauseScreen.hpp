@@ -2,7 +2,7 @@
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 #include "Screen.hpp"
-#include "../ui/MenuBuilder.hpp"
+#include "../ui/GuiBuilder.hpp"
 #include "ScreenManager.hpp"
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -21,7 +21,7 @@ public:
 
 private:
     Game& game;
-    MenuBuilder m_menuBuilder;
+    GuiBuilder m_guiBuilder;
 };
 
 } // namespace game
