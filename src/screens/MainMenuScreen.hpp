@@ -2,8 +2,7 @@
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 #include "Screen.hpp"
-#include "../ui/GuiBuilder.hpp"
-#include "ScreenManager.hpp"
+#include "GameState.hpp"
 #include <memory>
 #include <spdlog/spdlog.h>
 
@@ -21,8 +20,6 @@ public:
     void handleEvent(const sf::Event& event);
 
 private:
-    Game& game;
-    GuiBuilder m_guiBuilder;
     bool shouldQuit = false;
 };
 

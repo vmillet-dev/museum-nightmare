@@ -1,28 +1,32 @@
 #include "MainMenuScreen.hpp"
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
+#include "../ui/GuiBuilder.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-MainMenuScreen::MainMenuScreen(Game& game) : game(game), m_guiBuilder(game.getGui()) {
+MainMenuScreen::MainMenuScreen(Game& game) : Screen(game) {
     spdlog::info("Initializing MainMenuScreen");
 
-    m_guiBuilder
+    GuiBuilder(game.getGui())
         .addVerticalLayout("mainLayout")
         .addLabel("Museum Nightmare")
+            .setAutoLayout(tgui::AutoLayout::Top)
         .addButton("Play", [this, &game]() {
             spdlog::info("Starting game");
-            game.getScreenManager().setState(GameState::Playing);
+            this->game.getScreenManager().setState(GameState::Playing);
         })
-        .setTextSize(20)
-        .endButton()
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
         .addButton("Quit", [this, &game]() {
             spdlog::info("Quitting game");
-            game.getScreenManager().setState(GameState::Quit);
+            this->game.getScreenManager().setState(GameState::Quit);
         })
-        .setTextSize(20)
-        .endButton()
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
         .build();
 
     spdlog::info("MainMenuScreen initialized");

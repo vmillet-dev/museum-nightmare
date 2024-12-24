@@ -2,8 +2,10 @@
 
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
+#include <TGUI/Layout.hpp>
 #include "ButtonBuilder.hpp"
 #include <spdlog/spdlog.h>
+#include <map>
 
 namespace game {
 
@@ -12,6 +14,7 @@ private:
     tgui::Group::Ptr mainGroup;
     tgui::Group* currentParent;
     tgui::Gui* gui;
+    std::map<tgui::Widget::Ptr, tgui::AutoLayout> autoLayouts;
 
 public:
     GuiBuilder(tgui::Gui& gui) : gui(&gui) {
@@ -55,23 +58,64 @@ public:
         return *this;
     }
 
-    ButtonBuilder addButton(const std::string& text, const std::function<void()>& callback, const std::string& name = "") {
+    ButtonBuilder addButton(const std::string& text, const std::function<void()>& callback) {
         auto button = tgui::Button::create(text);
-        auto group = tgui::Group::create();
-        group->setSize({ "100%", "100%" });
-        group->add(button);
-        if (!name.empty()) {
-            button->setWidgetName(name);
-        }
         button->onPress(callback);
-        currentParent->add(group);
-        spdlog::debug("Added button with text: {}", text);
-        return ButtonBuilder(button, *this);
+
+        // Set default size with 16:9 ratio
+        button->setSize({"50%", "28.125%"});  // 16:9 ratio
+        currentParent->add(button);
+
+        return ButtonBuilder(button, *this).preserveAspectRatio();
+    }
+
+    GuiBuilder& setAutoLayout(tgui::AutoLayout layout) {
+        if (currentParent && !currentParent->getWidgets().empty()) {
+            auto lastWidget = currentParent->getWidgets().back();
+            autoLayouts[lastWidget] = layout;
+            updateWidgetLayout(lastWidget, layout);
+            spdlog::debug("Set AutoLayout for widget: {}", static_cast<int>(layout));
+        }
+        return *this;
     }
 
     void build() {
         gui->add(mainGroup);
         spdlog::debug("Built GUI with all widgets");
+    }
+
+private:
+    void updateWidgetLayout(tgui::Widget::Ptr widget, tgui::AutoLayout layout) {
+        switch (layout) {
+            case tgui::AutoLayout::Top:
+                widget->setPosition("0%", "0%");
+                widget->setWidth("100%");
+                spdlog::debug("Applied Top layout");
+                break;
+            case tgui::AutoLayout::Bottom:
+                widget->setPosition("0%", "100% - height");
+                widget->setWidth("100%");
+                spdlog::debug("Applied Bottom layout");
+                break;
+            case tgui::AutoLayout::Left:
+                widget->setPosition("0%", "0%");
+                widget->setHeight("100%");
+                spdlog::debug("Applied Left layout");
+                break;
+            case tgui::AutoLayout::Right:
+                widget->setPosition("100% - width", "0%");
+                widget->setHeight("100%");
+                spdlog::debug("Applied Right layout");
+                break;
+            case tgui::AutoLayout::Fill:
+                widget->setPosition("0%", "0%");
+                widget->setSize("100%", "100%");
+                spdlog::debug("Applied Fill layout");
+                break;
+            default:
+                spdlog::debug("Applied Manual layout");
+                break;
+        }
     }
 };
 

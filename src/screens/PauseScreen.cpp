@@ -1,28 +1,32 @@
 #include "PauseScreen.hpp"
 #include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
+#include "../ui/GuiBuilder.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game), m_guiBuilder(game.getGui()) {
+PauseScreen::PauseScreen(Game& game) : Screen(game) {
     spdlog::info("Initializing PauseScreen");
 
-    m_guiBuilder
-        .addVerticalLayout("mainLayout")
+    GuiBuilder(game.getGui())
+        .addVerticalLayout("pauseLayout")
         .addLabel("Paused")
+            .setAutoLayout(tgui::AutoLayout::Top)
         .addButton("Resume", [this, &game]() {
             spdlog::info("Resuming game");
-            game.getScreenManager().setState(GameState::Playing);
+            this->game.getScreenManager().setState(GameState::Playing);
         })
-        .setTextSize(20)
-        .endButton()
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
         .addButton("Main Menu", [this, &game]() {
             spdlog::info("Returning to main menu");
-            game.getScreenManager().setState(GameState::MainMenu);
+            this->game.getScreenManager().setState(GameState::MainMenu);
         })
-        .setTextSize(20)
-        .endButton()
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
         .build();
 
     spdlog::info("PauseScreen initialized");

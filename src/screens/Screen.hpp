@@ -3,8 +3,14 @@
 
 namespace game {
 
+class Game; // Forward declaration
+
 class Screen {
+protected:
+    Game& game;
+
 public:
+    Screen(Game& g) : game(g) {}
     virtual ~Screen() = default;
     virtual void update(float deltaTime) = 0;
     virtual void render(sf::RenderWindow& window) = 0;

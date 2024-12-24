@@ -1,13 +1,14 @@
 #pragma once
 #include <memory>
 #include <map>
-#include "Screen.hpp"
-#include "../core/GameState.hpp"
+#include <SFML/Graphics.hpp>
+#include "GameState.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
 class Game;  // Forward declaration
+class Screen;  // Forward declaration
 
 class ScreenManager {
 public:

@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/TGUI.hpp>
-#include "./GameState.hpp"
+#include "../screens/GameState.hpp"
 #include "../screens/ScreenManager.hpp"
 #include "../screens/MainMenuScreen.hpp"
 #include "../screens/GameScreen.hpp"

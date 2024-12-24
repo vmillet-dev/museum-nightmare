@@ -1,4 +1,5 @@
 #include "ScreenManager.hpp"
+#include "Screen.hpp"
 #include "MainMenuScreen.hpp"
 #include "GameScreen.hpp"
 #include "PauseScreen.hpp"
@@ -12,7 +13,7 @@ ScreenManager::ScreenManager(Game& game) : game(game) {
     registerScreen<GameScreen>(GameState::Playing);
     registerScreen<PauseScreen>(GameState::Paused);
 
-    currentScreen = screens[GameState::MainMenu].get(); //TODO 
+    currentScreen = screens[GameState::MainMenu].get(); //TODO
     spdlog::info("ScreenManager initialized with MainMenu screen");
 }
 
