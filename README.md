@@ -18,6 +18,8 @@ sudo apt-get update && sudo apt-get install -y \
     build-essential \
     cmake \
     libx11-dev \
+    libxrandr-dev \
+    libxcursor-dev \
     libgl1-mesa-dev \
     libudev-dev \
     libopenal-dev \

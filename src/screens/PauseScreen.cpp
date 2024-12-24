@@ -1,92 +1,57 @@
 #include "PauseScreen.hpp"
 #include "MainMenuScreen.hpp"
 #include "../core/Game.hpp"
+#include "../ui/GuiBuilder.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-PauseScreen::PauseScreen(Game& game) : game(game) {
-    spdlog::info("Initializing pause screen");
+PauseScreen::PauseScreen(Game& game) : Screen(game) {
+    spdlog::info("Initializing PauseScreen");
 
-    // Create resume button
-    resumeButton = std::make_unique<Button>(
-        "Resume",
-        sf::Vector2f(400, 250),
-        sf::Vector2f(200, 50)
-    );
+    GuiBuilder(game.getGui())
+        .addVerticalLayout("pauseLayout")
+        .addLabel("Paused")
+            .setAutoLayout(tgui::AutoLayout::Top)
+        .addButton("Resume", [this, &game]() {
+            spdlog::info("Resuming game");
+            this->game.getScreenManager().setState(GameState::Playing);
+        })
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
+        .addButton("Main Menu", [this, &game]() {
+            spdlog::info("Returning to main menu");
+            this->game.getScreenManager().setState(GameState::MainMenu);
+        })
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
+        .build();
 
-    // Create main menu button
-    mainMenuButton = std::make_unique<Button>(
-        "Main Menu",
-        sf::Vector2f(400, 350),
-        sf::Vector2f(200, 50)
-    );
+    spdlog::info("PauseScreen initialized");
+}
 
-    // Load font
-    if (!font.loadFromFile("assets/arial.ttf")) {
-        spdlog::error("Failed to load font!");
-    }
+void PauseScreen::handleInput(Game& game) {
+    // Input handling is now managed by TGUI
+}
 
-    // Create pause text
-    pauseText.setFont(font);
-    pauseText.setString("Paused");
-    pauseText.setCharacterSize(50);
-    pauseText.setFillColor(sf::Color::White);
-
-    // Center the pause text
-    sf::FloatRect textBounds = pauseText.getLocalBounds();
-    pauseText.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    pauseText.setPosition(400, 150);
-
-    // Add buttons to vector and set initial selection
-    buttons.push_back(std::move(resumeButton));
-    buttons.push_back(std::move(mainMenuButton));
-    buttons[selectedButtonIndex]->setSelected(true);
+void PauseScreen::handleEvent(const sf::Event& event) {
+    game.getGui().handleEvent(event);
 }
 
 void PauseScreen::update(float deltaTime) {
-    auto& inputManager = game.getInputManager();
-
-    // Handle button navigation
-    if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-    }
-    if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-    }
-
-    // Update all buttons with input manager
-    for (auto& button : buttons) {
-        button->update(inputManager);
-    }
-
-    // Handle button clicks
-    if (buttons[0]->isClicked()) {  // Resume button
-        spdlog::info("Resuming game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
-
-    if (buttons[1]->isClicked()) {  // Main Menu button
-        spdlog::info("Returning to main menu");
-        game.getScreenManager().setState(GameState::MainMenu);
-    }
+    // No update logic needed as input handling is done by TGUI
 }
 
 void PauseScreen::render(sf::RenderWindow& window) {
     // Draw semi-transparent background
-    sf::RectangleShape overlay(sf::Vector2f(800, 600));
+    sf::RectangleShape overlay(sf::Vector2f(window.getSize().x, window.getSize().y));
     overlay.setFillColor(sf::Color(0, 0, 0, 128));
     window.draw(overlay);
 
-    // Draw pause menu elements
-    window.draw(pauseText);
-    for (auto& button : buttons) {
-        button->render(window);
-    }
+    spdlog::debug("PauseScreen rendering - Window size: {}x{}",
+        window.getSize().x, window.getSize().y);
 }
 
 } // namespace game

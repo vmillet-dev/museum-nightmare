@@ -22,19 +22,26 @@ include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" FALSE)
+option(BUILD_TESTS "Build test executables" ON)
 
 # Add source files
 file(GLOB_RECURSE SOURCES
     "src/*.cpp"
 )
 
-# Remove main.cpp from sources
+# Remove main.cpp and test files from sources
 list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX ".*tests/.*\\.cpp$")
 
-# Create executable
+# Create main executable
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cpp)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_DEPENDENCIES})
+
+# Build tests if enabled
+if(BUILD_TESTS)
+    add_executable(test_window src/tests/TestWindow.cpp)
+    target_link_libraries(test_window PRIVATE ${PROJECT_DEPENDENCIES})
+endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/compiler_flags.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/InstallAndPackage.cmake)
@@ -43,4 +50,8 @@ include(${CMAKE_SOURCE_DIR}/cmake/InstallAndPackage.cmake)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets/)
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/copy_dlls.cmake)
+endif()
+
+if(BUILD_TESTS)
+    add_custom_command(TARGET test_window POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets/)
 endif()

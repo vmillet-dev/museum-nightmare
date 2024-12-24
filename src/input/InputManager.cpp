@@ -66,8 +66,8 @@ void InputManager::handleEvent(const sf::Event& event) {
     }
 }
 
-bool InputManager::isActionPressed(Action action) {
-    for (auto& device : devices) {
+bool InputManager::isActionPressed(Action action) const {
+    for (const auto& device : devices) {
         if (device->isActionPressed(action)) {
             return true;
         }
@@ -75,8 +75,8 @@ bool InputManager::isActionPressed(Action action) {
     return false;
 }
 
-bool InputManager::isActionJustPressed(Action action) {
-    for (auto& device : devices) {
+bool InputManager::isActionJustPressed(Action action) const {
+    for (const auto& device : devices) {
         if (device->isActionJustPressed(action)) {
             spdlog::debug("Action {} just pressed on {}", ActionUtil::toString(action), typeid(*device).name());
             return true;
@@ -85,8 +85,8 @@ bool InputManager::isActionJustPressed(Action action) {
     return false;
 }
 
-bool InputManager::isActionReleased(Action action) {
-    for (auto& device : devices) {
+bool InputManager::isActionReleased(Action action) const {
+    for (const auto& device : devices) {
         if (device->isActionReleased(action)) {
             spdlog::debug("Action {} released on {}", ActionUtil::toString(action), typeid(*device).name());
             return true;

@@ -48,6 +48,11 @@ void ConfigManager::createDefaultConfig() {
         {"debug", toml::table{
             {"level", "info"}
         }},
+        {"controller", toml::table{
+            {"enabled", true},
+            {"deadzone", 20.0f},
+            {"sensitivity", 100.0f}
+        }},
         {"actions", toml::table{
             {"MoveUp", toml::table{
                 {"keyboard", toml::array{"Z", "Up"}},
@@ -68,10 +73,26 @@ void ConfigManager::createDefaultConfig() {
                 {"keyboard", toml::array{"D", "Right"}},
                 {"mouse", toml::array{}},
                 {"controller", toml::array{"LeftStickRight"}}
+            }},
+            {"Confirm", toml::table{
+                {"keyboard", toml::array{"Return", "Space"}},
+                {"mouse", toml::array{"Left"}},
+                {"controller", toml::array{"A"}}
+            }},
+            {"Cancel", toml::table{
+                {"keyboard", toml::array{"Escape"}},
+                {"mouse", toml::array{"Right"}},
+                {"controller", toml::array{"B"}}
+            }},
+            {"Pause", toml::table{
+                {"keyboard", toml::array{"Escape"}},
+                {"mouse", toml::array{}},
+                {"controller", toml::array{"Start"}}
             }}
         }}
     };
     saveConfig();
+    spdlog::debug("Created default config with controller bindings: Confirm -> A, Cancel -> B, Pause -> Start");
 }
 
 void ConfigManager::saveConfig() {

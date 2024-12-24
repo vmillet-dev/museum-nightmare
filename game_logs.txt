@@ -1,0 +1,5 @@
+[2024-12-22 20:17:23.391] [game_logger] [info] Starting game application 
+[2024-12-22 20:17:23.392] [game_logger] [info] Initializing game...
+[2024-12-22 20:17:23.392] [game_logger] [debug] Input config: KB(ZQSD), Ctrl(false)
+[2024-12-22 20:17:23.392] [game_logger] [info] Config loaded
+Failed to open X11 display; make sure the DISPLAY environment variable is set correctly

@@ -1,56 +1,52 @@
 #include "MainMenuScreen.hpp"
 #include "GameScreen.hpp"
 #include "../core/Game.hpp"
+#include "../ui/GuiBuilder.hpp"
 #include <spdlog/spdlog.h>
 
 namespace game {
 
-MainMenuScreen::MainMenuScreen(Game& game) : game(game), selectedButtonIndex(0) {
-    buttons.push_back(std::make_unique<Button>("Play", sf::Vector2f(300, 200), sf::Vector2f(200, 50)));
-    buttons.push_back(std::make_unique<Button>("Quit", sf::Vector2f(300, 300), sf::Vector2f(200, 50)));
-    // Set initial button selection
-    buttons[selectedButtonIndex]->setSelected(true);
+MainMenuScreen::MainMenuScreen(Game& game) : Screen(game) {
+    spdlog::info("Initializing MainMenuScreen");
+
+    GuiBuilder(game.getGui())
+        .addVerticalLayout("mainLayout")
+        .addLabel("Museum Nightmare")
+            .setAutoLayout(tgui::AutoLayout::Top)
+        .addButton("Play", [this, &game]() {
+            spdlog::info("Starting game");
+            this->game.getScreenManager().setState(GameState::Playing);
+        })
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
+        .addButton("Quit", [this, &game]() {
+            spdlog::info("Quitting game");
+            this->game.getScreenManager().setState(GameState::Quit);
+        })
+            .preserveAspectRatio(16.0f/9.0f)
+            .setAutoLayout(tgui::AutoLayout::Fill)
+            .endButton()
+        .build();
+
+    spdlog::info("MainMenuScreen initialized");
+}
+
+void MainMenuScreen::handleInput(Game& game) {
+    // Input handling is now managed by TGUI
+}
+
+void MainMenuScreen::handleEvent(const sf::Event& event) {
+    game.getGui().handleEvent(event);
 }
 
 void MainMenuScreen::update(float deltaTime) {
-    auto& inputManager = game.getInputManager();
-
-    // Handle button navigation
-    if (inputManager.isActionJustPressed(Action::MoveDown)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex + 1) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
-    }
-    if (inputManager.isActionJustPressed(Action::MoveUp)) {
-        buttons[selectedButtonIndex]->setSelected(false);
-        selectedButtonIndex = (selectedButtonIndex - 1 + buttons.size()) % buttons.size();
-        buttons[selectedButtonIndex]->setSelected(true);
-        spdlog::debug("Main menu: Selected button {}", selectedButtonIndex);
-    }
-
-    // Update all buttons with input manager
-    for (auto& button : buttons) {
-        button->update(inputManager);
-    }
-
-    // Play button clicked
-    if (buttons[0]->isClicked()) {
-        spdlog::info("Starting game");
-        game.getScreenManager().setState(GameState::Playing);
-    }
-
-    // Quit button clicked
-    if (buttons[1]->isClicked()) {
-        spdlog::info("Quitting game");
-        game.getScreenManager().setState(GameState::Quit);
-    }
+    // No update logic needed as input handling is done by TGUI
 }
 
 void MainMenuScreen::render(sf::RenderWindow& window) {
-    for (auto& button : buttons) {
-        button->render(window);
-    }
+    spdlog::debug("MainMenu rendering - Window size: {}x{}",
+        window.getSize().x, window.getSize().y);
 }
 
 } // namespace game
