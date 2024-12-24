@@ -18,7 +18,8 @@ private:
 public:
     ButtonBuilder(tgui::Button::Ptr btn, GuiBuilder& p)
         : button(btn), parent(p), aspectRatio(0.0f), currentLayout(tgui::AutoLayout::Manual) {
-        button->setSize({ "50%", "35%" });
+        // Set initial size with absolute values to avoid division by zero in aspect ratio calculation
+        button->setSize({400.f, 225.f});  // Default 16:9 ratio with reasonable size
         setHorizontalAlignment(tgui::HorizontalAlignment::Center);
         setTextSize(20);
         spdlog::debug("Initialized ButtonBuilder with default settings");
@@ -80,7 +81,17 @@ public:
     }
 
     ButtonBuilder& preserveAspectRatio(float ratio = 0.0f) {
-        aspectRatio = (ratio > 0.0f) ? ratio : button->getSize().x / button->getSize().y;
+        if (ratio > 0.0f) {
+            aspectRatio = ratio;
+        } else {
+            tgui::Vector2f size = button->getSize();
+            if (size.y > 0) {
+                aspectRatio = size.x / size.y;
+            } else {
+                aspectRatio = 16.0f / 9.0f;  // Default to 16:9 if calculation fails
+            }
+        }
+        spdlog::debug("Button aspect ratio set to: {}", aspectRatio);
         button->onSizeChange([this](tgui::Vector2f newSize) {
             if (aspectRatio > 0) {
                 float height = newSize.x / aspectRatio;
@@ -88,7 +99,6 @@ public:
                 spdlog::debug("Button size adjusted to maintain aspect ratio: {}:{}", newSize.x, height);
             }
         });
-        spdlog::debug("Button aspect ratio set to: {}", aspectRatio);
         return *this;
     }
 
