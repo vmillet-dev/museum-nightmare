@@ -8,9 +8,9 @@ namespace game {
 
 Player::Player(float x, float y, Game& game)
     : Actor(x, y, std::make_unique<PlayerInputProvider>(game.getInputManager()), 200.0f) {
-    shape.setSize(sf::Vector2f(Constants::Physics::ACTOR_SIZE * 2, Constants::Physics::ACTOR_SIZE * 2));
+    shape.setSize({ Constants::Physics::ACTOR_SIZE * 2, Constants::Physics::ACTOR_SIZE * 2 });
     shape.setFillColor(sf::Color::Green);
-    shape.setOrigin(Constants::Physics::ACTOR_SIZE, Constants::Physics::ACTOR_SIZE);
+    shape.setOrigin({ Constants::Physics::ACTOR_SIZE, Constants::Physics::ACTOR_SIZE });
     shape.setPosition(position);
     spdlog::info("Player created at position ({}, {})", x, y);
 }

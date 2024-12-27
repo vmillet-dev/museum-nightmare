@@ -95,13 +95,18 @@ bool ControllerDevice::isActionReleased(Action action) {
 }
 
 void ControllerDevice::handleEvent(const sf::Event& event) {
-    if ((event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::JoystickButtonReleased) &&
-        event.joystickButton.joystickId == controllerId) {
-        setState(event.joystickButton.button, event.type == sf::Event::JoystickButtonPressed);
-    }
-
-    if (event.type == sf::Event::JoystickMoved && event.joystickMove.joystickId == controllerId) {
-        setAxisState(event.joystickMove.axis, event.joystickMove.position);
+    if (const auto* buttonPressed = event.getIf<sf::Event::JoystickButtonPressed>()) {
+        if (buttonPressed->joystickId == controllerId) {
+            setState(buttonPressed->button, true);
+        }
+    } else if (const auto* buttonReleased = event.getIf<sf::Event::JoystickButtonReleased>()) {
+        if (buttonReleased->joystickId == controllerId) {
+            setState(buttonReleased->button, false);
+        }
+    } else if (const auto* axisMoved = event.getIf<sf::Event::JoystickMoved>()) {
+        if (axisMoved->joystickId == controllerId) {
+            setAxisState(axisMoved->axis, axisMoved->position);
+        }
     }
 }
 
@@ -109,16 +114,23 @@ void ControllerDevice::setAxisBinding(std::string axis, Action action) {
     axisBindings[axis] = action;
 }
 
-void ControllerDevice::setAxisState(unsigned int axisId, float position) {
-    std::string axis = std::string(position > 0 ? "+" : "-") + std::to_string(axisId);
+void ControllerDevice::setAxisState(sf::Joystick::Axis axis, float position) {
+    std::string axisStr = std::string(position > 0 ? "+" : "-") + std::to_string(static_cast<int>(axis));
 
     auto absPosition = std::abs(position) > deadzone;
-    if (axisBindings.count(axis) != 0 && axisStates[axis].current != absPosition) {
-        spdlog::debug("Controller {}: Axis {} moved to position {} ({})", controllerId, axisId, position, axis);
+    if (axisBindings.count(axisStr) != 0 && axisStates[axisStr].current != absPosition) {
+        spdlog::debug("Controller {}: Axis {} moved to position {}", controllerId, static_cast<int>(axis), position);
 
-        auto& state = axisStates[axis];
+        auto& state = axisStates[axisStr];
         state.previous = state.current;
         state.current = absPosition;
+
+        if (axisBindings.count(axisStr) != 0) {
+            // Convert axis to a unique key space separate from button IDs
+            // Use high bits to ensure no overlap with button IDs
+            unsigned int axisKey = 0x10000 | static_cast<unsigned int>(axis);
+            setState(axisKey, absPosition);
+        }
     }
 }
 

@@ -35,7 +35,7 @@ void KeyboardDevice::loadBinding() {
             }
 
             sf::Keyboard::Key sfKey = mapper.stringToKey(keyName);
-            if (sfKey == sf::Keyboard::Unknown) {
+            if (sfKey == sf::Keyboard::Key::Unknown) {
                 spdlog::warn("Unknown key name for action {}: {}", actionStr, keyName);
                 continue;
             }
@@ -48,8 +48,10 @@ void KeyboardDevice::loadBinding() {
 }
 
 void KeyboardDevice::handleEvent(const sf::Event& event) {
-    if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
-        setState(event.key.code, event.type == sf::Event::KeyPressed);
+    if (const auto* keyPressed = event.getIf<sf::Event::KeyPressed>()) {
+        setDigitalState(keyPressed->code, true);
+    } else if (const auto* keyReleased = event.getIf<sf::Event::KeyReleased>()) {
+        setDigitalState(keyReleased->code, false);
     }
 }
 

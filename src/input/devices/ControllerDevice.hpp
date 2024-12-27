@@ -26,7 +26,7 @@ private:
     unsigned int controllerId = 0;
 
     void setAxisBinding(std::string axis, Action action);
-    void setAxisState(unsigned int axis, float position);
+    void setAxisState(sf::Joystick::Axis axis, float position);
 };
 
 } // namespace game

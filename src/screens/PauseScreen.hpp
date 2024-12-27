@@ -20,12 +20,12 @@ public:
     void render(sf::RenderWindow& window) override;
 
 private:
+    Game& game;
+    sf::Font font;  // Font must be declared before Text that uses it
+    std::unique_ptr<sf::Text> pauseText;
     std::vector<std::unique_ptr<Button>> buttons;
     std::unique_ptr<Button> resumeButton;
     std::unique_ptr<Button> mainMenuButton;
-    sf::Font font;
-    sf::Text pauseText;
-    Game& game;
     size_t selectedButtonIndex{0};  // Track currently selected button
 };
 

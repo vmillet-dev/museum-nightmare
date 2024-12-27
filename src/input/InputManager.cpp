@@ -53,11 +53,11 @@ void InputManager::removeControllerDevice(unsigned int controllerId) {
 }
 
 void InputManager::handleEvent(const sf::Event& event) {
-    if (event.type == sf::Event::JoystickConnected) {
-        createControllerDevice(event.joystickConnect.joystickId);
+    if (const auto* connected = event.getIf<sf::Event::JoystickConnected>()) {
+        createControllerDevice(connected->joystickId);
     }
-    else if (event.type == sf::Event::JoystickDisconnected) {
-        removeControllerDevice(event.joystickConnect.joystickId);
+    else if (const auto* disconnected = event.getIf<sf::Event::JoystickDisconnected>()) {
+        removeControllerDevice(disconnected->joystickId);
     }
 
     // Forward events to all devices

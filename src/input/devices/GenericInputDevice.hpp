@@ -18,7 +18,7 @@ public:
 
     bool isActionPressed(Action action) override {
         for (const auto& binding : bindings) {
-            if (binding.second == action && states[binding.first].current) {
+            if (binding.second == action && states[binding.first].isPressed()) {
                 return true;
             }
         }
@@ -28,7 +28,7 @@ public:
     bool isActionJustPressed(Action action) override {
         for (const auto& binding : bindings) {
             const auto& state = states[binding.first];
-            if (binding.second == action && state.current != state.previous && state.current) {
+            if (binding.second == action && !state.wasPressed() && state.isPressed()) {
                 return true;
             }
         }
@@ -38,7 +38,7 @@ public:
     bool isActionReleased(Action action) override {
         for (const auto& binding : bindings) {
             const auto& state = states[binding.first];
-            if (binding.second == action && state.current != state.previous && !state.current) {
+            if (binding.second == action && state.wasPressed() && !state.isPressed()) {
                 return true;
             }
         }
@@ -57,12 +57,17 @@ protected:
         return bindings.count(key) > 0;
     }
 
-    void setState(KeyType key, bool pressed) {
+    void setState(KeyType key, float value) {
         if (hasBinding(key)) {
             auto& state = states[key];
             state.previous = state.current;
-            state.current = pressed;
+            state.current = value;
         }
+    }
+
+    // Convenience method for digital inputs
+    void setDigitalState(KeyType key, bool pressed) {
+        setState(key, pressed ? 1.0f : 0.0f);
     }
 
     void clearBindingsMap() { bindings.clear(); }

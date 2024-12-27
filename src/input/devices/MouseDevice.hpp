@@ -13,7 +13,7 @@ public:
     sf::Vector2i getMousePosition() const;
 
 private:
-    void setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed);
+    void setButtonState(const sf::Mouse::Button& button, bool pressed);
 
     sf::RenderWindow& window;
     sf::Vector2i lastMousePos;
