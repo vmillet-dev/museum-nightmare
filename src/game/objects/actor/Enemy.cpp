@@ -6,10 +6,10 @@ namespace game {
 
 Enemy::Enemy(float x, float y)
     : Actor(x, y, std::make_unique<RandomAIInputProvider>(), 150.0f) {
-    shape.setSize(sf::Vector2f(Constants::Physics::ACTOR_SIZE * 2, Constants::Physics::ACTOR_SIZE * 2));
+    shape.setSize({ Constants::Physics::ACTOR_SIZE * 2, Constants::Physics::ACTOR_SIZE * 2 });
     shape.setFillColor(sf::Color::Red);
-    shape.setOrigin(Constants::Physics::ACTOR_SIZE, Constants::Physics::ACTOR_SIZE);
-    shape.setPosition(x, y);
+    shape.setOrigin({ Constants::Physics::ACTOR_SIZE, Constants::Physics::ACTOR_SIZE });
+    shape.setPosition({ x, y });
     spdlog::info("Enemy created at position ({}, {})", x, y);
 }
 

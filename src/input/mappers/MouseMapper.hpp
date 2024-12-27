@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <string>
 #include <mutex>
+#include <optional>
 #include "../../core/containers/bimap.hpp"
 
 namespace game {
@@ -9,7 +10,7 @@ namespace game {
 class MouseMapper {
 public:
     MouseMapper();
-    sf::Mouse::Button stringToButton(const std::string& buttonStr);
+    std::optional<sf::Mouse::Button> stringToButton(const std::string& buttonStr);
     std::string buttonToString(sf::Mouse::Button button);
 
 private:

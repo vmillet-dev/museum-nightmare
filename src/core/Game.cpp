@@ -7,7 +7,8 @@
 namespace game {
 
 Game::Game() : window(
-    sf::VideoMode(ConfigManager::getInstance().getWindowWidth(),ConfigManager::getInstance().getWindowHeight()),
+    sf::VideoMode({static_cast<unsigned int>(ConfigManager::getInstance().getWindowWidth()), 
+                           static_cast<unsigned int>(ConfigManager::getInstance().getWindowHeight())}),
     ConfigManager::getInstance().getWindowTitle()
 ) {
     sf::err().rdbuf(nullptr);  // Disable SFML error output
@@ -26,7 +27,7 @@ void Game::run() {
 
 void Game::handleEvent(const sf::Event& event) {
     // Handle window close
-    if (event.type == sf::Event::Closed) {
+    if (event.is<sf::Event::Closed>()) {
         spdlog::info("Window close requested");
         quit();
         return;
@@ -37,9 +38,8 @@ void Game::handleEvent(const sf::Event& event) {
 }
 
 void Game::handleEvents() {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-        handleEvent(event);
+    while (const std::optional<sf::Event> event = window.pollEvent()) {
+        handleEvent(*event);
     }
 }
 

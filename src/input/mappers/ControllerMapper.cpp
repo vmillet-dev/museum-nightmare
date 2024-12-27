@@ -24,14 +24,14 @@ void ControllerMapper::initializeMap() {
     buttonMap.insert(9, "RightStick");
 
     // Initialize axis mappings
-    axisMap.insert(sf::Joystick::X, "LeftStickX");
-    axisMap.insert(sf::Joystick::Y, "LeftStickY");
-    axisMap.insert(sf::Joystick::U, "RightStickX");
-    axisMap.insert(sf::Joystick::V, "RightStickY");
-    axisMap.insert(sf::Joystick::PovX, "DPadX");
-    axisMap.insert(sf::Joystick::PovY, "DPadY");
-    axisMap.insert(sf::Joystick::Z, "LeftTrigger");
-    axisMap.insert(sf::Joystick::R, "RightTrigger");
+    axisMap.insert(sf::Joystick::Axis::X, "LeftStickX");
+    axisMap.insert(sf::Joystick::Axis::Y, "LeftStickY");
+    axisMap.insert(sf::Joystick::Axis::U, "RightStickX");
+    axisMap.insert(sf::Joystick::Axis::V, "RightStickY");
+    axisMap.insert(sf::Joystick::Axis::PovX, "DPadX");
+    axisMap.insert(sf::Joystick::Axis::PovY, "DPadY");
+    axisMap.insert(sf::Joystick::Axis::Z, "LeftTrigger");
+    axisMap.insert(sf::Joystick::Axis::R, "RightTrigger");
 }
 
 unsigned int ControllerMapper::stringToButtonId(const std::string& name) {
@@ -44,11 +44,11 @@ unsigned int ControllerMapper::stringToButtonId(const std::string& name) {
 
 std::string ControllerMapper::stringToAxisKey(const std::string& name)
 {
-    unsigned int axisId = mapAxisId(name);
-    return (isAxisPositive(name) ? "+" : "-") + std::to_string(axisId);
+    sf::Joystick::Axis axis = mapAxisId(name);
+    return (isAxisPositive(name) ? "+" : "-") + std::to_string(static_cast<int>(axis));
 }
 
-unsigned int ControllerMapper::mapAxisId(const std::string& name) {
+sf::Joystick::Axis ControllerMapper::mapAxisId(const std::string& name) {
     std::string result;
 
     static const std::unordered_map<std::string, std::string> suffixMap = {

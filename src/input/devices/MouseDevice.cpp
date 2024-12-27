@@ -33,13 +33,13 @@ void MouseDevice::loadBinding() {
                 continue;
             }
 
-            auto sfButton = mapper.stringToButton(buttonName);
-            if (sfButton == sf::Mouse::Button::ButtonCount) {
+            auto sfButtonOpt = mapper.stringToButton(buttonName);
+            if (!sfButtonOpt.has_value()) {
                 spdlog::warn("Unknown mouse button name for action {}: {}", actionStr, buttonName);
                 continue;
             }
 
-            setBinding(sfButton, action);
+            setBinding(sfButtonOpt.value(), action);
             spdlog::debug("Set mouse binding: {} -> {}", buttonName, ActionUtil::toString(action));
         }
     }
@@ -47,8 +47,10 @@ void MouseDevice::loadBinding() {
 }
 
 void MouseDevice::handleEvent(const sf::Event& event) {
-    if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::MouseButtonReleased) {
-        setButtonState(event.mouseButton, event.type == sf::Event::MouseButtonPressed);
+    if (const auto* buttonPressed = event.getIf<sf::Event::MouseButtonPressed>()) {
+        setButtonState(buttonPressed->button, true);
+    } else if (const auto* buttonReleased = event.getIf<sf::Event::MouseButtonReleased>()) {
+        setButtonState(buttonReleased->button, false);
     }
 }
 
@@ -56,9 +58,10 @@ sf::Vector2i MouseDevice::getMousePosition() const {
     return lastMousePos;
 }
 
-void MouseDevice::setButtonState(sf::Event::MouseButtonEvent buttonEvent, bool pressed) {
-    spdlog::debug("Mouse Button {} at position ({}, {})", pressed ? "Pressed" : "Released", buttonEvent.x, buttonEvent.y);
-    setState(buttonEvent.button, pressed);
+void MouseDevice::setButtonState(const sf::Mouse::Button& button, bool pressed) {
+    auto mousePos = sf::Mouse::getPosition(window);
+    spdlog::debug("Mouse Button {} at position ({}, {})", pressed ? "Pressed" : "Released", mousePos.x, mousePos.y);
+    setDigitalState(button, pressed);
 }
 
 } // namespace game

@@ -7,18 +7,18 @@ MouseMapper::MouseMapper() {
 }
 
 void MouseMapper::initializeButtonMap() {
-    buttonMap.insert(sf::Mouse::Left, "LeftButton");
-    buttonMap.insert(sf::Mouse::Right, "RightButton");
-    buttonMap.insert(sf::Mouse::Middle, "MiddleButton");
-    buttonMap.insert(sf::Mouse::XButton1, "x1");
-    buttonMap.insert(sf::Mouse::XButton2, "x2");
+    buttonMap.insert(sf::Mouse::Button::Left, "LeftButton");
+    buttonMap.insert(sf::Mouse::Button::Right, "RightButton");
+    buttonMap.insert(sf::Mouse::Button::Middle, "MiddleButton");
+    buttonMap.insert(sf::Mouse::Button::Extra1, "x1");
+    buttonMap.insert(sf::Mouse::Button::Extra2, "x2");
 }
 
-sf::Mouse::Button MouseMapper::stringToButton(const std::string& buttonStr) {
+std::optional<sf::Mouse::Button> MouseMapper::stringToButton(const std::string& buttonStr) {
     try {
         return buttonMap.get_right(buttonStr);
     } catch (const std::out_of_range&) {
-        return sf::Mouse::ButtonCount;  // Return an invalid button if not found
+        return std::nullopt;  // Return nullopt for invalid buttons
     }
 }
 

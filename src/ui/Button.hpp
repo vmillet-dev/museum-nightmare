@@ -18,9 +18,9 @@ public:
 private:
     bool isMouseOver(const sf::Vector2f& mousePos) const;
 
+    sf::Font font;  // Font must be declared before Text that uses it
+    std::unique_ptr<sf::Text> text;
     sf::RectangleShape shape;
-    sf::Text text;
-    sf::Font font;
     bool isHovered;
     bool clicked;
     bool wasPressed;  // Track previous frame's press state

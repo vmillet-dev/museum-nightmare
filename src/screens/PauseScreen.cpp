@@ -8,6 +8,15 @@ namespace game {
 PauseScreen::PauseScreen(Game& game) : game(game) {
     spdlog::info("Initializing pause screen");
 
+    // Load font first
+    if (!font.openFromFile("assets/arial.ttf")) {
+        spdlog::error("Failed to load font!");
+    }
+
+    // Create pause text with font after loading
+    pauseText = std::make_unique<sf::Text>(font, "Paused", 50);
+    pauseText->setFillColor(sf::Color::White);
+
     // Create resume button
     resumeButton = std::make_unique<Button>(
         "Resume",
@@ -22,21 +31,10 @@ PauseScreen::PauseScreen(Game& game) : game(game) {
         sf::Vector2f(200, 50)
     );
 
-    // Load font
-    if (!font.loadFromFile("assets/arial.ttf")) {
-        spdlog::error("Failed to load font!");
-    }
-
-    // Create pause text
-    pauseText.setFont(font);
-    pauseText.setString("Paused");
-    pauseText.setCharacterSize(50);
-    pauseText.setFillColor(sf::Color::White);
-
     // Center the pause text
-    sf::FloatRect textBounds = pauseText.getLocalBounds();
-    pauseText.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    pauseText.setPosition(400, 150);
+    sf::FloatRect textBounds = pauseText->getLocalBounds();
+    pauseText->setOrigin(sf::Vector2f(textBounds.size.x / 2.f, textBounds.size.y / 2.f));
+    pauseText->setPosition({ 400, 150 });
 
     // Add buttons to vector and set initial selection
     buttons.push_back(std::move(resumeButton));
@@ -83,7 +81,7 @@ void PauseScreen::render(sf::RenderWindow& window) {
     window.draw(overlay);
 
     // Draw pause menu elements
-    window.draw(pauseText);
+    window.draw(*pauseText);
     for (auto& button : buttons) {
         button->render(window);
     }

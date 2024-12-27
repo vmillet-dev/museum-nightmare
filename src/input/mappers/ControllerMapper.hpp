@@ -20,10 +20,10 @@ private:
     ControllerMapper& operator=(const ControllerMapper&) = delete;
 
     Bimap<unsigned int, std::string> buttonMap;
-    Bimap<unsigned int, std::string> axisMap;
+    Bimap<sf::Joystick::Axis, std::string> axisMap;
 
     void initializeMap();
-    unsigned int mapAxisId(const std::string& name);
+    sf::Joystick::Axis mapAxisId(const std::string& name);
     bool isAxisPositive(const std::string& name);
 };
 

@@ -6,9 +6,9 @@ namespace game {
 
 Wall::Wall(float x, float y, float width, float height)
     : GameObject(x, y), width(width), height(height) {
-    shape.setSize(sf::Vector2f(width, height));
+    shape.setSize({ width, height });
     shape.setFillColor(sf::Color(128, 128, 128));  // Gray color
-    shape.setOrigin(width / 2, height / 2);
+    shape.setOrigin({ width / 2, height / 2 });
     shape.setPosition(position);
     spdlog::debug("Wall created: pos({:.1f},{:.1f}) size({:.1f},{:.1f})", x, y, width, height);
 }

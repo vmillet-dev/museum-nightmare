@@ -5,8 +5,12 @@
 namespace game {
 
 struct ActionState {
-    bool current;
-    bool previous;
+    float current = 0.0f;
+    float previous = 0.0f;
+
+    // Helper functions to maintain backward compatibility
+    bool isPressed() const { return current > 0.5f; }
+    bool wasPressed() const { return previous > 0.5f; }
 };
 
 class InputDevice {
