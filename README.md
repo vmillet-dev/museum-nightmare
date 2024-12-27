@@ -18,6 +18,7 @@ sudo apt-get update && sudo apt-get install -y \
     build-essential \
     cmake \
     libx11-dev \
+    libxi-dev \
     libgl1-mesa-dev \
     libudev-dev \
     libopenal-dev \
@@ -64,7 +65,7 @@ After building, you can run the game from the build directory:
 
 The project uses CMake for build configuration and depends on the following libraries (automatically fetched during build):
 
-- SFML 2.6.2: Graphics, window management, and input handling
+- SFML 3.0.0: Graphics, window management, and input handling
 - toml++ 3.4.0: Configuration file parsing
 - spdlog 1.12.0: Logging system
 
